@@ -1,0 +1,40 @@
+<%- model_class = Unit -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Unit %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_unit_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@units_grid) do |g|
+    g.column name: model_class.human_attribute_name(:no), attribute: 'no'
+
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:short_name), attribute: 'short_name'
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+
+    g.column name: model_class.human_attribute_name(:tcbd_khdh), attribute: 'tcbd_khdh'
+
+    g.column name: model_class.human_attribute_name(:level), attribute: 'level',custom_filter: Unit::UNIT_LEVEL.invert do |unit| 
+      unit.level
+    end
+    
+    g.column name: model_class.human_attribute_name(:parent_id), attribute: 'parent_id' ,custom_filter: Unit.accessible_by(current_ability).map{|u| [u.name,u.id]} do |unit|
+        unit.parent_id.blank? ? "" : Unit.find_by(id:unit.parent_id).name
+    end
+
+    
+    g.column do |unit|
+      ActiveSupport::SafeBuffer.new << 
+        (link_to t('.edit', :default => t("helpers.links.edit")), edit_unit_path(unit), :class => 'btn btn-xs btn-primary' if can? :update, unit) << ' ' <<
+        (link_to t('.destroy', :default => t("helpers.links.destroy")), unit_path(unit), :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, unit) << ' ' <<
+        (link_to t('.users', :default => t("helpers.links.users")), unit_users_path(unit), :class => 'btn btn-xs btn-info' if can? :user, unit) 
+    end
+  end 
+%>

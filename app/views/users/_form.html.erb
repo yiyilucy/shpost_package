@@ -1,0 +1,74 @@
+<%= form_for @user, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.error_messages %>
+  <% if can? :role, @user %>
+    <div class="control-group">
+      <%= f.label :username, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :username, :class => 'text_field' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :name, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :name, :class => 'text_field' %>
+      </div>
+    </div>
+  <% else %>
+    <dl class="dl-horizontal">
+      <dt><strong><%= f.label :username%></strong></dt>
+      <dd><%= @user.username %></dd>
+    </dl>
+    <dl class="dl-horizontal">
+      <dt><strong><%= f.label :name%></strong></dt>
+      <dd><%= @user.name %></dd>
+    </dl>
+  <% end %>
+  
+  <div class="control-group">
+    <%= f.label :password, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.password_field :password, :class => 'text_field' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :email, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :email, :class => 'text_field' %>
+    </div>
+  </div>
+
+
+  <% if can? :role, @user %>
+    <div class="control-group">
+      <%= f.label :unit_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select(:unit_id, Unit.accessible_by(current_ability).map{|u| [u.name,u.id]})%>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :role, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select(:role, User::ROLE.invert.select{|k, v| (can? :role, v.to_sym)}) %>
+      </div>
+    </div>
+  <% else %>
+    <dl class="dl-horizontal">
+      <dt><strong><%= f.label :unit_id%></strong></dt>
+      <dd><%= @user.unit.try :name %></dd>
+    </dl>
+
+    <dl class="dl-horizontal">
+      <dt><strong><%= f.label :role%></strong></dt>
+      <dd><%= @user.rolename %></dd>
+    </dl>
+  <% end %>
+
+  <div class="form-actions">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <% if can? :index, User%>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                users_path, :class => 'btn' %>
+    <% end %>
+  </div>
+<% end %>

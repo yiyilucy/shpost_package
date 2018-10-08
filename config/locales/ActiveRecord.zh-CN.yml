@@ -1,0 +1,391 @@
+zh-CN:
+  title: "上海邮政包裹查询系统"
+  welcome: "欢迎登陆"
+  date:
+    abbr_day_names:
+    - 日
+    - 一
+    - 二
+    - 三
+    - 四
+    - 五
+    - 六
+    abbr_month_names:
+    -
+    - 1月
+    - 2月
+    - 3月
+    - 4月
+    - 5月
+    - 6月
+    - 7月
+    - 8月
+    - 9月
+    - 10月
+    - 11月
+    - 12月
+    day_names:
+    - 星期日
+    - 星期一
+    - 星期二
+    - 星期三
+    - 星期四
+    - 星期五
+    - 星期六
+    formats:
+      default: ! '%Y-%m-%d'
+      long: ! '%Y年%b%d日'
+      short: ! '%b%d日'
+    month_names:
+    -
+    - 一月
+    - 二月
+    - 三月
+    - 四月
+    - 五月
+    - 六月
+    - 七月
+    - 八月
+    - 九月
+    - 十月
+    - 十一月
+    - 十二月
+    order:
+    - :year
+    - :month
+    - :day
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: 大约一小时
+        other: 大约 %{count} 小时
+      about_x_months:
+        one: 大约一个月
+        other: 大约 %{count} 个月
+      about_x_years:
+        one: 大约一年
+        other: 大约 %{count} 年
+      almost_x_years:
+        one: 接近一年
+        other: 接近 %{count} 年
+      half_a_minute: 半分钟
+      less_than_x_minutes:
+        one: 不到一分钟
+        other: 不到 %{count} 分钟
+      less_than_x_seconds:
+        one: 不到一秒
+        other: 不到 %{count} 秒
+      over_x_years:
+        one: 一年多
+        other: ! '%{count} 年多'
+      x_days:
+        one: 一天
+        other: ! '%{count} 天'
+      x_minutes:
+        one: 一分钟
+        other: ! '%{count} 分钟'
+      x_months:
+        one: 一个月
+        other: ! '%{count} 个月'
+      x_seconds:
+        one: 一秒
+        other: ! '%{count} 秒'
+    prompts:
+      day: 日
+      hour: 时
+      minute: 分
+      month: 月
+      second: 秒
+      year: 年
+  errors: &errors
+    access_deny:
+      title: 没有权限!
+      message: 您所使用的用户没有访问该页面的相关权限。
+    get_errors:
+      title: 发生错误!
+      message: 您所进行的操作发生了错误，请返回并检查相关操作是否正确。
+    format: ! '%{attribute} %{message}'
+    messages:
+      accepted: 必须是可被接受的
+      blank: 不能为空字符
+      confirmation: 与确认值不匹配
+      empty: 不能留空
+      equal_to: 必须等于 %{count}
+      even: 必须为双数
+      exclusion: 是保留关键字
+      greater_than: 必须大于 %{count}
+      greater_than_or_equal_to: 必须大于或等于 %{count}
+      inclusion: 不包含于列表中
+      invalid: 是无效的
+      less_than: 必须小于 %{count}
+      less_than_or_equal_to: 必须小于或等于 %{count}
+      not_a_number: 不是数字
+      not_an_integer: 必须是整数
+      odd: 必须为单数
+      record_invalid: ! '验证失败: %{errors}'
+      taken: 已经被使用
+      too_long: 过长（最长为 %{count} 个字符）
+      too_short: 过短（最短为 %{count} 个字符）
+      wrong_length: 长度非法（必须为 %{count} 个字符）
+    template:
+      body: 如下字段出现错误：
+      header:
+        one: 有 1 个错误发生导致「%{model}」无法被保存。
+        other: 有 %{count} 个错误发生导致「%{model}」无法被保存。
+  helpers:
+    index: 序号
+    select:
+      prompt: 请选择
+    submit:
+      create: 新增%{model}
+      submit: 储存%{model}
+      update: 更新%{model}
+    actions: 操作
+    links:
+      edit: 修改
+      new: 新增
+      destroy: 删除
+      cancel: 取消
+      back: 返回
+      users: 用户管理
+      roles: 角色管理
+    titles:
+      edit: 编辑%{model}
+      new: 新增%{model}
+  number:
+    currency:
+      format:
+        delimiter: ! ','
+        format: ! '%u %n'
+        precision: 2
+        separator: .
+        significant: false
+        strip_insignificant_zeros: false
+        unit: CN¥
+    format:
+      delimiter: ! ','
+      precision: 3
+      separator: .
+      significant: false
+      strip_insignificant_zeros: false
+    human:
+      decimal_units:
+        format: ! '%n %u'
+        units:
+          billion: 十亿
+          million: 百万
+          quadrillion: 千兆
+          thousand: 千
+          trillion: 兆
+          unit: ''
+      format:
+        delimiter: ''
+        precision: 1
+        significant: false
+        strip_insignificant_zeros: false
+      storage_units:
+        format: ! '%n %u'
+        units:
+          byte:
+            one: Byte
+            other: Bytes
+          gb: GB
+          kb: KB
+          mb: MB
+          tb: TB
+    percentage:
+      format:
+        delimiter: ''
+    precision:
+      format:
+        delimiter: ''
+  support:
+    array:
+      last_word_connector: ! ', 和 '
+      two_words_connector: ! ' 和 '
+      words_connector: ! ', '
+  time:
+    am: 上午
+    formats:
+      default: ! '%Y年%b%d日 %A %H:%M:%S %Z'
+      long: ! '%Y年%b%d日 %H:%M'
+      short: ! '%b%d日 %H:%M'
+    pm: 下午
+
+  wice_grid:
+    show_filter_tooltip: 显示过滤
+    hide_filter_tooltip: 隐藏过滤
+    csv_export_tooltip: 输出CSV档
+    filter_tooltip: 过滤
+    reset_filter_tooltip: 清除过滤
+    boolean_filter_true_label: "是"
+    boolean_filter_false_label: "否"
+    previous_label: «
+    next_label: »
+    # Title of the icon clicking on which will show the calendar to set the FROM date.
+    date_selector_tooltip_from: 从
+    # Title of the icon clicking on which will show the calendar to set the TO date.
+    date_selector_tooltip_to: 至
+    # The title of the checkox to turn on negation
+    negation_checkbox_title: 排除
+    # link to switch to show all records
+    show_all_records_label: 显示全部
+    # tooltip for the link to switch to show all records
+    show_all_records_tooltip: 显示全部记录
+    # Warning message shown when the user wants to switch to all-records mode
+    all_queries_warning: 确定要显示全部记录？
+    # link to paginated view
+    switch_back_to_paginated_mode_label: 回到分页显示
+    # tooltip for the link to paginated view
+    switch_back_to_paginated_mode_tooltip: 切换到分页显示
+    # Title of the date string.
+    date_string_tooltip: 按下以清除
+    saved_query_panel_title: 查询存储
+    save_query_button_label: 储存查询状态
+    saved_query_deletion_confirmation: 确定删除？
+    saved_query_deletion_link_title: 删除查询
+    saved_query_link_title: 读取查询
+    validates_uniqueness_error: 已存在相同名称的查询
+    validates_presence_error: 请为此查询命名
+    query_deleted_message: 查询已删除
+    query_saved_message: 查询已储存
+    select_all: 全选
+    deselect_all: 全清
+  # remove these aliases after 'activemodel' and 'activerecord' namespaces are removed from Rails repository
+  controller:
+    success_notice: "%{model}%{operation}成功"
+    create_success_notice: "%{model}创建成功"
+    update_success_notice: "%{model}更新成功"
+  activemodel:
+    errors:
+      <<: *errors
+  activerecord:
+    errors:
+      <<: *errors
+    models:
+      user:
+        one: 用户管理
+        other: 用户管理
+      unit:
+        one: 单位管理
+        other: 单位管理
+      user_log:
+        one: 用户日志
+        other: 用户日志
+      role:
+        one: 角色管理
+        other: 角色管理
+      import_info:
+        one: 信息导入
+        other: 信息导入
+    attributes:
+      user:
+        email: "电子邮件"
+        username: "用户名"
+        name: "姓名"
+        password: "密码"
+        encrypted_password: "密码"
+        unit: "单位"
+        sign_in_count: "登入次数"
+        role: "角色"
+        role_name: "角色"
+        unit_id: "所属单位"
+      unit:
+        "no": "编号"
+        name: "单位名称"
+        desc: "单位描述"
+        short_name: "英文缩写"
+        tcbd_khdh: "商务投递客户编号"
+        level: "单位级别"
+        parent_id: "上级单位"
+      role:
+        user_id: "用户"
+        unit_id: "单位"
+        role: "角色"
+      user_log:
+        user_id: "用户"
+        username: "操作用户"
+        operation: "操作"
+        object_class: "对象名称"
+        object_id: "对象主键"
+        object_symbol: "对象标识"
+        created_at: "创建时间"
+      import_info:
+        registration_no: "挂号编号"
+        postcode: "邮编"
+        desc: "备注"
+  menu:
+    permission:
+      name: "权限管理"
+      needrole:
+        can: :read
+        role: :User
+      submenu:
+        admin:
+          name: "用户管理"
+          link: "/users/"
+          need_count: false
+          needrole:
+            can: :read
+            role: :User
+        unit_admin:
+          name: "单位管理"
+          link: "/units/"
+          need_count: false
+          needrole:
+            can: :read
+            role: :User
+        # role_admin:
+        #   name: "角色管理"
+        #   link: "/roles/"
+        #   needrole:
+        #     can: :read
+        #     role: :User
+    
+    import:
+      name: "信息导入"
+      submenu:
+        import_info:
+          name: "信息导入"
+          link: "/import_infos/import"
+          need_count: false
+
+    logs:
+      name: "日志查询"
+      submenu:
+        user_log:
+          name: "日志查询"
+          link: "/user_logs"
+          need_count: false
+        # interface_log:
+        #   name: "接口信息(info)"
+        #   link: "/interface_infos"
+        #   need_count: false
+        #   needrole:
+        #     can: :read
+        #     role: :InterfaceInfo
+    # filetemp:
+    #   name: "模板管理"
+    #   needrole: 
+    #     can: :read
+    #     role: "Menu.Filetemp"
+    #   submenu:
+    #     filetemp_upload:
+    #       name: "模板上传"
+    #       link: "/filetemps/upload"
+    #       #needrole: ["create", "Filetemp"]
+    #     filetemp_download:
+    #       name: "模板下载"
+    #       link: "/filetemps"
+    #       #needrole: ["read", "Filetemp"]
+  user_navigation:
+    update_self: "个人信息"
+    show_unit: "单位信息"
+  action_2_operation:
+    index: 遍历
+    show: 查看
+    create: 新增
+    update: 更新
+    destroy: 删除
+    check: 确认
+    close: 关闭

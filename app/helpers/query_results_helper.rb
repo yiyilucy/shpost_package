@@ -1,0 +1,2 @@
+module QueryResultsHelper
+end
