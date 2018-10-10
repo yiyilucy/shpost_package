@@ -1,0 +1,27 @@
+<%- model_class = Business -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, Business %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_business_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@businesses_grid) do |g|
+    g.column name: model_class.human_attribute_name(:name), attribute: 'name'
+
+    g.column name: model_class.human_attribute_name(:start_date), attribute: 'start_date'
+
+    g.column name: model_class.human_attribute_name(:end_date), attribute: 'end_date'
+    
+    g.column do |business|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_business_path(business), :class => 'btn btn-xs btn-primary' if can? :update, business)
+      end
+
+  end 
+%>

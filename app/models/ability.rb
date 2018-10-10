@@ -10,7 +10,7 @@ class Ability
         can :manage, Role
         can :role, :unitadmin
         can :role, :user
-        can :manage, ImportInfo
+        can :manage, QueryResult
 
         # cannot :role, :superadmin
         cannot [:role, :create, :destroy, :update], User, role: 'superadmin'
@@ -37,8 +37,9 @@ class Ability
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
 
-        can :manage, ImportInfo
-
+        can :manage, QueryResult, id: user.unit_id
+        can :manage, Business, unit_id: user.unit_id
+        cannot :destroy, Business
         # can :manage,BusinessRelationship
         
     elsif user.user?

@@ -11,23 +11,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180929012654) do
+ActiveRecord::Schema.define(version: 20181008023120) do
 
-  create_table "import_infos", force: true do |t|
-    t.string   "registration_no"
-    t.string   "postcode"
-    t.string   "desc"
+  create_table "businesses", force: true do |t|
+    t.string   "name",       default: "", null: false
+    t.string   "start_date"
+    t.string   "end_date"
+    t.integer  "unit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "query_results", force: true do |t|
     t.string   "source"
-    t.string   "registration_no"
+    t.string   "registration_no", null: false
+    t.string   "postcode"
     t.datetime "order_date"
     t.datetime "query_date"
     t.string   "result"
     t.string   "status"
+    t.integer  "unit_id"
+    t.integer  "business_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

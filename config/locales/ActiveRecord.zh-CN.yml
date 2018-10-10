@@ -275,9 +275,12 @@ zh-CN:
       role:
         one: 角色管理
         other: 角色管理
-      import_info:
-        one: 信息导入
-        other: 信息导入
+      business:
+        one: 商户
+        other: 商户
+      query_result:
+        one: 查询结果
+        other: 查询结果
     attributes:
       user:
         email: "电子邮件"
@@ -310,10 +313,20 @@ zh-CN:
         object_id: "对象主键"
         object_symbol: "对象标识"
         created_at: "创建时间"
-      import_info:
+      business:
+        name: "名称"
+        start_date: "开始日期"
+        end_date: "结束日期"
+      query_result:
+        source: "邮政数据查询"
         registration_no: "挂号编号"
         postcode: "邮编"
-        desc: "备注"
+        order_date: "邮件日期"
+        query_date: "查询日期"
+        result: "查询结果"
+        status: "状态"
+        unit_id: "单位"
+        business_id: "商户"
   menu:
     permission:
       name: "权限管理"
@@ -342,14 +355,20 @@ zh-CN:
         #     can: :read
         #     role: :User
     
+    business:
+      name: "商户管理"
+      submenu:
+        business:
+          name: "商户管理"
+          link: "/businesses"
+          need_count: false
     import:
       name: "信息导入"
       submenu:
-        import_info:
+        query_result:
           name: "信息导入"
-          link: "/import_infos/import"
+          link: "/query_results/import"
           need_count: false
-
     logs:
       name: "日志查询"
       submenu:
