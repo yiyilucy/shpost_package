@@ -1,0 +1,25 @@
+<h1>Listing import_files</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @import_files.each do |import_file| %>
+      <tr>
+        <td><%= link_to 'Show', import_file %></td>
+        <td><%= link_to 'Edit', edit_import_file_path(import_file) %></td>
+        <td><%= link_to 'Destroy', import_file, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Import file', new_import_file_path %>

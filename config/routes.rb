@@ -1,6 +1,7 @@
 ShpostPackage::Application.routes.draw do
   
-  resources :query_results
+  
+  resources :import_files
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
@@ -70,12 +71,16 @@ ShpostPackage::Application.routes.draw do
      resources :roles, :controller => 'user_roles'
   end
 
-  resources :import_infos do
+  
+  resources :businesses
+
+  resources :query_results do
     collection do 
       get 'import'
-      post 'import' => 'import_infos#import'
+      post 'import' => 'query_results#import'
     end
   end
+
 
   
 end
