@@ -21,7 +21,7 @@ class Ability
     #can :manage, :all
         
 
-        can :manage, Unit, id: user.unit_id
+        can :manage, Unit, unit_id: user.unit_id
 
         can :read, UserLog, user: {unit_id: user.unit_id}
         can :destroy, UserLog, operation: '订单导入'
@@ -37,7 +37,7 @@ class Ability
         cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
 
-        can :manage, QueryResult, id: user.unit_id
+        can :manage, QueryResult, unit_id: user.unit_id
         can :manage, Business, unit_id: user.unit_id
         cannot :destroy, Business
         # can :manage,BusinessRelationship

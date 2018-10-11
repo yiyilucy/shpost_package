@@ -155,6 +155,107 @@ class QueryResultsController < ApplicationController
     xls_report.string  
   end
 
+  def export
+    @order_date=DateTime
+    @business_id=nil
+    results = []
+    is_blank = true
+
+    if params[:order_date].blank? or params[:order_date]["order_date"].blank?
+      @order_date=Time.now.strftime('%Y-%m-%d')
+    else 
+      @order_date = to_date(params[:order_date]["order_date"])
+    end
+    
+    if !params[:business].blank? and !params[:business]["business_id"].blank? and params[:business]!={"business_id"=>"全部"} and params[:business][:business_id]!="全部"
+      @business_id = params[:business]["business_id"]
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "own").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "other").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "unit").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "returns").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "waiting").order(:registration_no)
+      QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ?", "#{@order_date}%", @business_id).update_all query_date: Time.now
+    else
+      results << QueryResult.accessible_by(current_ability).where("order_date like ?  and status = ?", "#{@order_date}%", "own").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and status = ?", "#{@order_date}%", "other").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and status = ?", "#{@order_date}%", "unit").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and status = ?", "#{@order_date}%", "returns").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and status = ?", "#{@order_date}%", "waiting").order(:registration_no)
+      QueryResult.accessible_by(current_ability).where("order_date like ?", "#{@order_date}%").update_all query_date: Time.now
+    end
+
+    results.each do |r|
+      if !r.blank?
+        is_blank = false
+      end
+    end
+# binding.pry          
+    if is_blank
+      flash[:alert] = "无数据"
+      redirect_to :action => 'query_result_index'
+    else
+      respond_to do |format|  
+        format.xls {   
+          send_data(results_xls_content_for(results), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")  
+        }
+      end
+    end
+  end
+
+  def results_xls_content_for(objs)  
+    xls_report = StringIO.new  
+    book = Spreadsheet::Workbook.new  
+    sheet_name = ['本人收', '他人收', '单位收', '退件', '未妥投']
+    
+    i=0
+
+    objs.each do |obj|
+      sheet = book.create_worksheet :name => sheet_name[i]  
+   
+      blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+      sheet.row(0).default_format = blue  
+  
+      sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件日期 查询日期 查询结果}  
+      count_row = 1
+      obj.each do |o|  
+        sheet[count_row,0]="邮政数据查询"
+        sheet[count_row,1]=o.registration_no
+        sheet[count_row,2]=o.order_date.strftime('%Y-%m-%d').to_s
+        sheet[count_row,3]=o.query_date.strftime('%Y-%m-%d').to_s
+        sheet[count_row,4]=o.result.blank? ? "" : o.result
+        
+        count_row += 1
+      end
+      i += 1
+    end  
+  
+    book.write xls_report  
+    xls_report.string  
+  end
+
+  def query_result_index
+    @order_date=DateTime
+    @business_id=nil
+    @results = []
+    @sum = 0
+      
+    if params[:order_date].blank? or params[:order_date]["order_date"].blank?
+      @order_date=Time.now.strftime('%Y-%m-%d')
+    else 
+      @order_date = to_date(params[:order_date]["order_date"])
+    end
+
+    if !params[:business].blank? and !params[:business]["business_id"].blank? and params[:business]!={"business_id"=>"全部"} and params[:business][:business_id]!="全部"
+      @business_id = params[:business]["business_id"]
+      @results = QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ?", "#{@order_date}%", @business_id).group(:status).count
+      @sum = QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ?", "#{@order_date}%", @business_id).count
+    else
+      @results = QueryResult.accessible_by(current_ability).where("order_date like ?", "#{@order_date}%").group(:status).count
+      @sum = QueryResult.accessible_by(current_ability).where("order_date like ?", "#{@order_date}%").count
+    end
+
+  end
+
   private
     def set_query_result
       @query_result = QueryResult.find(params[:id])
@@ -178,5 +279,10 @@ class QueryResultsController < ApplicationController
 
         file_path
       end
+    end
+
+    def to_date(time)
+      date = Date.civil(time.split(/-|\//)[0].to_i,time.split(/-|\//)[1].to_i,time.split(/-|\//)[2].to_i)
+      return date
     end
 end

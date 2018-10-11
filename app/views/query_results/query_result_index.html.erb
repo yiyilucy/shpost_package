@@ -1,0 +1,72 @@
+<%- model_class = QueryResult -%>
+<div class="page-header">
+  <h1>数据查询</h1>
+</div> 
+<div text-align:center>
+  <%= form_tag('', name: 'form1')%>
+  <div style="float:left">
+  <table>
+  <tr>
+    <td valign="middle">
+    <%= label_tag(:order_date, "邮件日期:", :style => "padding:0px") %>
+    </td>
+    <td valign="middle">
+    <%= text_field("order_date","order_date", value: @order_date.to_s,:style => "width:90px") %>
+    </td>
+    <td valign="middle">
+    <%= label_tag(:business, "商户:",class: 'control-label') %>
+    </td>
+    <td valign="middle">
+    <%= select("business","business_id", Business.where(unit_id: current_user.unit_id).order(:id).map{|u| [u.name,u.id]}.insert(0,"全部"),class: 'control-label',selected: @business_id) %> 
+    </td>
+    <td valign="middle">
+    <%= submit_tag "查询",:class => 'btn btn-primary', onclick: "form1.action='query_result_index';form1.submit();" %>
+    </td>
+    </tr>
+    </table>
+    </div>
+    <div style="float:right">
+    <%= submit_tag "导出",:class => 'btn btn-primary', onclick: "form1.action='export.xls';form1.submit();" %>
+    </div>
+  </form>
+</div>
+<% if !@results.blank? %>
+<div text-align:center>
+<table class="table table-striped">
+<thead>
+  <tr>
+    <th>邮件日期</th>
+    <th>本人收(件)/占比</th>
+    <th>他人收(件)/占比</th>
+    <th>单位收(件)/占比</th>
+    <th>退件(件)/占比</th>
+    <th>未妥投(件)/占比</th>
+    <th>总件数</th>
+  </tr>
+</thead>
+<tbody>
+  <% own = @results["own"].blank? ? 0 : @results["own"] 
+  other = @results["other"].blank? ? 0 : @results["other"] 
+  unit = @results["unit"].blank? ? 0 : @results["unit"] 
+  returns = @results["returns"].blank? ? 0 : @results["returns"] 
+  waiting = @results["waiting"].blank? ? 0 : @results["waiting"] 
+  sum = @sum.to_f
+  %>
+
+  <tr>
+    <td><%= @order_date %></td>
+    <td><%= own.to_s + " /" + sprintf("%0.2f" ,own/sum) + "%" %></td>
+    <td><%= other.to_s + " /" + sprintf("%0.2f" ,other/sum) + "%" %></td>
+    <td><%= unit.to_s + " /" + sprintf("%0.2f" ,unit/sum) + "%" %></td>
+    <td><%= returns.to_s + " /" + sprintf("%0.2f" ,returns/sum) + "%" %></td>
+    <td><%= waiting.to_s + " /" + sprintf("%0.2f" ,waiting/sum) + "%" %></td>
+    <td><%= @sum %></td>
+  </tr>
+  <tr>
+    <td colspan="7"><b><%= "妥投率: " + sprintf("%0.2f" ,(own + other + unit)/sum) + "%, 未妥投率: " + (sprintf("%0.2f" ,waiting/sum)) + "%, 退件率: " + (sprintf("%0.2f" ,returns/sum)) + "%" %></b>
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
+<% end %>

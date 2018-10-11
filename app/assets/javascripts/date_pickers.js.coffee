@@ -7,6 +7,11 @@ ready = ->
     changeMonth:true,
     changeYear:true
   });
+  $('#order_date_order_date').datepicker({
+    showAnim:"blind",
+    changeMonth:true,
+    changeYear:true
+  });
   
 $(document).ready(ready)
 $(document).on('page:load', ready)
