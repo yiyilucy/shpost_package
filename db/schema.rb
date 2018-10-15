@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181008023120) do
+ActiveRecord::Schema.define(version: 20181012011532) do
 
   create_table "businesses", force: true do |t|
     t.string   "name",       default: "", null: false
@@ -20,7 +20,61 @@ ActiveRecord::Schema.define(version: 20181008023120) do
     t.integer  "unit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "secret_key"
   end
+
+  create_table "import_files", force: true do |t|
+    t.string   "file_name",                   null: false
+    t.string   "file_path",   default: "",    null: false
+    t.datetime "import_date"
+    t.integer  "user_id"
+    t.integer  "unit_id"
+    t.integer  "business_id"
+    t.boolean  "is_process",  default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "import_infos", force: true do |t|
+    t.string   "registration_no"
+    t.string   "postcode"
+    t.string   "desc"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "interface_senders", force: true do |t|
+    t.string   "url"
+    t.string   "host"
+    t.string   "port"
+    t.string   "interface_type"
+    t.string   "http_type"
+    t.string   "callback_class"
+    t.string   "callback_method"
+    t.text     "callback_params"
+    t.string   "status"
+    t.integer  "send_times"
+    t.datetime "next_time"
+    t.text     "body"
+    t.datetime "last_time"
+    t.text     "last_response"
+    t.string   "interface_code"
+    t.integer  "max_times"
+    t.integer  "interval"
+    t.text     "error_msg"
+    t.string   "object_class"
+    t.integer  "object_id"
+    t.integer  "unit_id"
+    t.integer  "business_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "interface_senders", ["business_id"], name: "index_interface_senders_on_business_id"
+  add_index "interface_senders", ["created_at"], name: "index_interface_senders_on_created_at"
+  add_index "interface_senders", ["object_id"], name: "index_interface_senders_on_object_id"
+  add_index "interface_senders", ["status"], name: "index_interface_senders_on_status"
+  add_index "interface_senders", ["unit_id"], name: "index_interface_senders_on_unit_id"
 
   create_table "query_results", force: true do |t|
     t.string   "source"

@@ -1,0 +1,24 @@
+<%- model_class = InterfaceSender -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:unit_id) %>:</strong></dt>
+  <dd><%= @interface_sender.unit.try(:name) %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:storage_id) %>:</strong></dt>
+  <dd><%= @interface_sender.storage.try(:name) %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:business_id) %>:</strong></dt>
+  <dd><%= @interface_sender.business.try(:name) %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:object_name) %>:</strong></dt>
+  <dd><%= @object_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:class_name) %>:</strong></dt>
+  <dd><%= @interface_sender.callback_class.blank? ? "" : InterfaceSender::CLASS_NAME[@interface_sender.callback_class.to_sym] %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:method_name) %>:</strong></dt>
+  <dd><%= @interface_sender.callback_method.blank? ? "" : InterfaceSender::METHOD_NAME[@interface_sender.callback_method.to_sym] %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:error_msg) %>:</strong></dt>
+  <dd><%= @interface_sender.error_msg.to_s %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              interface_senders_path, :class => 'btn btn-default'  %>

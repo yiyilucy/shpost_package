@@ -1,0 +1,22 @@
+zh-CN:
+  InterfaceSender:
+    # example:
+    #   url: 
+    #   interface_type: 'http'
+    #   http_type: 'post'
+    #   callback_class:
+    #   callback_method:
+    #   max_times: 5 #default_times: 10
+    #   interval: 300 #default_interval: 600
+
+    jdpt_trace:
+      # for test
+      url: 'http://211.156.195.33/querypush-twswn/mailTrack/queryMailTrackWn'
+      # for production
+      interface_type: 'http'
+      http_type: 'post'
+      callback_class: 'JdptInterface'
+      callback_method: 'do_response'
+      # object_class: 'Keyclientorder'
+      max_times: 5 #default_times: 10
+      interval: 300 #default_interval: 600
