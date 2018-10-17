@@ -1,0 +1,64 @@
+<%- model_class = InterfaceSender -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+</div>
+<div  align="right">
+<%=link_to t('全部重发'), "/interface_senders/all_resend",:class => 'btn btn-primary' %>
+</div>
+
+<%= grid(@interface_senders_grid) do |g|
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'unit_id' do |interface_sender| 
+      interface_sender.unit_id.blank? ? "" : interface_sender.unit.try(:name)
+    end
+
+    g.column name: model_class.human_attribute_name(:storage_id), attribute: 'storage_id' do |interface_sender| 
+      interface_sender.storage_id.blank? ? "" : interface_sender.storage.try(:name)
+    end
+
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'business_id' do |interface_sender| 
+      interface_sender.business_id.blank? ? "" : interface_sender.business.try(:name)
+    end
+
+    g.column name: model_class.human_attribute_name(:object_name) do |interface_sender| 
+      if !interface_sender.object_class.blank? && !interface_sender.object_id.blank?
+        begin
+          o = interface_sender.object_class.constantize
+          object = o.find_by id: interface_sender.object_id
+          if !object.barcode.blank?
+            object.barcode
+          end
+        rescue Exception => e
+          ""
+        end
+      end
+    end
+
+    g.column name: model_class.human_attribute_name(:class_name), attribute: 'callback_class' do |interface_sender| 
+      interface_sender.callback_class.blank? ? "" : InterfaceSender::CLASS_NAME[interface_sender.callback_class.to_sym]
+    end
+
+    g.column name: model_class.human_attribute_name(:method_name), attribute: 'callback_method' do |interface_sender| 
+      interface_sender.callback_method.blank? ? "" : InterfaceSender::METHOD_NAME[interface_sender.callback_method.to_sym]
+    end
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: InterfaceSender::STATUS_SHOW.map {|k, v| [model_class.human_attribute_name("status_#{k}"), v]} do |interface_sender| 
+      InterfaceSender::STATUS_SHOW[interface_sender.status.to_sym]
+      # interface_info.status
+
+    end
+
+    g.column name: model_class.human_attribute_name(:operate_times), attribute: 'send_times'
+
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at'
+    g.column name: model_class.human_attribute_name(:next_time), attribute: 'next_time'
+
+    g.column do |interface_sender|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.rebuild_interface', :default => t("helpers.links.rebuild_interface")), rebuild_interface_sender_path(interface_sender), method: :get, :class => 'btn btn-xs btn-primary' if can? :rebuild, interface_sender) << 
+      (link_to t('.resend_interface_info', :default => t("helpers.links.resend_interface_info")), resend_interface_sender_path(interface_sender), method: :get, :class => 'btn btn-xs btn-primary' if can? :resend, interface_sender) <<
+
+      (link_to t('.show_error_interface_sender', :default => t("helpers.links.show_error_interface_sender")), show_error_interface_sender_path(interface_sender), method: :get, target: '_blank', :class => 'btn btn-xs btn-primary' if can? :show_error, interface_sender)
+      end
+  end 
+%>
+
