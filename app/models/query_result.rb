@@ -11,5 +11,109 @@ class QueryResult < ActiveRecord::Base
 	  status.blank? ? "" : QueryResult::STATUS["#{status}".to_sym]
 	end
 
+	def self.import_data(import_file)
+		direct = "#{Rails.root}/public/download/"
+       
+		if !File.exist?(direct)
+			Dir.mkdir(direct)          
+		end
+		if import_file.blank?
+	    	files = ImportFile.where(is_process: false)
+	    else
+	    	files = ImportFile.where(id: import_file)
+	    end
+	    files.each do |f|
+	      if file = f.file_path
+	      	ActiveRecord::Base.transaction do	          
+	          	begin
+		            sheet_error = []
+		            rowarr = [] 
+		            instance=nil
+		            
+		            if file.include?('.xlsx')
+		              instance= Roo::Excelx.new(file)
+		            elsif file.include?('.xls')
+		              instance= Roo::Excel.new(file)
+		            elsif file.include?('.csv')
+		              instance= Roo::CSV.new(file)
+		            end
+		            instance.default_sheet = instance.sheets.first
+		            title_row = instance.row(1)
+		            registration_no_index = title_row.index("挂号编号")
+		            postcode_index = title_row.index("邮编")
+		            current_line = nil
+
+	            	2.upto(instance.last_row) do |line|
+# binding.pry
+			            current_line = line
+			            rowarr = instance.row(line)
+			            registration_no = rowarr[registration_no_index].blank? ? "" : rowarr[registration_no_index].to_s.gsub(' ','')
+			            postcode = rowarr[postcode_index].blank? ? "" : rowarr[postcode_index].to_s.gsub(' ','')
+
+		              	if registration_no.blank?
+			              txt = "缺少挂号编号"
+			              sheet_error << (rowarr << txt << current_line)
+			              next
+			            end
+		              # if postcode.blank?
+		              #   txt = "缺少邮编"
+		              #   sheet_error << (rowarr << txt)
+		              #   next
+		              # end
+
+	              		# info = QueryResult.find_by(registration_no: registration_no)
+	              
+	              		# if info.blank?
+	                		QueryResult.create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询"
+			            # else 
+			            #     info.update postcode: postcode
+			            # end
+	            	end
+	            
+		            if !sheet_error.blank?
+		            	filename = "Error_Infos_#{Time.now.strftime("%Y%m%d")}.xls"
+				        file_path = direct + filename
+
+			            exporterrorinfos_xls_content_for(sheet_error, title_row, file_path)
+						f.update is_process: true, status: "fail", desc: "部分导入成功,缺少挂号编号", err_file_path: file_path
+		            else
+		            	f.update is_process: true, status: "success"
+		            end
+				rescue Exception => e
+					f.update is_process: true, status: "fail", desc: e.message + "(第" + current_line.to_s + "行)", err_file_path: file
+				    Rails.logger.error e.message + "(第" + current_line.to_s + "行)"
+				    raise ActiveRecord::Rollback
+				end
+	        end
+	      end
+	      
+	    end
+ 	end
+
+ 	def self.exporterrorinfos_xls_content_for(obj,title_row,file_path)
+	    book = Spreadsheet::Workbook.new  
+	    sheet1 = book.create_worksheet :name => "Infos"  
+
+	    blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+	    red = Spreadsheet::Format.new :color => :red
+	    sheet1.row(0).default_format = blue 
+	     
+	    sheet1.row(0).concat title_row
+	    size = obj.first.size 
+	    count_row = 1
+	    obj.each do |obj|
+	      count = 0
+	      while count<=size
+	        sheet1[count_row,count]=obj[count]
+	        count += 1
+	      end
+	      
+	      count_row += 1
+	    end 
+	    book.write file_path
+	    
+	end
+
+
 
 end

@@ -1,25 +1,47 @@
-<h1>Listing import_files</h1>
+<%- model_class = ImportFile -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+</div>
 
-<table>
-  <thead>
-    <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
+<%= grid(@import_files_grid) do |g|
+    g.column name: model_class.human_attribute_name(:file_name), attribute: 'file_name'
 
-  <tbody>
-    <% @import_files.each do |import_file| %>
-      <tr>
-        <td><%= link_to 'Show', import_file %></td>
-        <td><%= link_to 'Edit', edit_import_file_path(import_file) %></td>
-        <td><%= link_to 'Destroy', import_file, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+    g.column name: model_class.human_attribute_name(:import_date), attribute: 'import_date' do |import_file|
+      import_file.import_date.strftime('%Y-%m-%d').to_s
+    end
 
-<br>
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'id', assoc: :business do |import_file|
+      import_file.business.try :name
+    end
 
-<%= link_to 'New Import file', new_import_file_path %>
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'id', assoc: :unit do |import_file|
+      import_file.unit.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:user_id), attribute: 'id', assoc: :user do |import_file|
+      import_file.user.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at'do |import_file|
+       import_file.created_at.localtime.to_s(:db)
+    end
+
+    g.column name: model_class.human_attribute_name(:is_process), attribute: 'is_process'do |import_file| 
+      import_file.is_process_name
+    end
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status' do |import_file| 
+      import_file.status_name
+    end
+
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+    
+    g.column do |import_file|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.download', :default => t("helpers.links.download")), download_import_file_path(import_file),:method => 'post', :class => 'btn btn-xs btn-primary' if (can? :download, import_file) and import_file.status.eql?"fail") << ' ' <<
+      (link_to t('.insert_data', :default => t("helpers.links.insert_data")), insert_data_import_file_path(import_file), :class => 'btn btn-xs btn-primary' if (can? :insert_data, import_file) and !import_file.is_process)
+      
+      end
+
+  end 
+%>

@@ -4,7 +4,7 @@ class BusinessesController < ApplicationController
   def index
     @businesses_grid = initialize_grid(@businesses,
          :order => 'businesses.id',
-         :order_direction => 'desc')
+         :order_direction => 'asc')
   end
 
   def show

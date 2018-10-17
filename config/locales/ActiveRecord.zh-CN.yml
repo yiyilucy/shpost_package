@@ -149,6 +149,8 @@ zh-CN:
       back: 返回
       users: 用户管理
       roles: 角色管理
+      download: 下载
+      insert_data: 导数据
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -281,6 +283,9 @@ zh-CN:
       query_result:
         one: 查询结果
         other: 查询结果
+      import_file:
+        one: 信息导入结果
+        other: 信息导入结果
     attributes:
       user:
         email: "电子邮件"
@@ -327,6 +332,18 @@ zh-CN:
         status: "状态"
         unit_id: "单位"
         business_id: "商户"
+      import_file:
+        file_name: "文件名"
+        file_path: "原文件存放路径"
+        import_date: "邮件日期"
+        user_id: "用户"
+        unit_id: "单位"
+        business_id: "商户"
+        is_process: "是否处理"
+        status: "状态"
+        desc: "出错信息描述"
+        err_file_path: "出错文件存放路径"
+        created_at: "导入时间"
   menu:
     permission:
       name: "权限管理"
@@ -368,6 +385,17 @@ zh-CN:
         query_result:
           name: "信息导入"
           link: "/query_results/import"
+          need_count: false
+        import_file:
+          name: "信息导入结果"
+          link: "/import_files"
+          need_count: false
+    query_result:
+      name: "数据查询"
+      submenu:
+        query_result:
+          name: "数据查询"
+          link: "/query_results/query_result_index"
           need_count: false
     logs:
       name: "日志查询"

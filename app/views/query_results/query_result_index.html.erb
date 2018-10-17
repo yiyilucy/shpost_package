@@ -8,10 +8,16 @@
   <table>
   <tr>
     <td valign="middle">
-    <%= label_tag(:order_date, "邮件日期:", :style => "padding:0px") %>
+    <%= label_tag(:start_date, "开始日期:", :style => "padding:0px") %>
     </td>
     <td valign="middle">
-    <%= text_field("order_date","order_date", value: @order_date.to_s,:style => "width:90px") %>
+    <%= text_field("start_date","start_date", value: @start_date.to_s,:style => "width:90px") %>
+    </td>
+    <td valign="middle">
+    <%= label_tag(:end_date, "结束日期:", :style => "padding:0px") %>
+    </td>
+    <td valign="middle">
+    <%= text_field("end_date","end_date", value: @end_date.to_s,:style => "width:90px") %>
     </td>
     <td valign="middle">
     <%= label_tag(:business, "商户:",class: 'control-label') %>
@@ -45,25 +51,36 @@
   </tr>
 </thead>
 <tbody>
-  <% own = @results["own"].blank? ? 0 : @results["own"] 
-  other = @results["other"].blank? ? 0 : @results["other"] 
-  unit = @results["unit"].blank? ? 0 : @results["unit"] 
-  returns = @results["returns"].blank? ? 0 : @results["returns"] 
-  waiting = @results["waiting"].blank? ? 0 : @results["waiting"] 
-  sum = @sum.to_f
+  <% success_all = 0
+     waiting_all = 0
+     returns_all = 0
+     sum_all = 0.00
+  %>
+  <% @sum.each do |s| %>
+  <% own = @results[[s[0], "own"]].blank? ? 0 : @results[[s[0], "own"]] 
+  other = @results[[s[0], "other"]].blank? ? 0 : @results[[s[0], "other"]]
+  unit = @results[[s[0], "unit"]].blank? ? 0 : @results[[s[0], "unit"]]
+  returns = @results[[s[0], "returns"]].blank? ? 0 : @results[[s[0], "returns"]] 
+  waiting = @results[[s[0], "waiting"]].blank? ? 0 : @results[[s[0], "waiting"]] 
+  sum = s[1].to_f
+  success_all = success_all + own + other + unit
+  waiting_all = waiting_all + waiting
+  returns_all = returns_all + returns
+  sum_all = sum_all + sum
   %>
 
   <tr>
-    <td><%= @order_date %></td>
-    <td><%= own.to_s + " /" + sprintf("%0.2f" ,own/sum) + "%" %></td>
-    <td><%= other.to_s + " /" + sprintf("%0.2f" ,other/sum) + "%" %></td>
-    <td><%= unit.to_s + " /" + sprintf("%0.2f" ,unit/sum) + "%" %></td>
-    <td><%= returns.to_s + " /" + sprintf("%0.2f" ,returns/sum) + "%" %></td>
-    <td><%= waiting.to_s + " /" + sprintf("%0.2f" ,waiting/sum) + "%" %></td>
-    <td><%= @sum %></td>
+    <td><%= s[0].strftime('%Y-%m-%d') %></td>
+    <td><%= own.to_s + " /" + sprintf("%0.2f" ,own/sum*100) + "%" %></td>
+    <td><%= other.to_s + " /" + sprintf("%0.2f" ,other/sum*100) + "%" %></td>
+    <td><%= unit.to_s + " /" + sprintf("%0.2f" ,unit/sum*100) + "%" %></td>
+    <td><%= returns.to_s + " /" + sprintf("%0.2f" ,returns/sum*100) + "%" %></td>
+    <td><%= waiting.to_s + " /" + sprintf("%0.2f" ,waiting/sum*100) + "%" %></td>
+    <td><%= s[1] %></td>
   </tr>
+  <% end %>
   <tr>
-    <td colspan="7"><b><%= "妥投率: " + sprintf("%0.2f" ,(own + other + unit)/sum) + "%, 未妥投率: " + (sprintf("%0.2f" ,waiting/sum)) + "%, 退件率: " + (sprintf("%0.2f" ,returns/sum)) + "%" %></b>
+    <td colspan="7"><b><%= "妥投率: " + sprintf("%0.2f" ,success_all/sum_all*100) + "%, 未妥投率: " + (sprintf("%0.2f" ,waiting_all/sum_all*100)) + "%, 退件率: " + (sprintf("%0.2f" ,returns_all/sum_all*100)) + "%" %></b>
     </td>
   </tr>
 </tbody>
