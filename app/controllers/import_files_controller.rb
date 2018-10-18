@@ -35,8 +35,13 @@ class ImportFilesController < ApplicationController
   end
 
   def download
-    file_path = @import_file.file_path
-    if File.exist?(file_path)
+    if @import_file.status.eql?"success"
+      file_path = @import_file.file_path
+    elsif @import_file.status.eql?"fail"
+      file_path = @import_file.err_file_path
+    end
+        
+    if !file_path.blank? and File.exist?(file_path)
       io = File.open(file_path)
       filename_before = @import_file.file_path.split('/').last[0,@import_file.file_path.split('/').last.rindex('.')]
       filename_after = @import_file.file_path.split('.').last
@@ -59,6 +64,6 @@ class ImportFilesController < ApplicationController
     end
 
     def import_file_params
-      params.require(:import_file).permit(:file_name, :file_path, :import_date, :is_process, :status, :desc, :err_file_path)
+      params.require(:import_file).permit(:file_name, :file_path, :import_date, :status, :desc, :err_file_path)
     end
 end

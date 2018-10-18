@@ -2,12 +2,6 @@
   <%= f.error_messages %>
 
   <div class="control-group">
-    <%= f.label :unit_id, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.select(:unit_id, Unit.where(parent_id: @user.unit_id).accessible_by(current_ability).map{|u| [u.name,u.id]}) %>
-    </div>
-  </div>
-  <div class="control-group">
     <%= f.label :role, :class => 'control-label' %>
     <div class="controls">
       <%= f.select(:role, Role::ROLE.invert) %>

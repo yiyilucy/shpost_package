@@ -135,15 +135,14 @@ class QueryResultsController < ApplicationController
   # end
 
   def import
+    @order_date = Time.now.strftime('%Y-%m-%d')
     unless request.get?
       business_id = params[:business_select]
-      if params[:order_date].blank? or params[:order_date]["order_date"].blank?
-        order_date=Time.now.strftime('%Y-%m-%d')
-      else 
-        order_date = to_date(params[:order_date]["order_date"])
+      if !params[:order_date].blank? and !params[:order_date]["order_date"].blank?
+        @order_date = to_date(params[:order_date]["order_date"])
       end
 
-      if file = upload_info(params[:file]['file'], business_id, order_date)    
+      if file = upload_info(params[:file]['file'], business_id, @order_date)    
         flash_message = "导入成功！"
       else
         flash_message = "导入失败!"
@@ -181,106 +180,23 @@ class QueryResultsController < ApplicationController
     xls_report.string  
   end
 
-#   def export
-#     @order_date=DateTime
-#     @business_id=nil
-#     results = []
-#     is_blank = true
 
-#     if params[:order_date].blank? or params[:order_date]["order_date"].blank?
-#       @order_date=Time.now.strftime('%Y-%m-%d')
-#     else 
-#       @order_date = to_date(params[:order_date]["order_date"])
-#     end
-    
-#     if !params[:business].blank? and !params[:business]["business_id"].blank? and params[:business]!={"business_id"=>"全部"} and params[:business][:business_id]!="全部"
-#       @business_id = params[:business]["business_id"]
-#       results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "own").order(:registration_no)
-#       results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "other").order(:registration_no)
-#       results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "unit").order(:registration_no)
-#       results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "returns").order(:registration_no)
-#       results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "waiting").order(:registration_no)
-#       QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ?", "#{@order_date}%", @business_id).update_all query_date: Time.now
-#     else
-#       results << QueryResult.accessible_by(current_ability).where("order_date like ?  and status = ?", "#{@order_date}%", "own").order(:registration_no)
-#       results << QueryResult.accessible_by(current_ability).where("order_date like ? and status = ?", "#{@order_date}%", "other").order(:registration_no)
-#       results << QueryResult.accessible_by(current_ability).where("order_date like ? and status = ?", "#{@order_date}%", "unit").order(:registration_no)
-#       results << QueryResult.accessible_by(current_ability).where("order_date like ? and status = ?", "#{@order_date}%", "returns").order(:registration_no)
-#       results << QueryResult.accessible_by(current_ability).where("order_date like ? and status = ?", "#{@order_date}%", "waiting").order(:registration_no)
-#       QueryResult.accessible_by(current_ability).where("order_date like ?", "#{@order_date}%").update_all query_date: Time.now
-#     end
-
-#     results.each do |r|
-#       if !r.blank?
-#         is_blank = false
-#       end
-#     end
-# # binding.pry          
-#     if is_blank
-#       flash[:alert] = "无数据"
-#       redirect_to :action => 'query_result_index'
-#     else
-#       respond_to do |format|  
-#         format.xls {   
-#           send_data(results_xls_content_for(results), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")  
-#         }
-#       end
-#     end
-#   end
-
-def export
-    @start_date = DateTime
-    @end_date = DateTime
+  def export
+    @order_date = params[:order_date]
     @business_id=nil
     results = []
-    is_blank = true
-
-    if params[:end_date].blank? or params[:end_date]["end_date"].blank?
-      @end_date = Time.now
-    else 
-      @end_date = to_date(params[:end_date]["end_date"])
-    end
-
-    if params[:start_date].blank? or params[:start_date]["start_date"].blank?
-      # @start_date = Time.now.beginning_of_month.strftime('%Y-%m-%d')
-      @start_date = @end_date.days_ago(15)
-    else 
-      @start_date = to_date(params[:start_date]["start_date"])
-    end
-    
-    if !params[:business].blank? and !params[:business]["business_id"].blank? and params[:business]!={"business_id"=>"全部"} and params[:business][:business_id]!="全部"
+        
+    if !@order_date.blank? and !params[:business].blank? and !params[:business]["business_id"].blank? 
       @business_id = params[:business]["business_id"]
-      results << QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date, @business_id, "own").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date, @business_id, "other").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date, @business_id, "unit").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date, @business_id, "returns").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date, @business_id, "waiting").order(:registration_no)
-      QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date, @business_id).update_all query_date: Time.now
-    else
-      results << QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and status = ?", @start_date, @end_date, "own").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and status = ?", @start_date, @end_date, "other").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and status = ?", @start_date, @end_date, "unit").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and status = ?", @start_date, @end_date, "returns").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and status = ?", @start_date, @end_date, "waiting").order(:registration_no)
-      QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? ", @start_date, @end_date).update_all query_date: Time.now
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "own").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "other").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?","#{@order_date}%", @business_id, "unit").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "returns").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "waiting").order(:registration_no)
+      QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ?", "#{@order_date}%", @business_id).update_all query_date: Time.now
     end
-
-    results.each do |r|
-      if !r.blank?
-        is_blank = false
-      end
-    end
-# binding.pry          
-    if is_blank
-      flash[:alert] = "无数据"
-      redirect_to :action => 'query_result_index'
-    else
-      respond_to do |format|  
-        format.xls {   
-          send_data(results_xls_content_for(results), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")  
-        }
-      end
-    end
+ 
+    send_data(results_xls_content_for(results), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")        
   end
 
   def results_xls_content_for(objs)  
@@ -296,7 +212,7 @@ def export
       blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
       sheet.row(0).default_format = blue  
   
-      sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件日期 查询日期 查询结果}  
+      sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件所属日期 查询日期 查询结果}  
       count_row = 1
       obj.each do |o|  
         sheet[count_row,0]="邮政数据查询"
@@ -314,28 +230,6 @@ def export
     xls_report.string  
   end
 
-  # def query_result_index
-  #   @order_date=DateTime
-  #   @business_id=nil
-  #   @results = []
-  #   @sum = 0
-      
-  #   if params[:order_date].blank? or params[:order_date]["order_date"].blank?
-  #     @order_date=Time.now.strftime('%Y-%m-%d')
-  #   else 
-  #     @order_date = to_date(params[:order_date]["order_date"])
-  #   end
-
-  #   if !params[:business].blank? and !params[:business]["business_id"].blank? and params[:business]!={"business_id"=>"全部"} and params[:business][:business_id]!="全部"
-  #     @business_id = params[:business]["business_id"]
-  #     @results = QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ?", "#{@order_date}%", @business_id).group(:status).count
-  #     @sum = QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ?", "#{@order_date}%", @business_id).count
-  #   else
-  #     @results = QueryResult.accessible_by(current_ability).where("order_date like ?", "#{@order_date}%").group(:status).count
-  #     @sum = QueryResult.accessible_by(current_ability).where("order_date like ?", "#{@order_date}%").count
-  #   end
-
-  # end
 
   def query_result_index
     @start_date = DateTime
@@ -352,23 +246,22 @@ def export
 
     if params[:start_date].blank? or params[:start_date]["start_date"].blank?
       # @start_date = Time.now.beginning_of_month.strftime('%Y-%m-%d')
-      @start_date = @end_date.days_ago(15)
+      # @start_date = @end_date.days_ago(15)
+      @start_date = Time.now
     else 
       @start_date = to_date(params[:start_date]["start_date"])
     end
 
-    if (Date.parse(@end_date.strftime('%Y-%m-%d')) - Date.parse(@start_date.strftime('%Y-%m-%d'))).to_i > 15
-      flash[:alert] = "日期间隔请勿超过15天"
-      redirect_to :action => 'query_result_index'
-    else
-      if !params[:business].blank? and !params[:business]["business_id"].blank? and params[:business]!={"business_id"=>"全部"} and params[:business][:business_id]!="全部"
-        @business_id = params[:business]["business_id"]
-        @results = QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date, @business_id).group("order_date").group(:status).order("order_date, status").count
-        @sum = QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date, @business_id).group("order_date").order("order_date").count
+    unless request.get?
+      if (Date.parse(@end_date.strftime('%Y-%m-%d')) - Date.parse(@start_date.strftime('%Y-%m-%d'))).to_i > 15
+        flash[:alert] = "日期间隔请勿超过15天"
+        redirect_to :action => 'query_result_index'
       else
-
-        @results = QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? ", @start_date, @end_date).group("order_date").group(:status).order("order_date, status").count
-        @sum = QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ?", @start_date, @end_date).group("order_date").order("order_date").count
+        if !params[:business].blank? and !params[:business]["business_id"].blank? 
+          @business_id = params[:business]["business_id"]
+          @results = QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date + 1.day, @business_id).group("order_date").group(:status).order("order_date, status").count
+          @sum = QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date + 1.day, @business_id).group("order_date").order("order_date").count
+        end
       end
     end
   end
@@ -387,7 +280,7 @@ def export
     def upload_info(file, business_id, order_date)
       if !file.original_filename.empty?
         direct = "#{Rails.root}/upload/info/"
-        filename = "#{Time.now.to_f}_#{file.original_filename}"
+        filename = "#{Time.now.strftime("%Y%m%d")}_#{file.original_filename}"
 
         file_path = direct + filename
         File.open(file_path, "wb") do |f|

@@ -18,7 +18,7 @@
 
     g.column name: model_class.human_attribute_name(:email), attribute: 'email'
 
-    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'unit_id' ,custom_filter: Unit.accessible_by(current_ability).map{|u| [u.name,u.id]} do |user|
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'id', assoc: :unit do |user|
       user.unit.try :name
     end
 

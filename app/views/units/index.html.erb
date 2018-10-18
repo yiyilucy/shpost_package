@@ -25,10 +25,7 @@
       unit.level
     end
     
-    g.column name: model_class.human_attribute_name(:parent_id), attribute: 'parent_id' ,custom_filter: Unit.accessible_by(current_ability).map{|u| [u.name,u.id]} do |unit|
-        unit.parent_id.blank? ? "" : Unit.find_by(id:unit.parent_id).name
-    end
-
+    
     
     g.column do |unit|
       ActiveSupport::SafeBuffer.new << 

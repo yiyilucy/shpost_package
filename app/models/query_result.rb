@@ -20,12 +20,21 @@ class QueryResult < ActiveRecord::Base
 			Dir.mkdir(direct)          
 		end
 		if import_file.blank?
-	    	files = ImportFile.where(is_process: false)
+	    	files = ImportFile.where(status: "waiting")
 	    else
-	    	files = ImportFile.where(id: import_file)
+	    	files = ImportFile.where(id: import_file, status: "waiting")
 	    end
+
 	    files.each do |f|
 	      if file = f.file_path
+	      	ActiveRecord::Base.transaction do	          
+	          	begin
+	          		f.update status: "doing"
+	          	rescue Exception => e
+					Rails.logger.error e.message 
+				    raise ActiveRecord::Rollback
+				end
+			end
 	      	ActiveRecord::Base.transaction do	          
 	          	begin
 		            sheet_error = []
@@ -46,7 +55,6 @@ class QueryResult < ActiveRecord::Base
 		            current_line = nil
 
 	            	2.upto(instance.last_row) do |line|
-# binding.pry
 			            current_line = line
 			            rowarr = instance.row(line)
 			            registration_no = rowarr[registration_no_index].blank? ? "" : rowarr[registration_no_index].to_s.gsub(' ','')
@@ -77,12 +85,12 @@ class QueryResult < ActiveRecord::Base
 				        file_path = direct + filename
 
 			            exporterrorinfos_xls_content_for(sheet_error, title_row, file_path)
-						f.update is_process: true, status: "fail", desc: "部分导入成功,缺少挂号编号", err_file_path: file_path
+						f.update status: "fail", desc: "部分导入成功,缺少挂号编号", err_file_path: file_path
 		            else
-		            	f.update is_process: true, status: "success"
+		            	f.update status: "success"
 		            end
 				rescue Exception => e
-					f.update is_process: true, status: "fail", desc: e.message + "(第" + current_line.to_s + "行)", err_file_path: file
+					f.update status: "fail", desc: e.message + "(第" + current_line.to_s + "行)", err_file_path: file
 				    Rails.logger.error e.message + "(第" + current_line.to_s + "行)"
 				    raise ActiveRecord::Rollback
 				end

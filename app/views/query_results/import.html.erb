@@ -11,7 +11,7 @@
 </div>
 <br/>
 <div>
-	<strong>邮件日期: </strong><%= text_field("order_date","order_date") %>
+	<strong>邮件所属日期: </strong><%= text_field("order_date","order_date", value: @order_date.to_s) %>
 </div>
 <br/>
 <font face="微软雅黑" color='#D9B300' size=3>上传文档: <%= file_field("file", "file",onclick: "$('#submit_button').removeAttr('disabled');") %></font>  

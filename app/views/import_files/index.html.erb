@@ -26,11 +26,7 @@
        import_file.created_at.localtime.to_s(:db)
     end
 
-    g.column name: model_class.human_attribute_name(:is_process), attribute: 'is_process'do |import_file| 
-      import_file.is_process_name
-    end
-
-    g.column name: model_class.human_attribute_name(:status), attribute: 'status' do |import_file| 
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: ImportFile::STATUS.invert do |import_file| 
       import_file.status_name
     end
 
@@ -38,8 +34,7 @@
     
     g.column do |import_file|
       ActiveSupport::SafeBuffer.new << 
-      (link_to t('.download', :default => t("helpers.links.download")), download_import_file_path(import_file),:method => 'post', :class => 'btn btn-xs btn-primary' if (can? :download, import_file) and import_file.status.eql?"fail") << ' ' <<
-      (link_to t('.insert_data', :default => t("helpers.links.insert_data")), insert_data_import_file_path(import_file), :class => 'btn btn-xs btn-primary' if (can? :insert_data, import_file) and !import_file.is_process)
+      (link_to t('.download', :default => t("helpers.links.download")), download_import_file_path(import_file),:method => 'post', :class => 'btn btn-xs btn-primary' if (can? :download, import_file) and ["fail", "success"].include?import_file.status)
       
       end
 

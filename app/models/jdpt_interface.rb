@@ -18,16 +18,23 @@ class JdptInterface
 
       query_results = query_results.order(:order_date)
 
-      i = query_results.size > 50 ? 50 : query_results.size
+      i = query_results.size > 10 ? 10 : query_results.size
       ts = []
       i.times.each do |x|
         t = Thread.new do
-          while query_results.size > 0
-            query_result = nil
-            @@jdpt_lock.synchronize do
-              query_result = query_results.pop
+          ActiveRecord::Base.transaction do
+            begin
+              while query_results.size > 0
+                query_result = nil
+                @@jdpt_lock.synchronize do
+                  query_result = query_results.pop
+                end
+                JdptInterface.jdpt_trace query_result
+              end
+            rescue Exception => e
+              Rails.logger.error e.message
+              raise ActiveRecord::Rollback
             end
-            JdptInterface.jdpt_trace query_result
           end
         end
         ts << t
@@ -36,9 +43,9 @@ class JdptInterface
         x.join
       end
 
-      query_results.each do |x|
-        JdptInterface.jdpt_trace x
-      end
+          # query_results.each do |x|
+          #   JdptInterface.jdpt_trace x
+          # end
     end
   end
 

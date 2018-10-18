@@ -16,8 +16,7 @@
   <dd><%= @unit.tcbd_khdh %></dd>
   <dt><strong><%= model_class.human_attribute_name(:level) %>:</strong></dt>
   <dd><%= @unit.level %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:parent_id) %>:</strong></dt>
-  <dd><%= @unit.parent_id.blank? ? "" : Unit.find_by(id:@unit.parent_id).name %></dd>
+  
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

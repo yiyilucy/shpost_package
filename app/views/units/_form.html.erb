@@ -35,12 +35,6 @@
       <%= f.select(:level, Unit::UNIT_LEVEL.invert) %>
     </div>
   </div>
-  <div class="control-group">
-    <%= f.label :parent_id, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.select(:parent_id, Unit.where("level in (1,2)").order(:level,:id).map{|u| [u.name,u.id]})%>
-    </div>
-  </div>
   
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),

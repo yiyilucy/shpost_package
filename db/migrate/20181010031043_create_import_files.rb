@@ -7,7 +7,6 @@ class CreateImportFiles < ActiveRecord::Migration
       t.integer :user_id
       t.integer :unit_id
       t.integer :business_id
-      t.boolean :is_process, default: false
       t.string :status, default: "waiting"
       t.string :desc
       t.string :err_file_path
