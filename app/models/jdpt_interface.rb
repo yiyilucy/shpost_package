@@ -53,7 +53,7 @@ class JdptInterface
 
     body = JdptInterface.init_jdpt_trace_body(query_result)
 
-    InterfaceSender.interface_sender_initialize("jdpt_trace", body, {business_id: query_result.business_id, unit_id: query_result.unit_id,  object_id: query_result.id, object_class: query_result.class.to_s})
+    InterfaceSender.interface_sender_initialize("jdpt_trace", body, {business_id: query_result.business_id, unit_id: query_result.unit_id,  object_id: query_result.id, object_class: query_result.class.to_s, callback_params: {id: query_result.id}.to_json})
   end
 
   def self.init_jdpt_trace_body(query_result)
@@ -76,14 +76,43 @@ class JdptInterface
     return body.to_json
   end
 
-  def do_response(res, *args)
+  def self.do_response(res, *args)
     begin
-      # res_hash = ActiveSupport::JSON.decode(res)
-      # msg_body = res_hash['msgBody']
-      # msg = JSON.parse msg_body
-      puts res
+      res_hash = ActiveSupport::JSON.decode(res)
+      if res_hash["responseState"]
+        query_result = QueryResult.find args.first['id']
+        if query_result.blank?
+          return false
+        end
 
-      return true
+        last_result = res_hash["responseItems"].last
+
+        status = nil
+        opt_code = last_result["opCode"]
+        if opt_code.blank?
+          return false
+        end
+
+        if opt_code.eql? '704'
+          if last_result["opDesc"].include? '本人'
+            status = QueryResult::STATUS[:own]
+          elsif last_result["opDesc"].include? '他人'
+            status = QueryResult::STATUS[:other]
+          else
+            status = QueryResult::STATUS[:unit]
+          end
+        elsif opt_code.eql? '748'
+          status = QueryResult::STATUS[:own]
+        elsif opt_code.eql? '747'
+          status = QueryResult::STATUS[:unit]
+        elsif opt_code.in? ['708', '711']
+          status = QueryResult::STATUS[:returns]
+        end
+        query_result.update(status: status, result: last_result["opDesc"], query_date: Date.today.to_time)
+        return true
+      else
+        return false
+      end
     rescue => e
       return false
     end
