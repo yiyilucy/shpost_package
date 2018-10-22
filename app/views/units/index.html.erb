@@ -21,10 +21,6 @@
 
     g.column name: model_class.human_attribute_name(:tcbd_khdh), attribute: 'tcbd_khdh'
 
-    g.column name: model_class.human_attribute_name(:level), attribute: 'level',custom_filter: Unit::UNIT_LEVEL.invert do |unit| 
-      unit.level
-    end
-    
     
     
     g.column do |unit|

@@ -29,12 +29,6 @@
       <%= f.text_field :tcbd_khdh, :class => 'text_field' %>
     </div>
   </div>
-  <div class="control-group">
-    <%= f.label :level, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.select(:level, Unit::UNIT_LEVEL.invert) %>
-    </div>
-  </div>
   
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
