@@ -44,7 +44,7 @@ class UnitUsersController < ApplicationController
   # PATCH/PUT /users/1.json
   def update
     respond_to do |format|
-      if @user.update(unituser_params)
+      if @user.update(user_params)
         format.html { redirect_to unit_user_path(@unit,@user), notice: I18n.t('controller.update_success_notice', model: '用户') }
         format.json { head :no_content }
       else

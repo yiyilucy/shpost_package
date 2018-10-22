@@ -22,8 +22,8 @@ class Ability
     #can :manage, :all
         
 
-        can :manage, Unit, unit_id: user.unit_id
-
+        can :manage, Unit, id: user.unit_id
+        cannot :create, Unit
         can :read, UserLog, user: {unit_id: user.unit_id}
         can :destroy, UserLog, operation: '订单导入'
 
@@ -35,7 +35,7 @@ class Ability
         can :role, :user
         
         # cannot :role, User, role: 'unitadmin'
-        cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
+        # cannot [:create, :destroy, :update], User, role: ['unitadmin', 'superadmin']
         can :update, User, id: user.id
 
         can :manage, QueryResult, unit_id: user.unit_id
@@ -44,10 +44,14 @@ class Ability
         can :manage, ImportFile, unit_id: user.unit_id
         
     elsif user.user?
-        can :update, User, id: user.id
+        # can :read, Unit, id: user.unit_id
+        # can [:read, :update], User, id: user.id
         can :read, UserLog, user: {id: user.id}
 
-        can :read, Unit, id: user.unit_id
+        can :manage, QueryResult, unit_id: user.unit_id
+        can :manage, Business, unit_id: user.unit_id
+        cannot :destroy, Business
+        can :manage, ImportFile, unit_id: user.unit_id
 
     else
         cannot :manage, :all
