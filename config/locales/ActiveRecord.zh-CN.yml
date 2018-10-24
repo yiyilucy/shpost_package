@@ -151,6 +151,8 @@ zh-CN:
       roles: 角色管理
       download: 下载
       insert_data: 导数据
+      up_download_import: 模板上传
+      up_download_export: 模板下载
     titles:
       edit: 编辑%{model}
       new: 新增%{model}
@@ -286,6 +288,9 @@ zh-CN:
       import_file:
         one: 信息导入结果
         other: 信息导入结果
+      up_download:
+        one: 上传下载模板
+        other: 上传下载模板
     attributes:
       user:
         email: "电子邮件"
@@ -342,6 +347,13 @@ zh-CN:
         desc: "出错信息描述"
         err_file_path: "出错文件存放路径"
         created_at: "导入时间"
+      up_download:
+        name: "名字"
+        use: "用途"
+        desc: "备注"
+        ver_no: "版本号"
+        url: "地址"
+        oper_date: "操作时间"
   menu:
     permission:
       name: "权限管理"
@@ -401,6 +413,16 @@ zh-CN:
         user_log:
           name: "日志查询"
           link: "/user_logs"
+          need_count: false
+    up_downloads:
+      name: "模板管理"
+      needrole:
+        can: :read
+        role: :UpDownload
+      submenu:
+        up_download:
+          name: "模板上传下载"
+          link: "/up_downloads"
           need_count: false
         # interface_log:
         #   name: "接口信息(info)"

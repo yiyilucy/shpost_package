@@ -15,6 +15,9 @@ class QueryResult < ActiveRecord::Base
 
 	def self.import_data(import_file)
 		direct = "#{Rails.root}/public/download/"
+		trans_error = false
+		current_line = nil
+		message = ""
        
 		if !File.exist?(direct)
 			Dir.mkdir(direct)          
@@ -50,9 +53,17 @@ class QueryResult < ActiveRecord::Base
 		            end
 		            instance.default_sheet = instance.sheets.first
 		            title_row = instance.row(1)
-		            registration_no_index = title_row.index("挂号编号")
-		            postcode_index = title_row.index("邮编")
-		            current_line = nil
+		            if !title_row.index("挂号编号").blank?
+		            	registration_no_index = title_row.index("挂号编号")
+		            else
+		            	registration_no_index = 2
+		            end
+		            if !title_row.index("邮编").blank?
+		            	postcode_index = title_row.index("邮编")
+		            else
+		            	postcode_index = 4
+		            end
+		            
 
 	            	2.upto(instance.last_row) do |line|
 			            current_line = line
@@ -90,11 +101,15 @@ class QueryResult < ActiveRecord::Base
 		            	f.update status: "success"
 		            end
 				rescue Exception => e
-					f.update status: "fail", desc: e.message + "(第" + current_line.to_s + "行)", err_file_path: file
+					trans_error = true
+					message = e.message + "(第" + current_line.to_s + "行)"
 				    Rails.logger.error e.message + "(第" + current_line.to_s + "行)"
 				    raise ActiveRecord::Rollback
 				end
 	        end
+	        if trans_error
+				f.update status: "fail", desc: message, err_file_path: file
+			end
 	      end
 	      
 	    end

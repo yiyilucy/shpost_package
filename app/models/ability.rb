@@ -12,6 +12,8 @@ class Ability
         can :role, :user
         can :manage, QueryResult
         can :manage, ImportFile
+        can :manage, Business
+        can :manage, UpDownload
 
         # cannot :role, :superadmin
         cannot [:role, :create, :destroy, :update], User, role: 'superadmin'
@@ -40,9 +42,9 @@ class Ability
 
         can :manage, QueryResult, unit_id: user.unit_id
         can :manage, Business, unit_id: user.unit_id
-        cannot :destroy, Business
+        cannot [:destroy, :new], Business
         can :manage, ImportFile, unit_id: user.unit_id
-        
+        can :manage, UpDownload
     elsif user.user?
         # can :read, Unit, id: user.unit_id
         # can [:read, :update], User, id: user.id
@@ -52,7 +54,7 @@ class Ability
         can :manage, Business, unit_id: user.unit_id
         cannot :destroy, Business
         can :manage, ImportFile, unit_id: user.unit_id
-
+        can [:read, :up_download_export], UpDownload
     else
         cannot :manage, :all
         #can :update, User, id: user.id

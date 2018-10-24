@@ -138,14 +138,18 @@ class QueryResultsController < ApplicationController
     @order_date = Time.now.strftime('%Y-%m-%d')
     unless request.get?
       business_id = params[:business_select]
-      if !params[:order_date].blank? and !params[:order_date]["order_date"].blank?
-        @order_date = to_date(params[:order_date]["order_date"])
-      end
-
-      if file = upload_info(params[:file]['file'], business_id, @order_date)    
-        flash_message = "导入成功！"
+      if business_id.blank?
+        flash_message = "请选择商户！"
       else
-        flash_message = "导入失败!"
+        if !params[:order_date].blank? and !params[:order_date]["order_date"].blank?
+          @order_date = to_date(params[:order_date]["order_date"])
+        end
+
+        if file = upload_info(params[:file]['file'], business_id, @order_date)    
+          flash_message = "导入成功！"
+        else
+          flash_message = "导入失败!"
+        end
       end
       flash[:notice] = flash_message
 
@@ -280,7 +284,7 @@ class QueryResultsController < ApplicationController
     def upload_info(file, business_id, order_date)
       if !file.original_filename.empty?
         direct = "#{Rails.root}/upload/info/"
-        filename = "#{Time.now.strftime("%Y%m%d")}_#{file.original_filename}"
+        filename = "#{Time.now.to_f}_#{file.original_filename}"
 
         file_path = direct + filename
         File.open(file_path, "wb") do |f|

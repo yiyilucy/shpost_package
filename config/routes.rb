@@ -1,4 +1,5 @@
 ShpostPackage::Application.routes.draw do
+  
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
@@ -85,6 +86,21 @@ ShpostPackage::Application.routes.draw do
       get 'download'
       post 'download' => 'import_files#download'
       get 'insert_data'
+    end
+  end
+
+  resources :up_downloads do
+    collection do 
+      get 'up_download_import'
+      post 'up_download_import' => 'up_downloads#up_download_import'
+      
+      get 'to_import'
+      
+      
+    end
+    member do
+      get 'up_download_export'
+      post 'up_download_export' => 'up_downloads#up_download_export'
     end
   end
 
