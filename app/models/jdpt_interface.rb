@@ -59,7 +59,8 @@ class JdptInterface
   def self.init_jdpt_trace_body(query_result)
     business = query_result.business
     body = {}
-    body['sendID'] = send_id = 'SHPOST_PACKAGE'
+    body['sendID'] = send_id = business.send_id
+    body['sendID'] = send_id ||= 'SHPOST_PACKAGE'
     body['proviceNo'] = '99'
     body['msgKind'] = 'SHPOST_PACKAGE_JDPT_TRACE'
     body['serialNo'] = "#{query_result.id}_#{Time.now.to_f}"
