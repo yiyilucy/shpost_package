@@ -81,14 +81,20 @@ class JdptInterface
     begin
       res_hash = ActiveSupport::JSON.decode(res)
       if res_hash["responseState"]
+        status = QueryResult::STATUS[:waiting]
+
         query_result = QueryResult.find args.first['id']
         if query_result.blank?
           return false
         end
 
+        if ! res_hash["errorDesc"].blank? && res_hash["responseItems"].blank?
+          query_result.update(status: status, result: res_hash["errorDesc"], query_date: Date.today.to_time)
+          return true
+        end
+
         last_result = res_hash["responseItems"].last
 
-        status = nil
         opt_code = last_result["opCode"]
         if opt_code.blank?
           return false
