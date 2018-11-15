@@ -243,7 +243,7 @@ class QueryResultsController < ApplicationController
     @sum = 0
           
     if params[:end_date].blank? or params[:end_date]["end_date"].blank?
-      @end_date = Time.now
+      @end_date = Date.parse(Time.now.strftime('%Y-%m-%d'))
     else 
       @end_date = to_date(params[:end_date]["end_date"])
     end
@@ -251,7 +251,7 @@ class QueryResultsController < ApplicationController
     if params[:start_date].blank? or params[:start_date]["start_date"].blank?
       # @start_date = Time.now.beginning_of_month.strftime('%Y-%m-%d')
       # @start_date = @end_date.days_ago(15)
-      @start_date = Time.now
+      @start_date = Date.parse(Time.now.strftime('%Y-%m-%d'))
     else 
       @start_date = to_date(params[:start_date]["start_date"])
     end
