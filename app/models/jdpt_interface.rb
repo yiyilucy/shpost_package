@@ -96,6 +96,7 @@ class JdptInterface
         last_result = res_hash["responseItems"].last
 
         opt_code = last_result["opCode"]
+        opt_at = last_result["opTime"]
         if opt_code.blank?
           return false
         end
@@ -115,7 +116,7 @@ class JdptInterface
         elsif opt_code.in? ['708', '711']
           status = QueryResult::STATUS[:returns]
         end
-        query_result.update(status: status, result: last_result["opDesc"], query_date: Date.today.to_time)
+        query_result.update(status: status, result: last_result["opDesc"], query_date: Date.today.to_time, operated_at: opt_at)
         return true
       else
         return false

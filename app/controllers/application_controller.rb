@@ -30,51 +30,7 @@ class ApplicationController < ActionController::Base
     object ||= eval("@#{controller_name.singularize}")
 
     operation = args.first[:operation]
-    if operation.eql?"确认出库"
-      if object
-        if object.order_type.eql?"b2b"
-          if current_storage.need_pick
-            operation = "b2b二次拣货确认出库"
-          else
-            operation = "b2b确认出库"
-          end
-        else
-          if object.order_type.eql?"b2c"
-            if current_storage.need_pick
-              operation = "电商二次拣货确认出库"
-            else
-              operation = "电商确认出库"
-            end
-          end
-        end
-      end
-    end
-    if operation.eql?"生成出库单"
-      if current_storage.need_pick
-        operation = "二次拣货生成出库单"
-      else
-        operation = "生成出库单"
-      end
-    end
-
-    if operation.eql?"生成批量出库单"
-      parent = eval("@#{args.first[:parent].to_s}")
-      if !parent.blank?
-        if parent.status.eql?"closed"
-          return
-        end
-      end
-    end
-
-    import_type = eval("@#{args.first[:import_type].to_s}")
-    if !import_type.blank?
-      if import_type.eql?"back" and operation.eql?"订单导入回馈"
-        operation = "面单信息回馈"
-      end
-      if import_type.eql?"standard" and operation.eql?"订单导入回馈"
-        operation = "订单导入"
-      end
-    end
+    
 
     finish = eval("@#{args.first[:finish].to_s}")
     # operation ||= I18n.t("action_2_operation.#{action_name}") + object.class.model_name.human.to_s
@@ -103,28 +59,9 @@ class ApplicationController < ActionController::Base
             @user_log.object_symbol = object.id
           end
           
-          if args.first[:operation].eql? "包装出库" 
-            @user_log.orders = Order.where(id: object.id)
-          end
-          if args.first[:operation].eql? "生成出库单" or args.first[:operation].eql? "确认出库"
-            @user_log.orders = object.orders
-          end
-          
           @user_log.save
-
-          if args.first[:operation].eql? "包装出库" 
-            Order.where(id: object.id).update_all(out_at:@user_log.created_at)
-          end
-          if args.first[:operation].eql?"确认出库"
-            Order.where(keyclientorder_id: object.id).update_all(out_at:@user_log.created_at)
-          end
-      
         end
       else
-        if operation.eql? "订单导入"
-            @user_log.orders = Order.where(id: ids)
-            @user_log.object_symbol = symbol
-        end
         @user_log.save
       end
     end
