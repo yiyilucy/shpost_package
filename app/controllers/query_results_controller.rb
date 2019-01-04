@@ -216,7 +216,7 @@ class QueryResultsController < ApplicationController
       blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
       sheet.row(0).default_format = blue  
   
-      sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件所属日期 查询日期 查询结果}  
+      sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件所属日期 查询日期 查询结果 操作时间}  
       count_row = 1
       obj.each do |o|  
         sheet[count_row,0]="邮政数据查询"
@@ -224,6 +224,7 @@ class QueryResultsController < ApplicationController
         sheet[count_row,2]=o.order_date.strftime('%Y-%m-%d').to_s
         sheet[count_row,3]=o.query_date.strftime('%Y-%m-%d').to_s
         sheet[count_row,4]=o.result.blank? ? "" : o.result
+        sheet[count_row,5]=o.operated_at.blank? ? "" : o.operated_at.strftime('%Y-%m-%d').to_s
         
         count_row += 1
       end
@@ -291,7 +292,7 @@ class QueryResultsController < ApplicationController
            f.write(file.read)
         end
 
-        ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id
+        ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, err_file_path: file_path
 
         file_path
       end

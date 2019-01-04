@@ -18,6 +18,7 @@ class QueryResult < ActiveRecord::Base
 		trans_error = false
 		current_line = nil
 		message = ""
+		txt = ""
        
 		if !File.exist?(direct)
 			Dir.mkdir(direct)          
@@ -72,8 +73,8 @@ class QueryResult < ActiveRecord::Base
 			            postcode = rowarr[postcode_index].blank? ? "" : rowarr[postcode_index].to_s.gsub(' ','')
 
 		              	if registration_no.blank?
-			              txt = "缺少挂号编号"
-			              sheet_error << (rowarr << txt << current_line)
+			              txt = "缺少挂号编号" + "(第" + current_line.to_s + "行)"
+			              sheet_error << (rowarr << txt)
 			              next
 			            end
 		              # if postcode.blank?
@@ -85,21 +86,29 @@ class QueryResult < ActiveRecord::Base
 	              		# info = QueryResult.find_by(registration_no: registration_no)
 	              
 	              		# if info.blank?
+	              		begin
 	                		QueryResult.create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询"
+			            rescue ActiveRecord::RecordInvalid => e
+							# trans_error = true
+							txt = e.message + "(第" + current_line.to_s + "行)"
+							sheet_error << (rowarr << txt)
+							next
+						    # raise ActiveRecord::Rollback
+						end
 			            # else 
 			            #     info.update postcode: postcode
 			            # end
 	            	end
 	            
 		            if !sheet_error.blank?
-		            	filename = "Error_Infos_#{Time.now.strftime("%Y%m%d")}.xls"
+		            	filename = "Error_Infos_#{Time.now.strftime('%Y%m%d %H:%M:%S')}.xls"
 				        file_path = direct + filename
-
+						    
 			            exporterrorinfos_xls_content_for(sheet_error, title_row, file_path)
-						f.update status: "fail", desc: "部分导入成功,缺少挂号编号", err_file_path: file_path
-		            else
-		            	f.update status: "success"
+						f.update desc: "部分导入成功,#{sheet_error.size}行失败,可能原因是#{txt}", err_file_path: file_path
 		            end
+		            f.update status: "success"
+		            
 				rescue Exception => e
 					trans_error = true
 					message = e.message + "(第" + current_line.to_s + "行)"
@@ -108,7 +117,7 @@ class QueryResult < ActiveRecord::Base
 				end
 	        end
 	        if trans_error
-				f.update status: "fail", desc: message, err_file_path: file
+				f.update status: "fail", desc: message
 			end
 	      end
 	      
@@ -125,6 +134,7 @@ class QueryResult < ActiveRecord::Base
 	     
 	    sheet1.row(0).concat title_row
 	    size = obj.first.size 
+	    				    
 	    count_row = 1
 	    obj.each do |obj|
 	      count = 0
