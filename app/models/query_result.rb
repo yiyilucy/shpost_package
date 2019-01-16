@@ -44,7 +44,7 @@ class QueryResult < ActiveRecord::Base
 		            sheet_error = []
 		            rowarr = [] 
 		            instance=nil
-		            
+		            # puts "begin"
 		            if file.include?('.xlsx')
 		              instance= Roo::Excelx.new(file)
 		            elsif file.include?('.xls')
@@ -52,6 +52,8 @@ class QueryResult < ActiveRecord::Base
 		            elsif file.include?('.csv')
 		              instance= Roo::CSV.new(file)
 		            end
+		            
+		            # puts "File read: "+Time.now.strftime("%Y-%m-%d %H:%M:%S")
 		            instance.default_sheet = instance.sheets.first
 		            title_row = instance.row(1)
 		            if !title_row.index("挂号编号").blank?
@@ -77,6 +79,7 @@ class QueryResult < ActiveRecord::Base
 			              sheet_error << (rowarr << txt)
 			              next
 			            end
+			            # puts "第" + current_line.to_s + "行, " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
 		              # if postcode.blank?
 		              #   txt = "缺少邮编"
 		              #   sheet_error << (rowarr << txt)
