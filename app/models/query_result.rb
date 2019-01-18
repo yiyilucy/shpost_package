@@ -23,14 +23,9 @@ class QueryResult < ActiveRecord::Base
 		if !File.exist?(direct)
 			Dir.mkdir(direct)          
 		end
-		if import_file.blank?
-	    	files = ImportFile.where(status: "waiting")
-	    else
-	    	files = ImportFile.where(id: import_file, status: "waiting")
-	    end
+		f = ImportFile.where(status: "waiting").first
 
-	    files.each do |f|
-	      if file = f.file_path
+	    if file = f.file_path
 	      	ActiveRecord::Base.transaction do	          
 	          	begin
 	          		f.update status: "doing"
@@ -44,7 +39,7 @@ class QueryResult < ActiveRecord::Base
 		            sheet_error = []
 		            rowarr = [] 
 		            instance=nil
-		            # puts "begin"
+		            # Rails.logger.info "begin"
 		            if file.include?('.xlsx')
 		              instance= Roo::Excelx.new(file)
 		            elsif file.include?('.xls')
@@ -53,7 +48,7 @@ class QueryResult < ActiveRecord::Base
 		              instance= Roo::CSV.new(file)
 		            end
 		            
-		            # puts "File read: "+Time.now.strftime("%Y-%m-%d %H:%M:%S")
+		            # Rails.logger.info "File read: "+Time.now.strftime("%Y-%m-%d %H:%M:%S")
 		            instance.default_sheet = instance.sheets.first
 		            title_row = instance.row(1)
 		            if !title_row.index("挂号编号").blank?
@@ -79,29 +74,19 @@ class QueryResult < ActiveRecord::Base
 			              sheet_error << (rowarr << txt)
 			              next
 			            end
-			            # puts "第" + current_line.to_s + "行, " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
-		              # if postcode.blank?
-		              #   txt = "缺少邮编"
-		              #   sheet_error << (rowarr << txt)
-		              #   next
-		              # end
-
-	              		# info = QueryResult.find_by(registration_no: registration_no)
-	              
-	              		# if info.blank?
-	              		begin
+			            # Rails.logger.info "第" + current_line.to_s + "行, " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
+			            begin
 	                		QueryResult.create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询"
 			            rescue ActiveRecord::RecordInvalid => e
-							# trans_error = true
 							txt = e.message + "(第" + current_line.to_s + "行)"
 							sheet_error << (rowarr << txt)
 							next
-						    # raise ActiveRecord::Rollback
 						end
-			            # else 
-			            #     info.update postcode: postcode
-			            # end
-	            	end
+
+						if current_line%1000 == 0
+							Rails.logger.info "*********** " + Time.now.strftime("%Y-%m-%d %H:%M:%S") + ", 文件<" + f.file_name + ">已处理到第" + current_line.to_s + "行 ***********"
+						end
+			        end
 	            
 		            if !sheet_error.blank?
 		            	filename = "Error_Infos_#{Time.now.strftime('%Y%m%d %H:%M:%S')}.xls"
@@ -122,8 +107,6 @@ class QueryResult < ActiveRecord::Base
 	        if trans_error
 				f.update status: "fail", desc: message
 			end
-	      end
-	      
 	    end
  	end
 
