@@ -41,9 +41,13 @@ class InterfaceSender < ActiveRecord::Base
     end
   end
 
-  def self.schedule_send
+  def self.schedule_send(thread_count = nil)
     interface_senders = self.where(status: InterfaceSender::STATUS[:waiting]).where('next_time < ?', Time.now).order(:created_at).limit(1000)
-    i = interface_senders.size > 50 ? 50 : interface_senders.size
+    if ! thread_count.blank?
+      i = thread_count
+    else
+      i = interface_senders.size > 50 ? 50 : interface_senders.size
+    end
     ts = []
     i.times.each do |x|
       t = Thread.new do
@@ -52,6 +56,10 @@ class InterfaceSender < ActiveRecord::Base
           @@lock.synchronize do
             is = interface_senders.pop
           end
+          if is.blank?
+            next
+          end
+          
           puts is.id
           is.interface_send
         end
