@@ -2,8 +2,8 @@ class JdptInterface
 
   def self.clean_date_by_days(days = 90)
     date = (Time.now - days.day).to_date
-    QueryResult.where("created_at < date").delete_all
-    InterfaceSender.where("created_at < date").delete_all
+    QueryResult.where("created_at < ?", date).delete_all
+    InterfaceSender.where("created_at < ?", date).delete_all
   end
 
   @@jdpt_lock = Mutex.new
