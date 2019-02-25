@@ -159,30 +159,30 @@ class QueryResultsController < ApplicationController
 
 
 
-  def exporterrorinfos_xls_content_for(obj,title_row)
-    xls_report = StringIO.new  
-    book = Spreadsheet::Workbook.new  
-    sheet1 = book.create_worksheet :name => "Infos"  
+  # def exporterrorinfos_xls_content_for(obj,title_row)
+  #   xls_report = StringIO.new  
+  #   book = Spreadsheet::Workbook.new  
+  #   sheet1 = book.create_worksheet :name => "Infos"  
 
-    blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
-    red = Spreadsheet::Format.new :color => :red
-    sheet1.row(0).default_format = blue 
+  #   blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+  #   red = Spreadsheet::Format.new :color => :red
+  #   sheet1.row(0).default_format = blue 
      
-    sheet1.row(0).concat title_row
-    size = obj.first.size 
-    count_row = 1
-    obj.each do |obj|
-      count = 0
-      while count<=size
-        sheet1[count_row,count]=obj[count]
-        count += 1
-      end
+  #   sheet1.row(0).concat title_row
+  #   size = obj.first.size 
+  #   count_row = 1
+  #   obj.each do |obj|
+  #     count = 0
+  #     while count<=size
+  #       sheet1[count_row,count]=obj[count]
+  #       count += 1
+  #     end
       
-      count_row += 1
-    end 
-    book.write xls_report  
-    xls_report.string  
-  end
+  #     count_row += 1
+  #   end 
+  #   book.write xls_report  
+  #   xls_report.string  
+  # end
 
 
   def export
