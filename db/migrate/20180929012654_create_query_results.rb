@@ -7,7 +7,7 @@ class CreateQueryResults < ActiveRecord::Migration
       t.datetime :order_date
       t.datetime :query_date
       t.string :result
-      t.string :status
+      t.string :status, default: 'waiting'
       t.integer :unit_id
       t.integer :business_id
 

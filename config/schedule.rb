@@ -11,14 +11,14 @@ env :GEM_PATH, ENV['GEM_PATH']
 
 set :output, "log/cron_log.log"
 
-# every 2.minutes do
-#   runner "InterfaceSender.schedule_send"
-# end
+every 2.minutes do
+  runner "InterfaceSender.schedule_send"
+end
 
-# every '15 1 * * *' do  
-#   runner "JdptInterface.batch_init_jdpt_trace"
-# end
+every '15 1 * * *' do  
+  runner "JdptInterface.batch_init_jdpt_trace"
+end
 
-every 30.minutes do
+every 2.minutes do
   runner "QueryResult.import_data(nil)"
 end

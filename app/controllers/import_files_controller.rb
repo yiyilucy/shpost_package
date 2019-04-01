@@ -35,7 +35,7 @@ class ImportFilesController < ApplicationController
   end
 
   def download
-    file_path = @import_file.err_file_path
+    file_path = @import_file.err_file_path.blank? ? @import_file.file_path : @import_file.err_file_path
         
     if !file_path.blank? and File.exist?(file_path)
       io = File.open(file_path)

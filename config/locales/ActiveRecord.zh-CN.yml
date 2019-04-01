@@ -347,6 +347,7 @@ zh-CN:
         desc: "出错信息描述"
         err_file_path: "出错文件存放路径"
         created_at: "导入时间"
+        type: "导入类型"
       up_download:
         name: "名字"
         use: "用途"

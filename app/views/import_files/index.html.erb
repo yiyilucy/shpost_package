@@ -10,15 +10,15 @@
       import_file.import_date.strftime('%Y-%m-%d').to_s
     end
 
-    g.column name: model_class.human_attribute_name(:business_id), attribute: 'id', assoc: :business do |import_file|
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', assoc: :business do |import_file|
       import_file.business.try :name
     end
 
-    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'id', assoc: :unit do |import_file|
+    g.column name: model_class.human_attribute_name(:unit_id), attribute: 'name', assoc: :unit do |import_file|
       import_file.unit.try :name
     end
 
-    g.column name: model_class.human_attribute_name(:user_id), attribute: 'id', assoc: :user do |import_file|
+    g.column name: model_class.human_attribute_name(:user_id), attribute: 'name', assoc: :user do |import_file|
       import_file.user.try :name
     end
 
@@ -34,7 +34,7 @@
     
     g.column do |import_file|
       ActiveSupport::SafeBuffer.new << 
-      (link_to t('.download', :default => t("helpers.links.download")), download_import_file_path(import_file),:method => 'post', :class => 'btn btn-xs btn-primary' if (can? :download, import_file) and ["fail", "success"].include?import_file.status)
+      (link_to t('.download', :default => t("helpers.links.download")), download_import_file_path(import_file),:method => 'post', :class => 'btn btn-xs btn-primary' if (can? :download, import_file))
       
       end
 
