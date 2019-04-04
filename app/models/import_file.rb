@@ -109,7 +109,7 @@ class ImportFile < ActiveRecord::Base
 			            filename = "Error_Infos_#{Time.now.strftime('%Y%m%d %H:%M:%S')}.xls"
 			            file_path = direct + filename
 			            
-			              exporterrorinfos_xls_content_for(sheet_error, title_row, file_path)
+			            exporterrorinfos_xls_content_for(sheet_error, title_row, file_path)
 			            f.update desc: "部分导入成功,#{sheet_error.size}行失败,可能原因是#{txt}", err_file_path: file_path
 			        end
 
@@ -128,7 +128,7 @@ class ImportFile < ActiveRecord::Base
     	end
   	end
 
-  	def exporterrorinfos_xls_content_for(obj,title_row,file_path)
+  	def self.exporterrorinfos_xls_content_for(obj,title_row,file_path)
 	    book = Spreadsheet::Workbook.new  
 	    sheet1 = book.create_worksheet :name => "Infos"  
 

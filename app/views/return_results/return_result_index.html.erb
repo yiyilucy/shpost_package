@@ -67,6 +67,11 @@
     <td><%= submit_tag "导出",:class => 'btn btn-primary', onclick: "form2.action='/return_results/export?order_date=#{s[0].strftime('%Y-%m-%d')}';form2.submit();" %></td>
   </tr>
   <% end %>
+  <% @sum_all = ((@sum_all==0) ? 0 : @sum_all.to_f) %>
+  <tr>
+    <td colspan="7"><b><%= "普通退件率: " + sprintf("%0.2f" ,@normal_all/@sum_all*100) + "%, 签收后退件率: " + (sprintf("%0.2f" ,@signed_all/@sum_all*100)) + "%, 异常退件率: " + (sprintf("%0.2f" ,@others_all/@sum_all*100)) + "%, 待查询率: " + (sprintf("%0.2f" ,@waiting_all/@sum_all*100)) + "%" %></b>
+    </td>
+  </tr>
 </tbody>
 </table>
 </div>
