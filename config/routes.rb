@@ -104,5 +104,15 @@ ShpostPackage::Application.routes.draw do
     end
   end
 
+  resources :return_results do
+    collection do 
+      get 'import'
+      post 'import' => 'return_results#import'
+      get 'return_result_index'
+      post 'return_result_index'
+      post 'export'
+    end
+  end
+
   
 end

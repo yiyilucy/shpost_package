@@ -30,6 +30,10 @@
       import_file.status_name
     end
 
+    g.column name: model_class.human_attribute_name(:import_type), attribute: 'import_type',custom_filter: ImportFile::IMPORT_TYPE.invert do |import_file| 
+      import_file.import_type_name
+    end
+
     g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
     
     g.column do |import_file|

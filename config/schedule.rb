@@ -20,5 +20,5 @@ every '15 1 * * *' do
 end
 
 every 2.minutes do
-  runner "QueryResult.import_data(nil)"
+  runner "ImportFile.import_data"
 end

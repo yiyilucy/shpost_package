@@ -12,6 +12,11 @@ ready = ->
     changeMonth:true,
     changeYear:true
   });
+  $('#return_date_return_date').datepicker({
+    changeYear: true,       
+    changeMonth: true,      
+    dateFormat: "yy-mm"
+  });
   
 $(document).ready(ready)
 $(document).on('page:load', ready)

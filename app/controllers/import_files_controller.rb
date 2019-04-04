@@ -54,12 +54,14 @@ class ImportFilesController < ApplicationController
     redirect_to import_files_path
   end
 
+
+
   private
     def set_import_file
       @import_file = ImportFile.find(params[:id])
     end
 
     def import_file_params
-      params.require(:import_file).permit(:file_name, :file_path, :import_date, :status, :desc, :err_file_path)
+      params.require(:import_file).permit(:file_name, :file_path, :import_date, :status, :desc, :err_file_path, :type)
     end
 end

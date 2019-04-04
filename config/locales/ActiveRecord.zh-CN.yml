@@ -347,7 +347,7 @@ zh-CN:
         desc: "出错信息描述"
         err_file_path: "出错文件存放路径"
         created_at: "导入时间"
-        type: "导入类型"
+        import_type: "导入类型"
       up_download:
         name: "名字"
         use: "用途"
@@ -397,6 +397,10 @@ zh-CN:
           name: "信息导入"
           link: "/query_results/import"
           need_count: false
+        return_result:
+          name: "退件导入"
+          link: "/return_results/import"
+          need_count: false
         import_file:
           name: "信息导入结果"
           link: "/import_files"
@@ -407,6 +411,10 @@ zh-CN:
         query_result:
           name: "数据查询"
           link: "/query_results/query_result_index"
+          need_count: false
+        return_result:
+          name: "退件查询"
+          link: "/return_results/return_result_index"
           need_count: false
     logs:
       name: "日志查询"
