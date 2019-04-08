@@ -12,10 +12,16 @@
   <table>
   <tr>
     <td valign="middle">
-    <%= label_tag(:return_date, "日期:", :style => "padding:0px") %>
+    <%= label_tag(:return_year, "年:", :style => "padding:0px") %>
     </td>
     <td valign="middle">
-    <%= text_field("return_date","return_date", value: @return_date.to_s,:style => "width:90px") %>
+    <%= select_tag "year", options_for_select(ReturnResult.select_years, :selected=>@year) %>
+    </td>
+    <td valign="middle">
+    <%= label_tag(:return_month, "月:", :style => "padding:0px") %>
+    </td>
+    <td valign="middle">
+    <%= select_tag "month", options_for_select(ReturnResult.select_months, :selected=>@month) %>
     </td>
     <td valign="middle">
     <%= label_tag(:business, "商户:",class: 'control-label') %>

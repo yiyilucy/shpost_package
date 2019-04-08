@@ -25,29 +25,29 @@ class ReturnResultsController < ApplicationController
 	end
 
 	def return_result_index
-	    @return_date = DateTime
+	    @year = ""
+	    @month = ""
 	    @business_id = nil
 	    @results = []
 	    @sum = 0
           
-	    if params[:return_date].blank? or params[:return_date]["return_date"].blank?
-	      @return_date = Time.now.strftime("%Y-%m")
-	    else 
-	      @return_date = params[:return_date]["return_date"]
-	    end
-
-	    unless request.get?
-	      	if !params[:business].blank? and !params[:business]["business_id"].blank? 
-		        @business_id = params[:business]["business_id"]
-		        @results = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", Date.parse(@return_date + "-01").beginning_of_month, Date.parse(@return_date + "-01").end_of_month, @business_id).group("order_date").group(:status).order("order_date, status").count
-		        @sum = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", Date.parse(@return_date + "-01").beginning_of_month, Date.parse(@return_date + "-01").end_of_month, @business_id).group("order_date").order("order_date").count
-		        @sum_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", Date.parse(@return_date + "-01").beginning_of_month, Date.parse(@return_date + "-01").end_of_month, @business_id).count
-		        @normal_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "-01").beginning_of_month, Date.parse(@return_date + "-01").end_of_month, @business_id, "normal").count
-		        @signed_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "-01").beginning_of_month, Date.parse(@return_date + "-01").end_of_month, @business_id, "signed").count
-		        @others_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "-01").beginning_of_month, Date.parse(@return_date + "-01").end_of_month, @business_id, "others").count
-		        @waiting_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "-01").beginning_of_month, Date.parse(@return_date + "-01").end_of_month, @business_id, "waiting").count
+	    if !params[:year].blank? and !params[:month].blank?
+	      @year = params[:year]
+	      @month = params[:month]
+	      @return_date = @year + @month.rjust(2, '0')
+		    unless request.get?
+		      	if !params[:business].blank? and !params[:business]["business_id"].blank? 
+			        @business_id = params[:business]["business_id"]
+			        @results = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id).group("order_date").group(:status).order("order_date, status").count
+			        @sum = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id).group("order_date").order("order_date").count
+			        @sum_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id).count
+			        @normal_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id, "normal").count
+			        @signed_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id, "signed").count
+			        @others_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id, "others").count
+			        @waiting_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id, "waiting").count
+			    end
 		    end
-	    end
+		end
 	end
 
   	def export
