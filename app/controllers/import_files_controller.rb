@@ -35,7 +35,7 @@ class ImportFilesController < ApplicationController
   end
 
   def download
-    file_path = @import_file.err_file_path
+    file_path = @import_file.err_file_path.blank? ? @import_file.file_path : @import_file.err_file_path
         
     if !file_path.blank? and File.exist?(file_path)
       io = File.open(file_path)
@@ -54,12 +54,14 @@ class ImportFilesController < ApplicationController
     redirect_to import_files_path
   end
 
+
+
   private
     def set_import_file
       @import_file = ImportFile.find(params[:id])
     end
 
     def import_file_params
-      params.require(:import_file).permit(:file_name, :file_path, :import_date, :status, :desc, :err_file_path)
+      params.require(:import_file).permit(:file_name, :file_path, :import_date, :status, :desc, :err_file_path, :type)
     end
 end

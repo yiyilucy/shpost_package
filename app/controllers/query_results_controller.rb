@@ -145,7 +145,7 @@ class QueryResultsController < ApplicationController
           @order_date = to_date(params[:order_date]["order_date"])
         end
 
-        if file = upload_info(params[:file]['file'], business_id, @order_date)    
+        if file = ImportFile.upload_info(params[:file]['file'], business_id, @order_date, "QueryResult", current_user)    
           flash_message = "导入成功！"
         else
           flash_message = "导入失败!"
@@ -280,22 +280,6 @@ class QueryResultsController < ApplicationController
 
     def query_result_params
       params[:query_result]
-    end
-
-    def upload_info(file, business_id, order_date)
-      if !file.original_filename.empty?
-        direct = "#{Rails.root}/upload/info/"
-        filename = "#{Time.now.to_f}_#{file.original_filename}"
-
-        file_path = direct + filename
-        File.open(file_path, "wb") do |f|
-           f.write(file.read)
-        end
-
-        ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, err_file_path: file_path
-
-        file_path
-      end
     end
 
     def to_date(time)

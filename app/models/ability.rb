@@ -14,6 +14,7 @@ class Ability
         can :manage, ImportFile
         can :manage, Business
         can :manage, UpDownload
+        can :manage, ReturnResult
 
         # cannot :role, :superadmin
         cannot [:role, :create, :destroy, :update], User, role: 'superadmin'
@@ -42,6 +43,7 @@ class Ability
         can :update, User, id: user.id
 
         can :manage, QueryResult, unit_id: user.unit_id
+        can :manage, ReturnResult, unit_id: user.unit_id
         can :manage, Business, unit_id: user.unit_id
         cannot [:destroy, :new], Business
         can :manage, ImportFile, unit_id: user.unit_id
@@ -52,6 +54,7 @@ class Ability
         can :read, UserLog, user: {id: user.id}
 
         can :manage, QueryResult, unit_id: user.unit_id
+        can :manage, ReturnResult, unit_id: user.unit_id
         can :manage, Business, unit_id: user.unit_id
         cannot :destroy, Business
         can :manage, ImportFile, unit_id: user.unit_id

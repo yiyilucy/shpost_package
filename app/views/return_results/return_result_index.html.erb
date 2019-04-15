@@ -1,0 +1,89 @@
+<%- model_class = ReturnResult -%>
+<div class="page-header">
+  <h1>退件查询</h1>
+
+<%= form_tag('', name: 'form2')%>
+<table>
+  <tr>
+    <td>
+<div text-align:center>
+  <%= form_tag('', name: 'form1')%>
+  <div style="float:left">
+  <table>
+  <tr>
+    <td valign="middle">
+    <%= label_tag(:return_year, "年:", :style => "padding:0px") %>
+    </td>
+    <td valign="middle">
+    <%= select_tag "year", options_for_select(ReturnResult.select_years, :selected=>@year) %>
+    </td>
+    <td valign="middle">
+    <%= label_tag(:return_month, "月:", :style => "padding:0px") %>
+    </td>
+    <td valign="middle">
+    <%= select_tag "month", options_for_select(ReturnResult.select_months, :selected=>@month) %>
+    </td>
+    <td valign="middle">
+    <%= label_tag(:business, "商户:",class: 'control-label') %>
+    </td>
+    <td valign="middle">
+    <%= select("business","business_id", Business.where(unit_id: current_user.unit_id).order(:id).map{|u| [u.name,u.id]},class: 'control-label',selected: @business_id) %> 
+    </td>
+    <td valign="middle">
+    <%= submit_tag "查询",:class => 'btn btn-primary', onclick: "form1.action='return_result_index';form1.submit();" %>
+    </td>
+  </tr>
+  </table>
+  </div>
+  </form>
+</div>
+</td>
+</tr>
+<% if !@results.blank? %>
+<tr>
+  <td>
+<div text-align:center>  
+<table class="table table-striped">
+<thead>
+  <tr>
+    <th>邮件所属日期</th>
+    <th>普通退件/占比</th>
+    <th>签收后退件/占比</th>
+    <th>异常退件/占比</th>
+    <th>待查询/占比</th>
+    <th>总件数</th>
+  </tr>
+</thead>
+<tbody>
+  <% @sum.each do |s| %>
+  <% normal = @results[[s[0], "normal"]].blank? ? 0 : @results[[s[0], "normal"]] 
+     signed = @results[[s[0], "signed"]].blank? ? 0 : @results[[s[0], "signed"]]
+     others = @results[[s[0], "others"]].blank? ? 0 : @results[[s[0], "others"]]
+     waiting = @results[[s[0], "waiting"]].blank? ? 0 : @results[[s[0], "waiting"]] 
+     sum = s[1].to_f
+  %>
+
+  <tr>
+    <td><%= s[0].strftime('%Y-%m-%d') %></td>
+    <td><%= normal.to_s + " /" + sprintf("%0.2f" ,normal/sum*100) + "%" %></td>
+    <td><%= signed.to_s + " /" + sprintf("%0.2f" ,signed/sum*100) + "%" %></td>
+    <td><%= others.to_s + " /" + sprintf("%0.2f" ,others/sum*100) + "%" %></td>
+    <td><%= waiting.to_s + " /" + sprintf("%0.2f" ,waiting/sum*100) + "%" %></td>
+    <td><%= s[1] %></td>
+    <td><%= submit_tag "导出",:class => 'btn btn-primary', onclick: "form2.action='/return_results/export?order_date=#{s[0].strftime('%Y-%m-%d')}';form2.submit();" %></td>
+  </tr>
+  <% end %>
+  <% @sum_all = ((@sum_all==0) ? 0 : @sum_all.to_f) %>
+  <tr>
+    <td colspan="7"><b><%= "普通退件率: " + sprintf("%0.2f" ,@normal_all/@sum_all*100) + "%, 签收后退件率: " + (sprintf("%0.2f" ,@signed_all/@sum_all*100)) + "%, 异常退件率: " + (sprintf("%0.2f" ,@others_all/@sum_all*100)) + "%, 待查询率: " + (sprintf("%0.2f" ,@waiting_all/@sum_all*100)) + "%" %></b>
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
+</td>
+</tr>
+<% end %>
+</table>
+</form>
+</div> 
