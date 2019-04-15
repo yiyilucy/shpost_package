@@ -93,7 +93,7 @@ class ImportFile < ActiveRecord::Base
 			            end
 		            	# Rails.logger.info "第" + current_line.to_s + "行, " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
 			            begin
-			              eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询"
+			              eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: "waiting"
 			            rescue ActiveRecord::RecordInvalid => e
 			              txt = e.message + "(第" + current_line.to_s + "行)"
 			              sheet_error << (rowarr << txt)
