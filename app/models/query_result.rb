@@ -39,7 +39,7 @@ class QueryResult < ActiveRecord::Base
     elsif opt_code.in? ['708', '711']
       status = QueryResult::STATUS[:returns]
     end
-    {"opt_at" => last_result["optTime"], "opt_desc" => opt_desc, "status" => status}
+    {"opt_at" => last_result["opTime"], "opt_desc" => opt_desc, "status" => status}
   end
 
 	def self.import_data(import_file)

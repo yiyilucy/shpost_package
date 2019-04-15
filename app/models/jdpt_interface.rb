@@ -67,7 +67,7 @@ class JdptInterface
   end
 
   def self.get_return_results(business)
-    ReturnResults.where(status: ReturnResults::STATUS[:waiting]).where(business: business).order(order_date: :desc)
+    ReturnResult.where(status: ReturnResult::STATUS[:waiting]).where(business: business).order(order_date: :desc)
   end
 
   def self.jdpt_trace(result)
