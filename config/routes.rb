@@ -114,5 +114,9 @@ ShpostPackage::Application.routes.draw do
     end
   end
 
+  match "/shpost_package/standard_interface/mail_push" => "standard_interface#mail_push", via: [:get, :post]
+
+  match "/shpost_package/standard_interface/mail_query" => "standard_interface#mail_query", via: [:get, :post]
+
   
 end
