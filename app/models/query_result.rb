@@ -18,31 +18,38 @@ class QueryResult < ActiveRecord::Base
 
     opt_code = last_result["opCode"]
     opt_desc = last_result["opDesc"]
+    opt_time = last_result["opTime"]
     
-    if opt_code.blank?
-      return false
-    end
     status = QueryResult::STATUS[:waiting]
 
-    if opt_code.eql? '704'
-      if opt_desc.include? '本人'
+    if !opt_code.blank?
+      if opt_code.eql? '704'
+        if opt_desc.include? '本人'
+          status = QueryResult::STATUS[:own]
+        elsif opt_desc.include? '他人'
+          status = QueryResult::STATUS[:other]
+        else
+          status = QueryResult::STATUS[:unit]
+        end
+      elsif opt_code.eql? '748'
         status = QueryResult::STATUS[:own]
-      elsif opt_desc.include? '他人'
-        status = QueryResult::STATUS[:other]
-      else
+      elsif opt_code.eql? '747'
         status = QueryResult::STATUS[:unit]
+      elsif opt_code.in? ['708', '711']
+        status = QueryResult::STATUS[:returns]
       end
-    elsif opt_code.eql? '748'
-      status = QueryResult::STATUS[:own]
-    elsif opt_code.eql? '747'
-      status = QueryResult::STATUS[:unit]
-    elsif opt_code.in? ['708', '711']
-      status = QueryResult::STATUS[:returns]
     end
-    {"opt_at" => last_result["opTime"], "opt_desc" => opt_desc, "status" => status}
+    result = {"opt_at" => opt_time, "opt_desc" => opt_desc, "status" => status}
+
+    if status.eql? QueryResult::STATUS[:waiting]
+      result["is_posting"] = response.find{|x| x['opCode'].eql? '203' }.blank? ? false : true
+    else
+      result["is_posting"] = false
+    end
+
+    result
   end
-
- 	
-
   
 end
+
+

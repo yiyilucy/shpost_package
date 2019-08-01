@@ -29,7 +29,9 @@ class StandardInterface
     query_result = QueryResult.find_by(registration_no: mail_no, business: business)
     raise "无该邮件信息" if query_result.blank?
 
-    mail_json = {"MAIL_NO" => query_result.registration_no, "STATUS" => query_result.status, "RESULT_MSG" => query_result.result, "OPERATED_AT" => query_result.operated_at.try(:strftime, '%Y%m%d'), "QUERIED_AT" => query_result.query_date.try(:strftime, '%Y%m%d%H%M')}
+    status = query_result.status.eql?(QueryResult::STATUS[:waiting]) && query_result.is_posting? ? "posting" : query_result.status
+
+    mail_json = {"MAIL_NO" => query_result.registration_no, "STATUS" => status, "RESULT_MSG" => query_result.result, "OPERATED_AT" => query_result.operated_at.try(:strftime, '%Y%m%d'), "QUERIED_AT" => query_result.query_date.try(:strftime, '%Y%m%d%H%M')}
   end
 
 end

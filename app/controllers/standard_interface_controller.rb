@@ -30,8 +30,15 @@ class StandardInterfaceController < ApplicationController
 
   def mail_query
     return error_builder('0005', '查询列表为空') if @context_hash['MAIL_NO'].blank?
-
-    success_builder({'ORDERS' => StandardInterface.mail_query(@context_hash, @business, @unit)})
+    begin
+      success_builder(StandardInterface.mail_query(@context_hash, @business, @unit))
+    rescue => e
+      if ! e.is_a? RuntimeError
+        out_error e
+      end
+      error_builder('0005', e.message)
+      return
+    end
   end
 
   private
