@@ -11,36 +11,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181012011532) do
+ActiveRecord::Schema.define(version: 20190812005952) do
 
   create_table "businesses", force: true do |t|
     t.string   "name",       default: "", null: false
-    t.string   "start_date"
-    t.string   "end_date"
+    t.integer  "start_date"
+    t.integer  "end_date"
     t.integer  "unit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "secret_key"
+    t.string   "send_id"
   end
 
   create_table "import_files", force: true do |t|
-    t.string   "file_name",                   null: false
-    t.string   "file_path",   default: "",    null: false
+    t.string   "file_name",                         null: false
+    t.string   "file_path",     default: "",        null: false
     t.datetime "import_date"
     t.integer  "user_id"
     t.integer  "unit_id"
     t.integer  "business_id"
-    t.boolean  "is_process",  default: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "import_infos", force: true do |t|
-    t.string   "registration_no"
-    t.string   "postcode"
+    t.string   "status",        default: "waiting"
     t.string   "desc"
+    t.string   "err_file_path"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "import_type"
   end
 
   create_table "interface_senders", force: true do |t|
@@ -76,19 +72,54 @@ ActiveRecord::Schema.define(version: 20181012011532) do
   add_index "interface_senders", ["status"], name: "index_interface_senders_on_status"
   add_index "interface_senders", ["unit_id"], name: "index_interface_senders_on_unit_id"
 
+  create_table "qr_attrs", force: true do |t|
+    t.datetime "data_date"
+    t.datetime "batch_date"
+    t.string   "lmk"
+    t.string   "id_code"
+    t.string   "issue_bank"
+    t.string   "name"
+    t.string   "bank_no"
+    t.string   "phone"
+    t.string   "address"
+    t.integer  "query_result_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "query_results", force: true do |t|
     t.string   "source"
-    t.string   "registration_no", null: false
+    t.string   "registration_no",                     null: false
     t.string   "postcode"
     t.datetime "order_date"
     t.datetime "query_date"
     t.string   "result"
-    t.string   "status"
+    t.string   "status",          default: "waiting"
+    t.integer  "unit_id"
+    t.integer  "business_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "operated_at"
+  end
+
+  add_index "query_results", ["registration_no"], name: "index_query_results_on_registration_no", unique: true
+
+  create_table "return_results", force: true do |t|
+    t.string   "source"
+    t.string   "registration_no",                     null: false
+    t.string   "postcode"
+    t.datetime "order_date"
+    t.datetime "query_date"
+    t.datetime "operated_at"
+    t.string   "result"
+    t.string   "status",          default: "waiting"
     t.integer  "unit_id"
     t.integer  "business_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "return_results", ["registration_no"], name: "index_return_results_on_registration_no", unique: true
 
   create_table "roles", force: true do |t|
     t.integer  "user_id"
@@ -105,12 +136,22 @@ ActiveRecord::Schema.define(version: 20181012011532) do
     t.string   "short_name"
     t.string   "tcbd_khdh"
     t.integer  "level"
-    t.integer  "parent_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true
+
+  create_table "up_downloads", force: true do |t|
+    t.string   "name"
+    t.string   "use"
+    t.string   "desc"
+    t.string   "ver_no"
+    t.string   "url"
+    t.datetime "oper_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "user_logs", force: true do |t|
     t.integer  "user_id",            default: 0,  null: false
@@ -142,6 +183,8 @@ ActiveRecord::Schema.define(version: 20181012011532) do
     t.integer  "unit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "locked_at"
+    t.integer  "failed_attempts",        default: 0
   end
 
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
