@@ -70,30 +70,76 @@ class ImportFile < ActiveRecord::Base
 			        title_row = instance.row(1)
 			        if !title_row.index("挂号编号").blank?
 			          registration_no_index = title_row.index("挂号编号")
-			        else
-			          registration_no_index = 2
+			        elsif !title_row.index("约投号码").blank?
+			          registration_no_index = title_row.index("约投号码")
 			        end
 			        if !title_row.index("邮编").blank?
 			          postcode_index = title_row.index("邮编")
-			        else
-			          postcode_index = 4
+			        end
+			        if !title_row.index("数据日期").blank?
+			          data_date_index = title_row.index("数据日期")
+			        end
+			        if !title_row.index("批次日期").blank?
+			          batch_date_index = title_row.index("批次日期")
+			        end
+			        if !title_row.index("联名卡标识").blank?
+			          lmk_index = title_row.index("联名卡标识")
+			        end
+			        if !title_row.index("识别码").blank?
+			          id_code_index = title_row.index("识别码")
+			        end
+			        if !title_row.index("发卡行").blank?
+			          issue_bank_index = title_row.index("发卡行")
+			        end
+			        if !title_row.index("姓名").blank?
+			          name_index = title_row.index("姓名")
+			        end
+			        if !title_row.index("网点编号").blank?
+			          bank_no_index = title_row.index("网点编号")
+			        end
+			        if !title_row.index("电话").blank?
+			          phone_index = title_row.index("电话")
+			        end
+			        if !title_row.index("地址").blank?
+			          address_index = title_row.index("地址")
 			        end
 		                
-
 		          	2.upto(instance.last_row) do |line|
-			            current_line = line
+		          		current_line = line
 			            rowarr = instance.row(line)
 			            registration_no = rowarr[registration_no_index].blank? ? "" : rowarr[registration_no_index].to_s.gsub(' ','')
-			            postcode = rowarr[postcode_index].blank? ? "" : rowarr[postcode_index].to_s.gsub(' ','')
+			            postcode = rowarr[postcode_index].blank? ? "" : rowarr[postcode_index].to_s.split('.0')[0]
 
 			            if registration_no.blank?
-			              txt = "缺少挂号编号" + "(第" + current_line.to_s + "行)"
+			              txt = "缺少挂号编号或约投号码" + "(第" + current_line.to_s + "行)"
 			              sheet_error << (rowarr << txt)
 			              next
 			            end
 		            	# Rails.logger.info "第" + current_line.to_s + "行, " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
 			            begin
-			              eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: "waiting"
+			              if !title_row.index("联名卡标识").blank?
+			              	data_date = rowarr[data_date_index].blank? ? nil : DateTime.parse(rowarr[data_date_index].to_s.split(".0")[0]).strftime('%Y-%m-%d')
+			              	batch_date = rowarr[batch_date_index].blank? ? nil : DateTime.parse(rowarr[batch_date_index].to_s.split(".0")[0]).strftime('%Y-%m-%d')
+			              	lmk = rowarr[lmk_index].blank? ? "" : rowarr[lmk_index].to_s.split('.0')[0]
+			              	id_code = rowarr[id_code_index].blank? ? "" : rowarr[id_code_index].to_s.split('.0')[0]
+			              	issue_bank = rowarr[issue_bank_index].blank? ? "" : rowarr[issue_bank_index].to_s.split('.0')[0]
+			              	name = rowarr[name_index].blank? ? "" : rowarr[name_index].to_s.split('.0')[0]
+			              	bank_no = rowarr[bank_no_index].blank? ? "" : rowarr[bank_no_index].to_s.split('.0')[0]
+			              	phone = rowarr[phone_index].blank? ? "" : rowarr[phone_index].to_s.split('.0')[0]
+			              	address = rowarr[address_index].blank? ? "" : rowarr[address_index].to_s.split('.0')[0]
+
+			              	import_object = eval(f.import_type).find_by_registration_no registration_no
+			              	
+			              	if import_object.blank?
+			              	  import_object = eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: "waiting"
+			              	  QrAttr.create! data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address, query_result_id: import_object.id
+			              	else 
+			              	  import_object.update postcode: postcode
+			              	  import_object.qr_attr.update data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address
+			              	end
+			              else
+			              	eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: "waiting"
+			              end
 			            rescue ActiveRecord::RecordInvalid => e
 			              txt = e.message + "(第" + current_line.to_s + "行)"
 			              sheet_error << (rowarr << txt)
