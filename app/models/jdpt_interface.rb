@@ -101,34 +101,41 @@ class JdptInterface
   end
 
   def self.do_response(res, *args)
-    begin
-      res_hash = ActiveSupport::JSON.decode(res)
-      if res_hash["responseState"]
-        if args.first['class'].blank?
-          result_class = QueryResult
-        else
-          result_class = eval(args.first['class'])
-        end
+    ActiveRecord::Base.transaction do
+      begin
+        res_hash = ActiveSupport::JSON.decode(res)
+        if res_hash["responseState"]
+          if args.first['class'].blank?
+            result_class = QueryResult
+          else
+            result_class = eval(args.first['class'])
+          end
 
-        result = result_class.find args.first['id']
-        if result.blank?
+          result = result_class.find args.first['id']
+          if result.blank?
+            return false
+          end
+
+          if ! res_hash["errorDesc"].blank? && res_hash["responseItems"].blank?
+            result.update!(status: result_class::STATUS[:waiting], result: res_hash["errorDesc"], query_date: Date.today.to_time, is_posting: false)
+            return true
+          end
+          last_result = result_class.get_result_with_status(res_hash["responseItems"])
+          
+          if result.is_a? QueryResult
+            result.update!(status: last_result["status"], result: last_result["opt_desc"], query_date: Date.today.to_time, operated_at: last_result["opt_at"], is_posting: last_result["is_posting"])
+          else
+            result.update!(status: last_result["status"], result: last_result["opt_desc"], query_date: Date.today.to_time, operated_at: last_result["opt_at"])
+          end
+          return true
+        else
           return false
         end
-
-        if ! res_hash["errorDesc"].blank? && res_hash["responseItems"].blank?
-          result.update(status: result_class::STATUS[:waiting], result: res_hash["errorDesc"], query_date: Date.today.to_time)
-          return true
-        end
-        last_result = result_class.get_result_with_status(res_hash["responseItems"])
-        
-        result.update(status: last_result["status"], result: last_result["opt_desc"], query_date: Date.today.to_time, operated_at: last_result["opt_at"])
-        return true
-      else
-        return false
+      rescue => e
+        raise ActiveRecord::Rollback
       end
-    rescue => e
-      return false
     end
+    return false
   end
 
   def self.data_digest(context, secret_key)

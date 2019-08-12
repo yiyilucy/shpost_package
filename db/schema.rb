@@ -12,7 +12,6 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 20190812005952) do
-
   create_table "businesses", force: true do |t|
     t.string   "name",       default: "", null: false
     t.integer  "start_date"
@@ -22,6 +21,7 @@ ActiveRecord::Schema.define(version: 20190812005952) do
     t.datetime "updated_at"
     t.string   "secret_key"
     t.string   "send_id"
+    t.string   "no"
   end
 
   create_table "import_files", force: true do |t|
@@ -34,6 +34,24 @@ ActiveRecord::Schema.define(version: 20190812005952) do
     t.string   "status",        default: "waiting"
     t.string   "desc"
     t.string   "err_file_path"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "import_type"
+  end
+
+  create_table "interface_infos", force: true do |t|
+    t.string   "controller_name"
+    t.string   "action_name"
+    t.text     "request_body"
+    t.text     "response_body"
+    t.text     "params"
+    t.string   "business_id"
+    t.string   "unit_id"
+    t.string   "request_ip"
+    t.string   "status"
+    t.integer  "parent_id"
+    t.string   "parent_type"
+    t.string   "business_code"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "import_type"
@@ -113,6 +131,26 @@ ActiveRecord::Schema.define(version: 20190812005952) do
     t.datetime "operated_at"
     t.string   "result"
     t.string   "status",          default: "waiting"
+    t.integer  "unit_id"
+    t.integer  "business_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "operated_at"
+    t.string   "business_code"
+    t.boolean  "is_posting"
+  end
+
+  add_index "query_results", ["registration_no"], name: "index_query_results_on_registration_no", unique: true
+
+  create_table "return_results", force: true do |t|
+    t.string   "source"
+    t.string   "registration_no", null: false
+    t.string   "postcode"
+    t.datetime "order_date"
+    t.datetime "query_date"
+    t.datetime "operated_at"
+    t.string   "result"
+    t.string   "status"
     t.integer  "unit_id"
     t.integer  "business_id"
     t.datetime "created_at"
