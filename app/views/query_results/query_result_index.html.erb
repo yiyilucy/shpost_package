@@ -75,14 +75,14 @@
   %>
 
   <tr>
-    <td><%= s[0].strftime('%Y-%m-%d') %></td>
+    <td><%= s[0] %></td>
     <td><%= own.to_s + " /" + sprintf("%0.2f" ,own/sum*100) + "%" %></td>
     <td><%= other.to_s + " /" + sprintf("%0.2f" ,other/sum*100) + "%" %></td>
     <td><%= unit.to_s + " /" + sprintf("%0.2f" ,unit/sum*100) + "%" %></td>
     <td><%= returns.to_s + " /" + sprintf("%0.2f" ,returns/sum*100) + "%" %></td>
     <td><%= waiting.to_s + " /" + sprintf("%0.2f" ,waiting/sum*100) + "%" %></td>
     <td><%= s[1] %></td>
-    <td><%= submit_tag "导出",:class => 'btn btn-primary', onclick: "form2.action='/query_results/export?order_date=#{s[0].strftime('%Y-%m-%d')}';form2.submit();" %></td>
+    <td><%= submit_tag "导出",:class => 'btn btn-primary', onclick: "form2.action='/query_results/export?order_date=#{s[0]}';form2.submit();" %></td>
   </tr>
   <% end %>
   <tr>

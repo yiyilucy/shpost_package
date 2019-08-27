@@ -136,6 +136,8 @@ class QueryResultsController < ApplicationController
 
   def import
     @order_date = Time.now.strftime('%Y-%m-%d')
+    is_query = true
+    
     unless request.get?
       business_id = params[:business_select]
       if business_id.blank?
@@ -144,8 +146,11 @@ class QueryResultsController < ApplicationController
         if !params[:order_date].blank? and !params[:order_date]["order_date"].blank?
           @order_date = to_date(params[:order_date]["order_date"])
         end
+        if !params[:checkbox].blank? and !params[:checkbox][:is_query].blank? 
+          is_query = (params[:checkbox][:is_query].eql?"1") ? false : true
+        end
 
-        if file = ImportFile.upload_info(params[:file]['file'], business_id, @order_date, "QueryResult", current_user)    
+        if file = ImportFile.upload_info(params[:file]['file'], business_id, @order_date, "QueryResult", current_user, is_query)    
           flash_message = "导入成功！"
         else
           flash_message = "导入失败!"
@@ -242,6 +247,7 @@ class QueryResultsController < ApplicationController
     @business_id = nil
     @results = []
     @sum = 0
+    groupQuery = ""
           
     if params[:end_date].blank? or params[:end_date]["end_date"].blank?
       @end_date = Date.parse(Time.now.strftime('%Y-%m-%d'))
@@ -264,8 +270,13 @@ class QueryResultsController < ApplicationController
       else
         if !params[:business].blank? and !params[:business]["business_id"].blank? 
           @business_id = params[:business]["business_id"]
-          @results = QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date + 1.day, @business_id).group("order_date").group(:status).order("order_date, status").count
-          @sum = QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date + 1.day, @business_id).group("order_date").order("order_date").count
+          if RailsEnv.is_oracle?
+            groupQuery = "to_char(query_results.order_date,'yyyy-mm-dd')"
+          else
+            groupQuery = "strftime('%Y-%m-%d',query_results.order_date)"
+          end
+          @results = QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date + 1.day, @business_id).group(groupQuery).group(:status).order("order_date, status").count
+          @sum = QueryResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date + 1.day, @business_id).group(groupQuery).order("order_date").count
         end
       end
     end

@@ -5,6 +5,7 @@ class ImportFile < ActiveRecord::Base
 
 	STATUS = { success: '成功', fail: '失败', waiting: '待处理', doing: '处理中'}
 	IMPORT_TYPE = { QueryResult: '信息导入', ReturnResult: '退件导入'}
+	IS_QUERY = { true: '是', false: '否'}
 	
     def status_name
 	  status.blank? ? "" : ImportFile::STATUS["#{status}".to_sym]
@@ -14,7 +15,11 @@ class ImportFile < ActiveRecord::Base
 	  import_type.blank? ? "" : ImportFile::IMPORT_TYPE["#{import_type}".to_sym]
 	end
 
-	def self.upload_info(file, business_id, order_date, import_type, current_user)
+	def is_query_name
+	  is_query.blank? ? "" : ImportFile::IS_QUERY["#{is_query}".to_sym]
+	end
+
+	def self.upload_info(file, business_id, order_date, import_type, current_user, is_query)
 		if !file.original_filename.empty?
 	      direct = "#{Rails.root}/upload/info/"
 	      filename = "#{Time.now.to_f}_#{file.original_filename}"
@@ -24,7 +29,7 @@ class ImportFile < ActiveRecord::Base
 	        f.write(file.read)
 	      end
 
-	      ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, err_file_path: file_path, import_type: import_type
+	      ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, err_file_path: file_path, import_type: import_type, is_query: is_query
 
 	      file_path
 	    end
@@ -88,6 +93,9 @@ class ImportFile < ActiveRecord::Base
 			        if !title_row.index("识别码").blank?
 			          id_code_index = title_row.index("识别码")
 			        end
+			        if !title_row.index("文件SN号").blank?
+			          sn_index = title_row.index("文件SN号")
+			        end
 			        if !title_row.index("发卡行").blank?
 			          issue_bank_index = title_row.index("发卡行")
 			        end
@@ -117,29 +125,34 @@ class ImportFile < ActiveRecord::Base
 			            end
 		            	# Rails.logger.info "第" + current_line.to_s + "行, " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
 			            begin
-			              if !title_row.index("联名卡标识").blank?
-			              	data_date = rowarr[data_date_index].blank? ? nil : DateTime.parse(rowarr[data_date_index].to_s.split(".0")[0]).strftime('%Y-%m-%d')
-			              	batch_date = rowarr[batch_date_index].blank? ? nil : DateTime.parse(rowarr[batch_date_index].to_s.split(".0")[0]).strftime('%Y-%m-%d')
-			              	lmk = rowarr[lmk_index].blank? ? "" : rowarr[lmk_index].to_s.split('.0')[0]
-			              	id_code = rowarr[id_code_index].blank? ? "" : rowarr[id_code_index].to_s.split('.0')[0]
-			              	issue_bank = rowarr[issue_bank_index].blank? ? "" : rowarr[issue_bank_index].to_s.split('.0')[0]
-			              	name = rowarr[name_index].blank? ? "" : rowarr[name_index].to_s.split('.0')[0]
-			              	bank_no = rowarr[bank_no_index].blank? ? "" : rowarr[bank_no_index].to_s.split('.0')[0]
-			              	phone = rowarr[phone_index].blank? ? "" : rowarr[phone_index].to_s.split('.0')[0]
-			              	address = rowarr[address_index].blank? ? "" : rowarr[address_index].to_s.split('.0')[0]
+			              	if !title_row.index("联名卡标识").blank?
+				              	data_date = rowarr[data_date_index].blank? ? nil : DateTime.parse(rowarr[data_date_index].to_s.split(".0")[0]).strftime('%Y-%m-%d')
+				              	batch_date = rowarr[batch_date_index].blank? ? nil : DateTime.parse(rowarr[batch_date_index].to_s.split(".0")[0]).strftime('%Y-%m-%d')
+				              	lmk = rowarr[lmk_index].blank? ? "" : rowarr[lmk_index].to_s.split('.0')[0]
+				              	id_code = rowarr[id_code_index].blank? ? "" : rowarr[id_code_index].to_s.split('.0')[0]
+				              	sn = rowarr[sn_index].blank? ? "" : rowarr[sn_index].to_s.split('.0')[0]
+				              	issue_bank = rowarr[issue_bank_index].blank? ? "" : rowarr[issue_bank_index].to_s.split('.0')[0]
+				              	name = rowarr[name_index].blank? ? "" : rowarr[name_index].to_s.split('.0')[0]
+				              	bank_no = rowarr[bank_no_index].blank? ? "" : rowarr[bank_no_index].to_s.split('.0')[0]
+				              	phone = rowarr[phone_index].blank? ? "" : rowarr[phone_index].to_s.split('.0')[0]
+				              	address = rowarr[address_index].blank? ? "" : rowarr[address_index].to_s.split('.0')[0]
 
-			              	import_object = eval(f.import_type).find_by_registration_no registration_no
-			              	
-			              	if import_object.blank?
-			              	  import_object = eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: "waiting"
-			              	  QrAttr.create! data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address, query_result_id: import_object.id
-			              	else 
-			              	  import_object.update postcode: postcode
-			              	  import_object.qr_attr.update data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address
-			              	end
-			              else
-			              	eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: "waiting"
-			              end
+				              	import_object = eval(f.import_type).find_by_registration_no registration_no
+				              	
+				              	if import_object.blank?
+				              		if f.is_query
+				              	  		import_object = eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: "waiting"
+				              	  	else
+				              	  		import_object = eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: "own"
+				              	  	end
+				              	  	QrAttr.create! data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn,  issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address, query_result_id: import_object.id
+				              	else 
+				              	  import_object.update postcode: postcode
+				              	  import_object.qr_attr.update data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn, issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address
+				              	end
+			             	else
+				              	eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: "waiting"
+				            end
 			            rescue ActiveRecord::RecordInvalid => e
 			              txt = e.message + "(第" + current_line.to_s + "行)"
 			              sheet_error << (rowarr << txt)

@@ -25,26 +25,40 @@ class ReturnResultsController < ApplicationController
 	end
 
 	def return_result_index
-	    @year = ""
-	    @month = ""
+	    @start_date=DateTime
+    	@end_date=DateTime
 	    @business_id = nil
 	    @results = []
 	    @sum = 0
+	    groupQuery = ""
+
+	    if !params[:start_date].blank? and !params[:start_date]["start_date"].blank?
+	      @start_date = to_date(params[:start_date]["start_date"])
+	    else
+	      @start_date = 1.month.ago
+	    end
+	    if !params[:end_date].blank? and !params[:end_date]["end_date"].blank?
+	      @end_date = to_date(params[:end_date]["end_date"])
+	    else
+	      @end_date = Time.now
+	    end
           
-	    if !params[:year].blank? and !params[:month].blank?
-	      @year = params[:year]
-	      @month = params[:month]
-	      @return_date = @year + @month.rjust(2, '0')
-		    unless request.get?
+	    if !@start_date.blank? and !@end_date.blank?
+	        unless request.get?
 		      	if !params[:business].blank? and !params[:business]["business_id"].blank? 
 			        @business_id = params[:business]["business_id"]
-			        @results = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id).group("order_date").group(:status).order("order_date, status").count
-			        @sum = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id).group("order_date").order("order_date").count
-			        @sum_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id).count
-			        @normal_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id, "normal").count
-			        @signed_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id, "signed").count
-			        @others_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id, "others").count
-			        @waiting_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", Date.parse(@return_date + "01").beginning_of_month, Date.parse(@return_date + "01").end_of_month, @business_id, "waiting").count
+			        if RailsEnv.is_oracle?
+				      groupQuery = "to_char(return_results.order_date,'yyyy-mm-dd')"
+				    else
+				      groupQuery = "strftime('%Y-%m-%d',return_results.order_date)"
+				    end
+			        @results = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date+1.day, @business_id).group(groupQuery).group(:status).order("order_date, status").count
+			        @sum = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date+1.day, @business_id).group(groupQuery).order("order_date").count
+			        @sum_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date+1.day, @business_id).count
+			        @normal_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "normal").count
+			        @signed_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "signed").count
+			        @others_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "others").count
+			        @waiting_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "waiting").count
 			    end
 		    end
 		end
@@ -54,17 +68,31 @@ class ReturnResultsController < ApplicationController
 	    @order_date = params[:order_date]
 	    @business_id=nil
 	    results = []
+	    is_abc =false
+
+	    if !params[:checkbox].blank? and !params[:checkbox][:is_abc].blank? 
+	      is_abc = (params[:checkbox][:is_abc].eql?"1") ? true : false
+	    end
         
 	    if !@order_date.blank? and !params[:business].blank? and !params[:business]["business_id"].blank? 
 	      @business_id = params[:business]["business_id"]
-	      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "normal").order(:registration_no)
-	      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "signed").order(:registration_no)
-	      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?","#{@order_date}%", @business_id, "others").order(:registration_no)
-	      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "waiting").order(:registration_no)
+
+	      if is_abc
+	      	results = ReturnResult.accessible_by(current_ability).joins(:query_result).joins({query_result: :qr_attr}).where("return_results.order_date like ? and return_results.business_id = ?", "#{@order_date}%", @business_id).order("qr_attrs.batch_date, return_results.registration_no")
+	      else
+		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "normal").order(:registration_no)
+		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "signed").order(:registration_no)
+		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?","#{@order_date}%", @business_id, "others").order(:registration_no)
+		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "waiting").order(:registration_no)
+		  end
 	      ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ?", "#{@order_date}%", @business_id).update_all query_date: Time.now
 	    end
- 
-    	send_data(results_xls_content_for(results), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")        
+ 		
+ 		if is_abc
+ 			send_data(results_abc_xls_content_for(results), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_ABC_#{Time.now.strftime("%Y%m%d")}.xls")
+ 		else
+    		send_data(results_xls_content_for(results), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")    
+    	end    
   	end
 
   	def results_xls_content_for(objs)  
@@ -105,7 +133,29 @@ class ReturnResultsController < ApplicationController
 	    xls_report.string  
  	end
 
+ 	def results_abc_xls_content_for(obj)
+	    xls_report = StringIO.new  
+	    book = Spreadsheet::Workbook.new  
+	    sheet1 = book.create_worksheet :name => "Results_ABC"  
 
+	    blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+	    sheet1.row(0).default_format = blue 
+	    sheet1.row(0).concat %w{邮编 姓名 电话 地址 批次日期 约投号码 退回原因}  
+	    count_row = 1
+	    obj.each do |obj|
+	      sheet1[count_row,0]=obj.postcode
+	      sheet1[count_row,1]=obj.query_result.qr_attr.name
+	      sheet1[count_row,2]=obj.query_result.qr_attr.phone
+	      sheet1[count_row,3]=obj.query_result.qr_attr.address
+	      sheet1[count_row,4]=obj.query_result.qr_attr.batch_date.strftime("%Y-%m-%d").to_s
+	      sheet1[count_row,5]=obj.registration_no
+	      sheet1[count_row,6]=obj.reason
+	      
+	      count_row += 1
+	    end 
+	    book.write xls_report  
+	    xls_report.string  
+	end
 
 	private
 		def to_date(time)

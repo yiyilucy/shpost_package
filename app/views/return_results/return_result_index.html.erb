@@ -12,22 +12,25 @@
   <table>
   <tr>
     <td valign="middle">
-    <%= label_tag(:return_year, "年:", :style => "padding:0px") %>
+    <%= label_tag(:start_date, "开始日期:") %>
     </td>
     <td valign="middle">
-    <%= select_tag "year", options_for_select(ReturnResult.select_years, :selected=>@year) %>
+    <%= text_field("start_date","start_date", value: @start_date.strftime("%Y-%m-%d").to_s) %>
     </td>
     <td valign="middle">
-    <%= label_tag(:return_month, "月:", :style => "padding:0px") %>
+    <%= label_tag(:end_date, "结束日期:") %>
     </td>
     <td valign="middle">
-    <%= select_tag "month", options_for_select(ReturnResult.select_months, :selected=>@month) %>
+    <%= text_field("end_date","end_date", value: @end_date.strftime("%Y-%m-%d").to_s) %>
     </td>
     <td valign="middle">
     <%= label_tag(:business, "商户:",class: 'control-label') %>
     </td>
     <td valign="middle">
     <%= select("business","business_id", Business.where(unit_id: current_user.unit_id).order(:id).map{|u| [u.name,u.id]},class: 'control-label',selected: @business_id) %> 
+    </td>
+    <td>
+      <%= check_box("checkbox","is_abc")%>农行退件格式
     </td>
     <td valign="middle">
     <%= submit_tag "查询",:class => 'btn btn-primary', onclick: "form1.action='return_result_index';form1.submit();" %>
@@ -64,13 +67,13 @@
   %>
 
   <tr>
-    <td><%= s[0].strftime('%Y-%m-%d') %></td>
+    <td><%= s[0] %></td>
     <td><%= normal.to_s + " /" + sprintf("%0.2f" ,normal/sum*100) + "%" %></td>
     <td><%= signed.to_s + " /" + sprintf("%0.2f" ,signed/sum*100) + "%" %></td>
     <td><%= others.to_s + " /" + sprintf("%0.2f" ,others/sum*100) + "%" %></td>
     <td><%= waiting.to_s + " /" + sprintf("%0.2f" ,waiting/sum*100) + "%" %></td>
     <td><%= s[1] %></td>
-    <td><%= submit_tag "导出",:class => 'btn btn-primary', onclick: "form2.action='/return_results/export?order_date=#{s[0].strftime('%Y-%m-%d')}';form2.submit();" %></td>
+    <td><%= submit_tag "导出",:class => 'btn btn-primary', onclick: "form2.action='/return_results/export?order_date=#{s[0]}';form2.submit();" %></td>
   </tr>
   <% end %>
   <% @sum_all = ((@sum_all==0) ? 0 : @sum_all.to_f) %>
