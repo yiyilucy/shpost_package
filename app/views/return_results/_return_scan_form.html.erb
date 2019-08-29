@@ -1,0 +1,40 @@
+<%- model_class = QueryResult -%>
+<%- model_class_a = QrAttr -%>
+<table class="table table-striped">
+  <thead>
+  </thead>
+  <tbody>
+    <% if !@query_result.blank? %>
+  	<tr>
+      <td width='10%' style="font-weight:bold"> <%= model_class.human_attribute_name(:registration_no)+":" %></td>
+      <td width='15%'> <%= @query_result.registration_no %> </td>
+      <td width='10%' style="font-weight:bold"> <%= model_class.human_attribute_name(:postcode)+":" %></td>
+      <td width='15%'> <%= @query_result.postcode %></td>
+      <td width='10%' style="font-weight:bold"> <%= model_class_a.human_attribute_name(:data_date)+":" %></td>
+      <td width='15%'> <%= (@query_result.qr_attr.blank?) ? "" : ((@query_result.qr_attr.data_date.blank?) ? "" : @query_result.qr_attr.data_date.strftime("%Y-%m-%d") ) %></td>
+      <td width='10%' style="font-weight:bold"> <%= model_class_a.human_attribute_name(:batch_date)+":"  %></td>
+      <td width='15%'> <%= (@query_result.qr_attr.blank?) ? "" : ((@query_result.qr_attr.batch_date.blank?) ? "" : @query_result.qr_attr.batch_date.strftime("%Y-%m-%d") ) %></td>
+    </tr>
+    <tr>
+      <td width='10%' style="font-weight:bold"> <%= model_class_a.human_attribute_name(:name)+":" %></td>
+      <td width='15%'> <%= @query_result.qr_attr.try(:name) %></td>
+      <td width='10%' style="font-weight:bold"> <%= model_class_a.human_attribute_name(:phone)+":" %></td>
+      <td width='15%'> <%= @query_result.qr_attr.try(:phone) %></td>
+      <td width='10%' style="font-weight:bold"> <%= model_class_a.human_attribute_name(:address)+":" %></td>
+      <td width='15%'> <%= @query_result.qr_attr.try(:address) %></td>
+      <td width='10%' style="font-weight:bold"> <%= model_class_a.human_attribute_name(:lmk)+":" %></td>
+      <td width='15%'> <%= @query_result.qr_attr.try(:lmk) %></td>
+    </tr>
+    <tr>
+      <td width='10%' style="font-weight:bold"> <%= model_class_a.human_attribute_name(:id_code)+":" %></td>
+      <td width='15%'> <%= @query_result.qr_attr.try(:id_code) %></td>
+      <td width='10%' style="font-weight:bold"> <%= model_class_a.human_attribute_name(:sn)+":" %></td>
+      <td width='15%'> <%= @query_result.qr_attr.try(:sn) %></td>
+      <td width='10%' style="font-weight:bold"> <%= model_class_a.human_attribute_name(:issue_bank)+":" %></td>
+      <td width='15%'> <%= @query_result.qr_attr.try(:issue_bank) %></td>
+      <td width='10%' style="font-weight:bold"> <%= model_class_a.human_attribute_name(:bank_no)+":" %></td>
+      <td width='15%'> <%= @query_result.qr_attr.try(:bank_no) %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

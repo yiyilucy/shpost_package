@@ -1,0 +1,26 @@
+<%- model_class = ReturnReason -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <div style="float:right">
+    <% if can? :new, ReturnReason %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+                  new_return_reason_path,
+                  :class => 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= grid(@return_reasons_grid) do |g|
+    g.column name: model_class.human_attribute_name(:reason), attribute: 'reason'
+
+    g.column do |return_reason|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_return_reason_path(return_reason), :class => 'btn btn-xs btn-primary' if can? :update, return_reason) << ' ' << 
+      (link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      return_reason_path(return_reason),
+                       :method => :delete, :data => { :confirm => t('wice_grid.saved_query_deletion_confirmation', :default => t("helpers.links.confirm", :default => '确定删除?')) }, :class => 'btn btn-xs btn-danger' if can? :destroy, return_reason)
+      end
+
+  end 
+%>

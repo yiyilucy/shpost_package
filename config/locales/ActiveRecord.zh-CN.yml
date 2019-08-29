@@ -291,6 +291,12 @@ zh-CN:
       up_download:
         one: 上传下载模板
         other: 上传下载模板
+      return_reason:
+        one: 退件理由管理
+        other: 退件理由管理
+      qr_attr:
+        one: 邮件属性
+        other: 邮件属性
     attributes:
       user:
         email: "电子邮件"
@@ -355,6 +361,20 @@ zh-CN:
         ver_no: "版本号"
         url: "地址"
         oper_date: "操作时间"
+      return_reason:
+        reason: "理由"
+        unit_id: "单位"
+      qr_attr:
+        data_date: "数据日期"
+        batch_date: "批次日期"
+        lmk: "联名卡标识"
+        id_code: "识别码"
+        sn: "文件SN号"
+        issue_bank: "发卡行"
+        name: "姓名"
+        bank_no: "网点编号"
+        phone: "电话"
+        address: "地址"
   menu:
     permission:
       name: "权限管理"
@@ -390,6 +410,13 @@ zh-CN:
           name: "商户管理"
           link: "/businesses"
           need_count: false
+    return_reason:
+      name: "退件理由管理"
+      submenu:
+        return_reason:
+          name: "退件理由管理"
+          link: "/return_reasons"
+          need_count: false
     import:
       name: "信息导入"
       submenu:
@@ -416,6 +443,12 @@ zh-CN:
           name: "退件查询"
           link: "/return_results/return_result_index"
           need_count: false
+    return_scan:
+      name: "退件扫描录入"
+      submenu:
+        return_scan:
+          name: "退件扫描录入"
+          link: "/return_results/return_scan"
     logs:
       name: "日志查询"
       submenu:

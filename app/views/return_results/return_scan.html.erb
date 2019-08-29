@@ -1,0 +1,16 @@
+<%- model_class = ReturnResult -%>
+<div class="page-header">
+  <h1>退件</h1>
+</div>
+<div>
+  <%= label_tag 'name', '约投号码:', class: 'control-group' %>
+  <%= text_field_tag 'registration_no', nil, class: "controls" %>
+</div>
+<div>
+   <%= label_tag 'name1', '退件理由设置:', class: 'control-group' %>
+   <%= select_tag "return_reason", options_for_select(ReturnReason.all.map{|r| [r.reason,r.id]}) %>
+   <input type="button" id="setreason" value="确定" class='btn btn-primary' >
+</div>
+<div id="out_query_results">
+  <%= render :partial => 'return_results/return_scan_form' %>
+</div>

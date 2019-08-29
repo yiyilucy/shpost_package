@@ -1,0 +1,14 @@
+var qid = <%= @curr_query_result %>;
+
+$('#registration_no').blur();
+
+if (qid == 0){
+  alert("无符合条件的约投挂号件");
+  $('#registration_no').val("");
+  $('#out_query_results').html(" <%= escape_javascript(render(:partial => "return_results/return_scan_form")) %> ");
+  $('#registration_no').focus();
+}else{
+  $('#registration_no').val("<%= @registration_no %>");
+  $('#out_query_results').html(" <%= escape_javascript(render(:partial => "return_results/return_scan_form",:object => @curr_query_result)) %> ");
+  $('#return_reason').focus();
+}

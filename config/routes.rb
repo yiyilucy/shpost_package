@@ -1,4 +1,5 @@
 ShpostPackage::Application.routes.draw do
+  
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
@@ -110,10 +111,16 @@ ShpostPackage::Application.routes.draw do
       get 'return_result_index'
       post 'return_result_index'
       post 'export'
+      get 'return_scan'
+      get 'find_query_result'
+      get 'do_return'
     end
   end
 
   resources :qr_attrs
+
+  resources :return_reasons
+
 
   match "/shpost_package/standard_interface/mail_push" => "standard_interface#mail_push", via: [:get, :post]
 

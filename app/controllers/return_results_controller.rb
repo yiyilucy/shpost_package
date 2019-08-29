@@ -157,6 +157,42 @@ class ReturnResultsController < ApplicationController
 	    xls_report.string  
 	end
 
+	def find_query_result
+	    @registration_no = params[:registration_no]
+	    
+	    if !@registration_no.blank? 
+	      @query_result = QueryResult.accessible_by(current_ability).find_by(unit_id: current_user.unit.try(:id), registration_no: @registration_no)
+	      if @query_result.nil?
+	        @curr_query_result = 0
+	      else
+	        @curr_query_result = @query_result.id
+	      end
+	      
+	      respond_to do |format|
+	        format.js 
+	      end
+	    end
+	end
+
+	def do_return
+		registration_no = params[:registration_no]
+		return_reason = params[:return_reason]
+
+		if !registration_no.blank? && !return_reason.blank?
+			query_result = QueryResult.accessible_by(current_ability).find_by(unit_id: current_user.unit.try(:id), registration_no: registration_no)
+			if !query_result.blank?
+				if query_result.return_result.blank?
+					ReturnResult.create! registration_no: query_result.registration_no, postcode: query_result.postcode, order_date: Time.now.strftime('%Y-%m-%d'), unit_id: current_user.unit_id, business_id: query_result.business_id, source: "邮政数据查询", status: "normal", query_result_id: query_result.id, reason: return_reason
+				else
+					query_result.return_result.update reason: return_reason
+				end
+			end
+		end
+		respond_to do |format|
+	    	format.js 
+	    end
+	end
+
 	private
 		def to_date(time)
 	      date = Date.civil(time.split(/-|\//)[0].to_i,time.split(/-|\//)[1].to_i,time.split(/-|\//)[2].to_i)
