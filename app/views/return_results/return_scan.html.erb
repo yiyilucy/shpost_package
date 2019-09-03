@@ -8,7 +8,7 @@
 </div>
 <div>
    <%= label_tag 'name1', '退件理由设置:', class: 'control-group' %>
-   <%= select_tag "return_reason", options_for_select(ReturnReason.all.map{|r| [r.reason,r.id]}) %>
+   <%= select_tag "return_reason", options_for_select(ReturnReason.accessible_by(current_ability).map{|r| [r.reason,r.id]}) %>
    <input type="button" id="setreason" value="确定" class='btn btn-primary' >
 </div>
 <div id="out_query_results">

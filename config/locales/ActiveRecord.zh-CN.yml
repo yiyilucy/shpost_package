@@ -417,6 +417,12 @@ zh-CN:
           name: "退件理由管理"
           link: "/return_reasons"
           need_count: false
+    return_scan:
+      name: "退件扫描录入"
+      submenu:
+        return_scan:
+          name: "退件扫描录入"
+          link: "/return_results/return_scan"
     import:
       name: "信息导入"
       submenu:
@@ -443,12 +449,6 @@ zh-CN:
           name: "退件查询"
           link: "/return_results/return_result_index"
           need_count: false
-    return_scan:
-      name: "退件扫描录入"
-      submenu:
-        return_scan:
-          name: "退件扫描录入"
-          link: "/return_results/return_scan"
     logs:
       name: "日志查询"
       submenu:
