@@ -31,6 +31,11 @@ class ReturnResultsController < ApplicationController
 	    @results = []
 	    @sum = 0
 	    groupQuery = ""
+	    is_own =false
+
+	    if !params[:checkbox].blank? and !params[:checkbox][:is_own].blank? 
+	      is_own = (params[:checkbox][:is_own].eql?"1") ? true : false
+	    end
 
 	    if !params[:start_date].blank? and !params[:start_date]["start_date"].blank?
 	      @start_date = to_date(params[:start_date]["start_date"])
@@ -52,13 +57,23 @@ class ReturnResultsController < ApplicationController
 				    else
 				      groupQuery = "strftime('%Y-%m-%d',return_results.order_date)"
 				    end
-			        @results = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date+1.day, @business_id).group(groupQuery).group(:status).order("order_date, status").count
-			        @sum = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date+1.day, @business_id).group(groupQuery).order("order_date").count
-			        @sum_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date+1.day, @business_id).count
-			        @normal_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "normal").count
-			        @signed_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "signed").count
-			        @others_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "others").count
-			        @waiting_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "waiting").count
+				    if is_own
+				    	@results = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and user_id = ?", @start_date, @end_date+1.day, @business_id, current_user.id).group(groupQuery).group(:status).order("order_date, status").count
+				        @sum = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and user_id = ?", @start_date, @end_date+1.day, @business_id, current_user.id).group(groupQuery).order("order_date").count
+				        @sum_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and user_id = ?", @start_date, @end_date+1.day, @business_id, current_user.id).count
+				        @normal_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ? and user_id = ?", @start_date, @end_date+1.day, @business_id, "normal", current_user.id).count
+				        @signed_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ? and user_id = ?", @start_date, @end_date+1.day, @business_id, "signed", current_user.id).count
+				        @others_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ? and user_id = ?", @start_date, @end_date+1.day, @business_id, "others", current_user.id).count
+				        @waiting_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ? and user_id = ?", @start_date, @end_date+1.day, @business_id, "waiting", current_user.id).count
+				    else
+				        @results = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date+1.day, @business_id).group(groupQuery).group(:status).order("order_date, status").count
+				        @sum = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date+1.day, @business_id).group(groupQuery).order("order_date").count
+				        @sum_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ?", @start_date, @end_date+1.day, @business_id).count
+				        @normal_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "normal").count
+				        @signed_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "signed").count
+				        @others_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "others").count
+				        @waiting_all = ReturnResult.accessible_by(current_ability).where("order_date >= ? and order_date <= ? and business_id = ? and status = ?", @start_date, @end_date+1.day, @business_id, "waiting").count
+				    end
 			    end
 		    end
 		end
@@ -69,6 +84,11 @@ class ReturnResultsController < ApplicationController
 	    @business_id=nil
 	    results = []
 	    is_abc =false
+	    is_own =false
+
+	    if !params[:checkbox].blank? and !params[:checkbox][:is_own].blank? 
+	      is_own = (params[:checkbox][:is_own].eql?"1") ? true : false
+	    end
 
 	    if !params[:checkbox].blank? and !params[:checkbox][:is_abc].blank? 
 	      is_abc = (params[:checkbox][:is_abc].eql?"1") ? true : false
@@ -78,7 +98,11 @@ class ReturnResultsController < ApplicationController
 	      @business_id = params[:business]["business_id"]
 
 	      if is_abc
-	      	results = ReturnResult.accessible_by(current_ability).joins(:query_result).joins({query_result: :qr_attr}).where("return_results.order_date like ? and return_results.business_id = ?", "#{@order_date}%", @business_id).order("qr_attrs.batch_date, return_results.registration_no")
+	      	if is_own
+	      		results = ReturnResult.accessible_by(current_ability).where(user_id: current_user.id).joins(:query_result).joins({query_result: :qr_attr}).where("return_results.order_date like ? and return_results.business_id = ?", "#{@order_date}%", @business_id).order("return_results.created_at")
+	      	else
+	      		results = ReturnResult.accessible_by(current_ability).joins(:query_result).joins({query_result: :qr_attr}).where("return_results.order_date like ? and return_results.business_id = ?", "#{@order_date}%", @business_id).order("return_results.created_at")
+	      	end
 	      else
 		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "normal").order(:registration_no)
 		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "signed").order(:registration_no)
@@ -159,6 +183,7 @@ class ReturnResultsController < ApplicationController
 
 	def find_query_result
 	    @registration_no = params[:registration_no]
+	    @has_return_result = 0
 	    
 	    if !@registration_no.blank? 
 	      @query_result = QueryResult.accessible_by(current_ability).find_by(unit_id: current_user.unit.try(:id), registration_no: @registration_no)
@@ -166,6 +191,9 @@ class ReturnResultsController < ApplicationController
 	        @curr_query_result = 0
 	      else
 	        @curr_query_result = @query_result.id
+	        if !@query_result.return_result.blank?
+	        	@has_return_result = 1
+	        end
 	      end
 	      
 	      respond_to do |format|
@@ -176,13 +204,13 @@ class ReturnResultsController < ApplicationController
 
 	def do_return
 		registration_no = params[:registration_no]
-		return_reason = params[:return_reason]
+		return_reason = (params[:return_reason].blank?) ? "" : params[:return_reason].split(".").last
 
 		if !registration_no.blank? && !return_reason.blank?
 			query_result = QueryResult.accessible_by(current_ability).find_by(unit_id: current_user.unit.try(:id), registration_no: registration_no)
 			if !query_result.blank?
 				if query_result.return_result.blank?
-					ReturnResult.create! registration_no: query_result.registration_no, postcode: query_result.postcode, order_date: Time.now.strftime('%Y-%m-%d'), unit_id: current_user.unit_id, business_id: query_result.business_id, source: "邮政数据查询", status: "normal", query_result_id: query_result.id, reason: return_reason
+					ReturnResult.create! registration_no: query_result.registration_no, postcode: query_result.postcode, order_date: Time.now.strftime('%Y-%m-%d'), unit_id: current_user.unit_id, business_id: query_result.business_id, source: "邮政数据查询", status: "normal", query_result_id: query_result.id, reason: return_reason, user_id: current_user.id
 				else
 					query_result.return_result.update reason: return_reason
 				end

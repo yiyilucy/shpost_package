@@ -32,6 +32,9 @@
     <td>
       <%= check_box("checkbox","is_abc")%>农行退件格式导出
     </td>
+    <td>
+      <%= check_box("checkbox","is_own")%>只导出本用户数据
+    </td>
     <td valign="middle">
     <%= submit_tag "查询",:class => 'btn btn-primary', onclick: "form1.action='return_result_index';form1.submit();" %>
     </td>

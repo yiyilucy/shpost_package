@@ -10,5 +10,6 @@ if (qid == 0){
 }else{
   $('#registration_no').val("<%= @registration_no %>");
   $('#out_query_results').html(" <%= escape_javascript(render(:partial => "return_results/return_scan_form",:object => @curr_query_result)) %> ");
+  
   $('#return_reason').focus();
 }

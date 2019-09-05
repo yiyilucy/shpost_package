@@ -13,7 +13,7 @@ $(document).on "page:load",->
   $('#registration_no').focus();
 
 ready = ->
-  $("#registration_no").keypress(enterpress)
+  $("#registration_no").keyup(enterpress)
   $("#return_reason").keypress(enterpress2)
   $("#setreason").keypress(enterpress3)
 
@@ -34,10 +34,9 @@ do_return = ->
           dataType : 'script'
           });
 
-enterpress = (e) ->
-  e = e || window.event;   
-  if e.keyCode == 13   
-    if $('#registration_no').val() != ""
+enterpress = ->
+  if $('#registration_no').val() != ""
+    if $('#registration_no').val().length == 13
       find_query_result()
       return false;
 

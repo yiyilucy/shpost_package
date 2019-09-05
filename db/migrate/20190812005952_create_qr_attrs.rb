@@ -5,6 +5,7 @@ class CreateQrAttrs < ActiveRecord::Migration
       t.datetime :batch_date
       t.string :lmk
       t.string :id_code
+      t.string :sn
       t.string :issue_bank
       t.string :name
       t.string :bank_no
