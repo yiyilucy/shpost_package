@@ -332,6 +332,7 @@ zh-CN:
         name: "名称"
         start_date: "开始日期"
         end_date: "结束日期"
+        keep_days: "数据保存日期"
       query_result:
         source: "邮政数据查询"
         registration_no: "挂号编号"

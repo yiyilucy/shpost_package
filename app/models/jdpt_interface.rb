@@ -1,10 +1,16 @@
 class JdptInterface
 
-  def self.clean_date_by_days(days = 90)
-    date = (Time.now - days.day).to_date
-    QueryResult.where("created_at < ?", date).delete_all
-    ReturnResult.where("created_at < ?", date).delete_all
-    InterfaceSender.where("created_at < ?", date).delete_all
+  def self.clean_data_by_days(days = nil)
+    Business.all.each do |business|
+      keep_days ||= days 
+      keep_days ||= business.keep_days
+      keep_days = 90 if keep_days.blank? || (keep_days <= 0)
+
+      date = (Time.now - keep_days.day).to_date
+      QueryResult.where("created_at < ?", date).where(business: business).delete_all
+      ReturnResult.where("created_at < ?", date).where(business: business).delete_all
+      InterfaceSender.where("created_at < ?", date).where(business: business).delete_all
+    end
   end
 
   @@jdpt_lock = Mutex.new
