@@ -204,7 +204,7 @@ background-color: #0099CC;
     height: 316px;
     margin: 120px auto 0px;
     /*background-image: url('<%=asset_path("login_bg.jpg")%>');*/
-    background-image: url('/assets/login_bg.jpg');
+    background-image: url('/assets/login_bg.png');
     background-size: 514px 316px;
     background-position: center;
     background-repeat: no-repeat;
