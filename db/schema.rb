@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190812005952) do
+ActiveRecord::Schema.define(version: 20190906023622) do
+
   create_table "businesses", force: true do |t|
     t.string   "name",       default: "", null: false
     t.integer  "start_date"
@@ -22,6 +23,7 @@ ActiveRecord::Schema.define(version: 20190812005952) do
     t.string   "secret_key"
     t.string   "send_id"
     t.string   "no"
+    t.integer  "keep_days"
   end
 
   create_table "import_files", force: true do |t|
@@ -37,6 +39,7 @@ ActiveRecord::Schema.define(version: 20190812005952) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "import_type"
+    t.boolean  "is_query"
   end
 
   create_table "interface_infos", force: true do |t|
@@ -54,7 +57,6 @@ ActiveRecord::Schema.define(version: 20190812005952) do
     t.string   "business_code"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "import_type"
   end
 
   create_table "interface_senders", force: true do |t|
@@ -107,30 +109,12 @@ ActiveRecord::Schema.define(version: 20190812005952) do
 
   create_table "query_results", force: true do |t|
     t.string   "source"
-    t.string   "registration_no",                     null: false
+    t.string   "registration_no", null: false
     t.string   "postcode"
     t.datetime "order_date"
     t.datetime "query_date"
     t.string   "result"
-    t.string   "status",          default: "waiting"
-    t.integer  "unit_id"
-    t.integer  "business_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.datetime "operated_at"
-  end
-
-  add_index "query_results", ["registration_no"], name: "index_query_results_on_registration_no", unique: true
-
-  create_table "return_results", force: true do |t|
-    t.string   "source"
-    t.string   "registration_no",                     null: false
-    t.string   "postcode"
-    t.datetime "order_date"
-    t.datetime "query_date"
-    t.datetime "operated_at"
-    t.string   "result"
-    t.string   "status",          default: "waiting"
+    t.string   "status"
     t.integer  "unit_id"
     t.integer  "business_id"
     t.datetime "created_at"
@@ -141,6 +125,13 @@ ActiveRecord::Schema.define(version: 20190812005952) do
   end
 
   add_index "query_results", ["registration_no"], name: "index_query_results_on_registration_no", unique: true
+
+  create_table "return_reasons", force: true do |t|
+    t.string   "reason"
+    t.integer  "unit_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "return_results", force: true do |t|
     t.string   "source"
@@ -155,6 +146,9 @@ ActiveRecord::Schema.define(version: 20190812005952) do
     t.integer  "business_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "query_result_id"
+    t.string   "reason"
+    t.integer  "user_id"
   end
 
   add_index "return_results", ["registration_no"], name: "index_return_results_on_registration_no", unique: true

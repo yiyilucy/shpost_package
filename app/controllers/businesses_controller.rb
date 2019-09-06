@@ -54,6 +54,6 @@ class BusinessesController < ApplicationController
     end
 
     def business_params
-      params.require(:business).permit(:name, :start_date, :end_date, :unit_id)
+      params.require(:business).permit(:name, :start_date, :end_date, :unit_id, :keep_days)
     end
 end
