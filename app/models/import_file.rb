@@ -145,7 +145,11 @@ class ImportFile < ActiveRecord::Base
 				              	  	QrAttr.create! data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn,  issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address, query_result_id: import_object.id
 				              	else 
 				              	  import_object.update postcode: postcode
-				              	  import_object.qr_attr.update data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn, issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address
+				              	  if !import_object.qr_attr.blank?
+				              	  	import_object.qr_attr.create_or_update data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn, issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address
+				              	  else
+				              	  	QrAttr.create! data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn,  issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address, query_result_id: import_object.id
+				              	  end
 				              	end
 			             	else
 				              	eval(f.import_type).create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: "waiting"
