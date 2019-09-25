@@ -15,7 +15,7 @@ class ReturnResult < ActiveRecord::Base
   end
 
   def self.get_result_with_status(response)
-    response_signed = response.reject{|x| !x["opCode"].in? ["704", '748', '747', '703']}
+    response_signed = response.reject{|x| !x["opCode"].in? ["704", '748', '747', '703', '711']}
 
     last_result = response_signed.first
     last_result ||= {}
