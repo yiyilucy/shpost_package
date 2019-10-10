@@ -12,7 +12,7 @@ class ReturnResultsController < ApplicationController
 	          @order_date = to_date(params[:order_date]["order_date"])
 	        end
 
-	        if file = ImportFile.upload_info(params[:file]['file'], business_id, @order_date, "ReturnResult", current_user)    
+	        if file = ImportFile.upload_info(params[:file]['file'], business_id, @order_date, "ReturnResult", current_user, true, false)    
 	          flash_message = "导入成功！"
 	        else
 	          flash_message = "导入失败!"
@@ -99,9 +99,9 @@ class ReturnResultsController < ApplicationController
 
 	      if is_abc
 	      	if is_own
-	      		results = ReturnResult.accessible_by(current_ability).where(user_id: current_user.id).joins(:query_result).joins({query_result: :qr_attr}).where("return_results.order_date like ? and return_results.business_id = ?", "#{@order_date}%", @business_id).order("return_results.created_at")
+	      		results = ReturnResult.accessible_by(current_ability).where(user_id: current_user.id).includes(:query_result).includes({query_result: :qr_attr}).where("return_results.order_date like ? and return_results.business_id = ?", "#{@order_date}%", @business_id).order("return_results.created_at")
 	      	else
-	      		results = ReturnResult.accessible_by(current_ability).joins(:query_result).joins({query_result: :qr_attr}).where("return_results.order_date like ? and return_results.business_id = ?", "#{@order_date}%", @business_id).order("return_results.created_at")
+	      		results = ReturnResult.accessible_by(current_ability).includes(:query_result).includes({query_result: :qr_attr}).where("return_results.order_date like ? and return_results.business_id = ?", "#{@order_date}%", @business_id).order("return_results.created_at")
 	      	end
 	      else
 		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "normal").order(:registration_no)

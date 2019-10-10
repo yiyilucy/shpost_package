@@ -30,7 +30,7 @@
     <%= select("business","business_id", Business.where(unit_id: current_user.unit_id).order(:id).map{|u| [u.name,u.id]},class: 'control-label',selected: @business_id) %> 
     </td>
     <td valign="middle">
-    <%= submit_tag "查询",:class => 'btn btn-primary', onclick: "form1.action='query_result_index';form1.submit();" %>
+    <%= submit_tag "查询", :name => 'submit',:class => 'btn btn-primary', onclick: "form1.action='query_result_index';form1.submit();" %>
     </td>
   </tr>
   </table>

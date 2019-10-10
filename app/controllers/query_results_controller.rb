@@ -137,6 +137,7 @@ class QueryResultsController < ApplicationController
   def import
     @order_date = Time.now.strftime('%Y-%m-%d')
     is_query = true
+    is_update = false
     
     unless request.get?
       business_id = params[:business_select]
@@ -149,8 +150,11 @@ class QueryResultsController < ApplicationController
         if !params[:checkbox].blank? and !params[:checkbox][:is_query].blank? 
           is_query = (params[:checkbox][:is_query].eql?"1") ? false : true
         end
+        if !params[:checkbox].blank? and !params[:checkbox][:is_update].blank? 
+          is_update = (params[:checkbox][:is_update].eql?"1") ? true : false
+        end
 
-        if file = ImportFile.upload_info(params[:file]['file'], business_id, @order_date, "QueryResult", current_user, is_query)    
+        if file = ImportFile.upload_info(params[:file]['file'], business_id, @order_date, "QueryResult", current_user, is_query, is_update)    
           flash_message = "导入成功！"
         else
           flash_message = "导入失败!"
