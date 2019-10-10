@@ -53,7 +53,7 @@ class ReturnResultsController < ApplicationController
 		      	if !params[:business].blank? and !params[:business]["business_id"].blank? 
 			        @business_id = params[:business]["business_id"]
 			        if RailsEnv.is_oracle?
-				      groupQuery = "to_char(return_results.order_date,'yyyy-mm-dd')"
+				      groupQuery = "return_results.order_date"
 				    else
 				      groupQuery = "strftime('%Y-%m-%d',return_results.order_date)"
 				    end

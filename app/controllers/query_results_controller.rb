@@ -275,7 +275,7 @@ class QueryResultsController < ApplicationController
         if !params[:business].blank? and !params[:business]["business_id"].blank? 
           @business_id = params[:business]["business_id"]
           if RailsEnv.is_oracle?
-            groupQuery = "to_char(query_results.order_date,'yyyy-mm-dd')"
+            groupQuery = "query_results.order_date"
           else
             groupQuery = "strftime('%Y-%m-%d',query_results.order_date)"
           end
