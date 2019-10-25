@@ -14,6 +14,7 @@ class JdptInterface
   end
 
   @@jdpt_lock = Mutex.new
+  
   def self.batch_init_jdpt_trace
     Business.all.each do |business|
       query_results = get_query_results business
@@ -46,7 +47,7 @@ class JdptInterface
           rescue Exception => e
             Rails.logger.error e.message
             puts e.message
-            raise ActiveRecord::Rollback
+            throw e
           end
         end
       end
@@ -130,6 +131,8 @@ class JdptInterface
           
           if result.is_a? QueryResult
             result.update!(status: last_result["status"], result: last_result["opt_desc"], query_date: Date.today.to_time, operated_at: last_result["opt_at"], is_posting: last_result["is_posting"])
+
+            result.update_to_send
           else
             result.update!(status: last_result["status"], result: last_result["opt_desc"], query_date: Date.today.to_time, operated_at: last_result["opt_at"])
           end
@@ -138,7 +141,9 @@ class JdptInterface
           return false
         end
       rescue => e
-        raise ActiveRecord::Rollback
+        Rails.logger.error e.message
+        puts e.message
+        throw e
       end
     end
     return false

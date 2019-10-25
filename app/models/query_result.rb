@@ -11,9 +11,26 @@ class QueryResult < ActiveRecord::Base
 
   STATUS_SHOW = { own: '本人收', other: '他人收', unit: '单位收', returns: '退件', waiting: '未妥投'}
 
+  STATUS_DELIVERED = [STATUS[:own], STATUS[:other], STATUS[:unit]]
+
   def status_name
   	status.blank? ? "" : QueryResult::STATUS["#{status}".to_sym]
 	end
+
+  def update_to_send
+    if to_send?
+      update to_send: true
+    end
+  end
+
+  def to_send?
+    if business.eql? Business.find_by(no: I18n.t(:YwtbInterface)[:business][:business_no])
+      if !status.eql?(STATUS[:waiting]) || ! is_sent || order_date <= (Date.today - business.end_date)
+        return true
+      end 
+    end
+    return false
+  end
 
   def self.get_result_with_status(response)
     last_result = response.last

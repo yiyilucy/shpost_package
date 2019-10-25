@@ -1,0 +1,7 @@
+zh-CN:
+  YwtbInterface:
+    business:
+      business_no: '010101'
+    oauth2_get_token:
+      client_id: EMS
+      client_secret: 1111111b

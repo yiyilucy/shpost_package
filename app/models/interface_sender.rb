@@ -6,7 +6,7 @@ class InterfaceSender < ActiveRecord::Base
   @@lock = Mutex.new
 
   STATUS = { waiting: 'waiting', success: 'success', failed: 'failed' }
-  INTERFACE_TYPE = {xml: 'xml', http: 'http', soap: 'soap'}
+  INTERFACE_TYPE = {xml: 'xml', http: 'http', soap: 'soap', json: 'json'}
   HTTP_TYPE = {post: 'post', get: 'get'}
 
   STATUS_SHOW = { success: '成功', failed: '失败', waiting: '待处理' }
@@ -38,6 +38,7 @@ class InterfaceSender < ActiveRecord::Base
       
       # interface_sender.set_next_time
       interface_sender.save!
+      return interface_sender
     end
   end
 
@@ -91,18 +92,19 @@ class InterfaceSender < ActiveRecord::Base
             response = self.xml_send
           when INTERFACE_TYPE[:http]
             response = self.http_send
+          when INTERFACE_TYPE[:json]
+            response = self.http_send true
           when INTERFACE_TYPE[:soap]
             response  = self.soap_send
           else
             response = self.http_send
         end
       end
-      throw TimeourError if response.blank?
+      throw TimeoutError if response.blank?
 
       self.callback response
     rescue Exception => e
       self.error_msg = "#{e.class.name} #{e.message} \n#{e.backtrace.join("\n")}"
-
       self.fail! response
     end
   end
@@ -193,12 +195,23 @@ class InterfaceSender < ActiveRecord::Base
     response.body
   end
 
-  def http_send
+  def http_send is_json = false
     send_url = URI.parse(self.url)
     if self.http_type.blank?
       self.http_type = 'post'
     end
-    response = HTTPClient.send self.http_type , send_url, JSON.parse(self.body)
+    request = {}
+    if ! self.body.blank?
+      if is_json
+        request[:body] = self.body
+      else
+        request[:body] = JSON.parse(self.body)
+      end
+    end
+    if ! self.header.blank?
+      request[:header] = JSON.parse(self.header)
+    end 
+    response = HTTPClient.send self.http_type , send_url, request#{'Content-Type' => 'application/json'}
     response.body
   end
 

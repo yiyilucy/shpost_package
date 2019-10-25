@@ -8,7 +8,29 @@ zh-CN:
     #   callback_method:
     #   max_times: 5 #default_times: 10
     #   interval: 300 #default_interval: 600
-
+    ywtb_token:
+      # for test
+      url: 'http://117.184.226.70:8022/ac-product-api/oauth2/getToken'
+      # for production
+      interface_type: 'http'
+      http_type: 'post'
+      callback_class: 'YwtbInterface'
+      callback_method: 'ywtb_express'
+      # object_class: 'Keyclientorder'
+      max_times: 5 #default_times: 10
+      interval: 300 #default_interval: 600
+    ywtb_express:
+      # for test
+      url: 'http://117.184.226.70:8022/ac-product-api/uapply/saveExpress'
+      # for production
+      interface_type: 'json'
+      http_type: 'post'
+      callback_class: 'YwtbInterface'
+      callback_method: 'do_response'
+      header: "{\"Content-Type\":\"application/json\"}"
+      # object_class: 'Keyclientorder'
+      max_times: 5 #default_times: 10
+      interval: 300 #default_interval: 600
     jdpt_trace:
       # for test
       url: 'http://211.156.195.33/querypush-twswn/mailTrack/queryMailTrackWn'

@@ -19,6 +19,10 @@ every '15 1 * * *' do
   runner "JdptInterface.batch_init_jdpt_trace"
 end
 
+every '15 2 * * *' do  
+  runner "JdptInterface.batch_init_ywtb"
+end
+
 every 2.minutes do
   runner "ImportFile.import_data"
 end
