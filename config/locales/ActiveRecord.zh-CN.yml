@@ -376,6 +376,12 @@ zh-CN:
         bank_no: "网点编号"
         phone: "电话"
         address: "地址"
+        id_num: "身份证号码"
+        province: "寄达省名称"
+        city: "寄达市名称"
+        district: "寄达区名称"
+        weight: "重量(克)"
+        price: "总邮资"
   menu:
     permission:
       name: "权限管理"

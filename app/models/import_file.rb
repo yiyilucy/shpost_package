@@ -63,7 +63,7 @@ class ImportFile < ActiveRecord::Base
     		sheet_error = []
       	rowarr = [] 
         instance=nil
-        # Rails.logger.info "begin"
+        Rails.logger.info "begin"
         if file.end_with?('.xlsx')
         	instance= Roo::Excelx.new(file)
         elsif file.end_with?('.xls')
@@ -75,13 +75,15 @@ class ImportFile < ActiveRecord::Base
         	return false
         end
                 
-      	# Rails.logger.info "File read: "+Time.now.strftime("%Y-%m-%d %H:%M:%S")
+      	Rails.logger.info "File read: "+Time.now.strftime("%Y-%m-%d %H:%M:%S")
         instance.default_sheet = instance.sheets.first
         title_row = instance.row(1)
         if !title_row.index("挂号编号").blank?
           registration_no_index = title_row.index("挂号编号")
         elsif !title_row.index("约投号码").blank?
           registration_no_index = title_row.index("约投号码")
+        elsif !title_row.index("邮件号").blank?
+          registration_no_index = title_row.index("邮件号")
         end
         if !title_row.index("邮编").blank?
           postcode_index = title_row.index("邮编")
@@ -91,6 +93,8 @@ class ImportFile < ActiveRecord::Base
         end
         if !title_row.index("批次日期").blank?
           batch_date_index = title_row.index("批次日期")
+        elsif !title_row.index("收寄时间").blank?
+          batch_date_index = title_row.index("收寄时间")
         end
         if !title_row.index("联名卡标识").blank?
           lmk_index = title_row.index("联名卡标识")
@@ -106,6 +110,8 @@ class ImportFile < ActiveRecord::Base
         end
         if !title_row.index("姓名").blank?
           name_index = title_row.index("姓名")
+        elsif !title_row.index("收件人").blank?
+          name_index = title_row.index("收件人")
         end
         if !title_row.index("网点编号").blank?
           bank_no_index = title_row.index("网点编号")
@@ -115,6 +121,24 @@ class ImportFile < ActiveRecord::Base
         end
         if !title_row.index("地址").blank?
           address_index = title_row.index("地址")
+        end
+        if !title_row.index("身份证号码").blank?
+          id_num_index = title_row.index("身份证号码")
+        end
+        if !title_row.index("寄达省名称").blank?
+          province_index = title_row.index("寄达省名称")
+        end
+        if !title_row.index("寄达市名称").blank?
+          city_index = title_row.index("寄达市名称")
+        end
+        if !title_row.index("寄达区名称").blank?
+          district_index = title_row.index("寄达区名称")
+        end
+        if !title_row.index("重量(克)").blank?
+          weight_index = title_row.index("重量(克)")
+        end
+        if !title_row.index("总邮资").blank?
+          price_index = title_row.index("总邮资")
         end
 
         result_object = eval(f.import_type)
@@ -138,23 +162,29 @@ class ImportFile < ActiveRecord::Base
 		            	rowarr = instance.row(current_line)
 		            	line += 1
 		            end
-		            
-		            registration_no = rowarr[registration_no_index].blank? ? "" : rowarr[registration_no_index].to_s.gsub(' ','').split('.0')[0]
-		            postcode = rowarr[postcode_index].blank? ? "" : rowarr[postcode_index].to_s.split('.0')[0]
-		            data_date = rowarr[data_date_index].blank? ? nil : DateTime.parse(rowarr[data_date_index].to_s.split(".0")[0]).strftime('%Y-%m-%d')
-              	batch_date = rowarr[batch_date_index].blank? ? nil : DateTime.parse(rowarr[batch_date_index].to_s.split(".0")[0]).strftime('%Y-%m-%d')
-              	lmk = rowarr[lmk_index].blank? ? "" : rowarr[lmk_index].to_s.split('.0')[0]
-              	id_code = rowarr[id_code_index].blank? ? "" : rowarr[id_code_index].to_s.split('.0')[0]
-              	sn = rowarr[sn_index].blank? ? "" : rowarr[sn_index].to_s.split('.0')[0]
-              	issue_bank = rowarr[issue_bank_index].blank? ? "" : rowarr[issue_bank_index].to_s.split('.0')[0]
-              	name = rowarr[name_index].blank? ? "" : rowarr[name_index].to_s.split('.0')[0]
-              	bank_no = rowarr[bank_no_index].blank? ? "" : rowarr[bank_no_index].to_s.split('.0')[0]
-              	phone = rowarr[phone_index].blank? ? "" : rowarr[phone_index].to_s.split('.0')[0]
-              	address = rowarr[address_index].blank? ? "" : rowarr[address_index].to_s.split('.0')[0]
+	            
+		            registration_no = registration_no_index.blank? ? "" : (rowarr[registration_no_index].blank? ? "" : rowarr[registration_no_index].to_s.gsub(' ','').split('.0')[0])
+		            postcode = postcode_index.blank? ? "" : (rowarr[postcode_index].blank? ? "" : rowarr[postcode_index].to_s.split('.0')[0])
+		            data_date = data_date_index.blank? ? nil : (rowarr[data_date_index].blank? ? nil : DateTime.parse(rowarr[data_date_index].to_s.split(".0")[0]).strftime('%Y-%m-%d'))
+              	batch_date = batch_date_index.blank? ? nil : (rowarr[batch_date_index].blank? ? nil : DateTime.parse(rowarr[batch_date_index].to_s.split(".0")[0]).strftime('%Y-%m-%d'))
+              	lmk = lmk_index.blank? ? "" : (rowarr[lmk_index].blank? ? "" : rowarr[lmk_index].to_s.split('.0')[0])
+              	id_code = id_code_index.blank? ? "" : (rowarr[id_code_index].blank? ? "" : rowarr[id_code_index].to_s.split('.0')[0])
+              	sn = sn_index.blank? ? "" : (rowarr[sn_index].blank? ? "" : rowarr[sn_index].to_s.split('.0')[0])
+              	issue_bank = issue_bank_index.blank? ? "" : (rowarr[issue_bank_index].blank? ? "" : rowarr[issue_bank_index].to_s.split('.0')[0])
+              	name = name_index.blank? ? "" : (rowarr[name_index].blank? ? "" : rowarr[name_index].to_s.split('.0')[0])
+              	bank_no = bank_no_index.blank? ? "" : (rowarr[bank_no_index].blank? ? "" : rowarr[bank_no_index].to_s.split('.0')[0])
+              	phone = phone_index.blank? ? "" : (rowarr[phone_index].blank? ? "" : rowarr[phone_index].to_s.split('.0')[0])
+              	address = address_index.blank? ? "" : (rowarr[address_index].blank? ? "" : rowarr[address_index].to_s.split('.0')[0])
+              	id_num = id_num_index.blank? ? "" : (rowarr[id_num_index].blank? ? "" : rowarr[id_num_index].to_s.split('.0')[0])
+              	province = province_index.blank? ? "" : (rowarr[province_index].blank? ? "" : rowarr[province_index].to_s.split('.0')[0])
+              	city = city_index.blank? ? "" : (rowarr[city_index].blank? ? "" : rowarr[city_index].to_s.split('.0')[0])
+              	district = district_index.blank? ? "" : (rowarr[district_index].blank? ? "" : rowarr[district_index].to_s.split('.0')[0])
+              	weight = weight_index.blank? ? 0.00 : (rowarr[weight_index].blank? ? 0.00 : rowarr[weight_index].to_f.round(2))
+              	price = price_index.blank? ? 0.00 : (rowarr[price_index].blank? ? 0.00 : rowarr[price_index].to_f.round(2))
 
 		            if registration_no.blank?
-		              txt = "缺少挂号编号或约投号码" + "(第" + current_line.to_s + "行)"
-		              puts txt
+		              txt = "缺少挂号编号或约投号码或邮件号" + "(第" + current_line.to_s + "行)"
+		              # puts txt
 		              sheet_error << (rowarr << txt)
 		              next
 		            end
@@ -166,18 +196,18 @@ class ImportFile < ActiveRecord::Base
 
 			            	if import_object.blank?
 			            		import_object = result_object.create! registration_no: registration_no, postcode: postcode, order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status
-		            			if !title_row.index("联名卡标识").blank?
-		            				QrAttr.create! data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn,  issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address, query_result_id: import_object.id
+		            			if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
+		            				QrAttr.create! data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn,  issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address, query_result_id: import_object.id, id_num: id_num, province: province, city: city, district: district, weight: weight, price: price
 		            			end
 		            		else
 		            			if f.is_update
-			            			if !title_row.index("联名卡标识").blank?
+			            			if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
 			            				import_object.update order_date: f.import_date, status: status
 
 		            					if !import_object.qr_attr.blank?
-		              	  			import_object.qr_attr.update data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn, issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address
+		              	  			import_object.qr_attr.update data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn, issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address, id_num: id_num, province: province, city: city, district: district, weight: weight, price: price
 		              	  		else
-		              	  			QrAttr.create! data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn,  issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address, query_result_id: import_object.id
+		              	  			QrAttr.create! data_date: data_date, batch_date: batch_date, lmk: lmk, id_code: id_code, sn: sn,  issue_bank: issue_bank, name: name, bank_no: bank_no, phone: phone, address: address, query_result_id: import_object.id, id_num: id_num, province: province, city: city, district: district, weight: weight, price: price
 		              	  		end
 			              	  else
 			            				if is_query
