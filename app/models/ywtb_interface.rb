@@ -2,7 +2,7 @@ class YwtbInterface
   @@ywtb_lock = Mutex.new
   
   def self.batch_init_ywtb
-    business = Business.find_by no: I18n.t(:YwtbInterface)[:business][:no]
+    business = Business.find_by no: I18n.t(:YwtbInterface)[:business][:business_no]
     results = QueryResult.where(business: business, to_send: true).order(order_date: :desc)
     batch_init_ywtb_interface_by_thread results
 
@@ -18,7 +18,7 @@ class YwtbInterface
           begin
             while results.size > 0
               result = nil
-              @@jdpt_lock.synchronize do
+              @@ywtb_lock.synchronize do
                 result = results.pop
               end
               if result.blank?
@@ -52,7 +52,7 @@ class YwtbInterface
         if !res_hash["access_token"].blank?
           result = QueryResult.find args.first['id']
           body = {"accessToken"=> res_hash["access_token"],
-            "orgCode"=> "SHGASH",
+            "departCode"=> "SHGASH",
             "applyNo"=> result.qr_attr.try(:id_num),
             "expressType"=> "结果寄送",
             "applicant"=> result.qr_attr.try(:name),
@@ -60,11 +60,11 @@ class YwtbInterface
             "senderAddress"=> result.qr_attr.try(:address),
             "senderAddressP"=> result.qr_attr.try(:province),
             "senderAddressC"=> result.qr_attr.try(:city),
-            "senderAddressD"=> result.qr_attr.try(:district),
-            "senderPostcode"=> result.postcode,
+            "senderAddressD"=> '上海',
+            "senderPostcode"=> '200000',
             "senderPhone"=> result.qr_attr.try(:phone),
             "recieverName"=> "人口办",
-            "recieverAddress"=> "人口办",
+            "recieverAddress"=> "康定路460弄8号",
             "recieverAddressP"=> "上海",
             "recieverAddressC"=> "上海",
             "recieverAddressD"=> "黄浦区",
