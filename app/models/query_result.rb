@@ -54,7 +54,7 @@ class QueryResult < ActiveRecord::Base
         status = QueryResult::STATUS[:own]
       elsif opt_code.eql? '747'
         status = QueryResult::STATUS[:unit]
-      elsif opt_code.in? ['708', '711']
+      elsif !response.reject{|x| !x["opCode"].in? ["708", '711']}.blank?
         status = QueryResult::STATUS[:returns]
       end
     end
