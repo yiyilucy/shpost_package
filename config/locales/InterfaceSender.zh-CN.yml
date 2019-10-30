@@ -12,6 +12,7 @@ zh-CN:
       # for test
       url: 'http://117.184.226.70:8022/ac-product-api/oauth2/getToken'
       # for production
+      #url: 'http://ywtb.sh.gov.cn:18018/ac-product-api/oauth2/getToken'
       interface_type: 'http'
       http_type: 'post'
       callback_class: 'YwtbInterface'
@@ -23,6 +24,7 @@ zh-CN:
       # for test
       url: 'http://117.184.226.70:8022/ac-product-api/uapply/saveExpress'
       # for production
+      # url: 'http://ywtb.sh.gov.cn:18018/ac-product-api/uapply/saveExpress'
       interface_type: 'json'
       http_type: 'post'
       callback_class: 'YwtbInterface'
@@ -33,12 +35,13 @@ zh-CN:
       interval: 300 #default_interval: 600
     jdpt_trace:
       # for test
-      url: 'http://211.156.195.33/querypush-twswn/mailTrack/queryMailTrackWn'
+      url: 'http://10.4.44.237/querypush-twsln/mailTrack/queryMailTrackLn'
       # for production
+      # url: 'http://10.4.189.174/querypush-twsln/mailTrack/queryMailTrackLn'
       interface_type: 'http'
       http_type: 'post'
       callback_class: 'JdptInterface'
       callback_method: 'do_response'
       # object_class: 'Keyclientorder'
-      max_times: 5 #default_times: 10
-      interval: 300 #default_interval: 600
+      max_times: 2 #default_times: 10
+      interval: 3600 #default_interval: 600
