@@ -28,7 +28,7 @@ class JdptInterface
   end
 
   def self.batch_init_jdpt_trace_by_thread(results)
-    i = results.size > 50 ? 50 : results.size
+    i = results.size > 5 ? 5 : results.size
     ts = []
     i.times.each do |x|
       t = Thread.new do

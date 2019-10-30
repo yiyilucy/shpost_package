@@ -47,7 +47,7 @@ class InterfaceSender < ActiveRecord::Base
     if ! thread_count.blank?
       i = thread_count
     else
-      i = interface_senders.size > 50 ? 50 : interface_senders.size
+      i = interface_senders.size > 5 ? 5 : interface_senders.size
     end
     ts = []
     i.times.each do |x|

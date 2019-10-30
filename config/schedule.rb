@@ -5,7 +5,7 @@
 
 # Example:
 #
-set :environment , :development
+# set :environment , :development
 env :PATH, ENV['PATH']
 env :GEM_PATH, ENV['GEM_PATH']
 
@@ -15,14 +15,19 @@ every 2.minutes do
   runner "InterfaceSender.schedule_send"
 end
 
-every '15 1 * * *' do  
+every :day, :at => '0:15am' do
   runner "JdptInterface.batch_init_jdpt_trace"
+end
+
+every 2.minutes do
+  runner "ImportFile.import_data"
+end
+
+every :day, :at => '11:35pm' do
+  runner "JdptInterface.clean_date_by_days"
 end
 
 every '15 2 * * *' do  
   runner "JdptInterface.batch_init_ywtb"
 end
 
-every 2.minutes do
-  runner "ImportFile.import_data"
-end
