@@ -19,7 +19,7 @@ class QueryResult < ActiveRecord::Base
 
   def update_to_send
     if to_send?
-      update to_send: true
+      update! to_send: true
     end
   end
 

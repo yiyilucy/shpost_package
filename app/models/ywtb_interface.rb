@@ -6,7 +6,7 @@ class YwtbInterface
     results = QueryResult.where(business: business, to_send: true).order(order_date: :desc)
     batch_init_ywtb_interface_by_thread results
 
-    results.update_all(to_send: false)
+    results.update_all(to_send: false, is_sent: true)
   end
 
   def self.batch_init_ywtb_interface_by_thread(results)
