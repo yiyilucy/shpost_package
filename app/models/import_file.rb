@@ -226,8 +226,9 @@ class ImportFile < ActiveRecord::Base
 
 		    Rails.logger.info "*********** begin ***********"
 		    line = 2
+		    row_count = instance.count
 		    begin
-          while (line <= instance.count)
+          while (line <= row_count)
           	current_line = line
           	rowarr = instance.row(current_line)
           	line += 1
@@ -326,15 +327,16 @@ class ImportFile < ActiveRecord::Base
 
 		    Rails.logger.info "*********** begin ***********"
 
-		    i = (instance.count-1) > 50 ? 50 : (instance.count-1)
+		    row_count = instance.count
+		    i = (row_count-1) > 50 ? 50 : (row_count-1)
 
 		    ts = []
 		    line = 2
 		    i.times.each do |x|
 		    	t = Thread.new do
           	begin
-	            while (line <= instance.count)
-	            	if line > instance.count
+	            while (line <= row_count)
+	            	if line > row_count
 	            		puts "===#{line}==="
 		            	break
 		            end 
@@ -355,7 +357,7 @@ class ImportFile < ActiveRecord::Base
 	            	# Rails.logger.info "第" + current_line.to_s + "行, " + Time.now.strftime("%Y-%m-%d %H:%M:%S")
 	            	ActiveRecord::Base.connection_pool.with_connection do
 			            begin
-			            	process_datas(result_object, f, title_row)
+			            	process_datas(result_object, f, title_row, infos_hash)
 		            	rescue ActiveRecord::RecordInvalid => e
 		             		txt = e.message + "(第" + current_line.to_s + "行)"
 	              		sheet_error << (rowarr << txt)
