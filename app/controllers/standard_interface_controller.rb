@@ -87,7 +87,8 @@ class StandardInterfaceController < ApplicationController
 
   def verify_sign
     @sign = params[:sign]
-    return error_builder('0001') if !@sign.eql? Digest::MD5.hexdigest("#{@context}#{@business.secret_key}")
+    secrect_key = @business.secret_key1 ||= @business.secret_key
+    return error_builder('0001') if !@sign.eql? Digest::MD5.hexdigest("#{@context}#{secrect_key}")
   end
 
   def interface_return
