@@ -28,7 +28,7 @@ class JdptInterface
   end
 
   def self.batch_init_jdpt_trace_by_thread(results)
-    i = results.size > 50 ? 50 : results.size
+    i = results.size > 5 ? 5 : results.size
     ts = []
     i.times.each do |x|
       t = Thread.new do
@@ -124,7 +124,11 @@ class JdptInterface
           end
 
           if ! res_hash["errorDesc"].blank? && res_hash["responseItems"].blank?
-            result.update!(status: result_class::STATUS[:waiting], result: res_hash["errorDesc"], query_date: Date.today.to_time, is_posting: false)
+            result.update!(status: result_class::STATUS[:waiting], result: res_hash["errorDesc"], query_date: Date.today.to_time)
+
+            result.is_a? QueryResult
+              result.update_to_send
+            end
             return true
           end
           last_result = result_class.get_result_with_status(res_hash["responseItems"])
