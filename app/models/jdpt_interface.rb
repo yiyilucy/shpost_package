@@ -124,7 +124,7 @@ class JdptInterface
           end
 
           if ! res_hash["errorDesc"].blank? && res_hash["responseItems"].blank?
-            result.update!(status: result_class::STATUS[:waiting], result: res_hash["errorDesc"], query_date: Date.today.to_time, is_posting: false)
+            result.update!(status: result_class::STATUS[:waiting], result: res_hash["errorDesc"], query_date: Date.today.to_time)
 
             result.is_a? QueryResult
               result.update_to_send

@@ -6,7 +6,7 @@ class YwtbInterface
     results = QueryResult.where(business: business, to_send: true).order(order_date: :desc)
     batch_init_ywtb_interface_by_thread results
 
-    results.update_all(to_send: false, is_sent: true)
+    results.update_all(to_send: false)
   end
 
   def self.batch_init_ywtb_interface_by_thread(results)
@@ -85,7 +85,7 @@ class YwtbInterface
             "isTips"=> "是"
             }.to_json
 
-          interface_sender = InterfaceSender.interface_sender_initialize("ywtb_express", body, {business_id: result.business_id, unit_id: result.unit_id,  object_id: result.id, object_class: result.class.to_s})#, callback_params: {id: result.id, class: result.class.to_s}.to_json})
+          interface_sender = InterfaceSender.interface_sender_initialize("ywtb_express", body, {business_id: result.business_id, unit_id: result.unit_id,  object_id: result.id, object_class: result.class.to_s, callback_params: {id: result.id}.to_json})#, callback_params: {id: result.id, class: result.class.to_s}.to_json})
       
           interface_sender.interface_send
           return true
@@ -110,8 +110,10 @@ class YwtbInterface
   def self.do_response(res, *args)
     ActiveRecord::Base.transaction do
       begin
+        result = QueryResult.find args.first['id']
         res_hash = ActiveSupport::JSON.decode(res)
         if res_hash['isSuccess']
+          result.update! is_sent: true
           return true
         else
           return false
