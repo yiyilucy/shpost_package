@@ -126,7 +126,7 @@ class JdptInterface
           if ! res_hash["errorDesc"].blank? && res_hash["responseItems"].blank?
             result.update!(status: result_class::STATUS[:waiting], result: res_hash["errorDesc"], query_date: Date.today.to_time)
 
-            result.is_a? QueryResult
+            if result.is_a? QueryResult
               result.update_to_send
             end
             return true
@@ -144,10 +144,10 @@ class JdptInterface
         else
           return false
         end
-      rescue => e
-        Rails.logger.error e.message
-        puts e.message
-        throw e
+      # rescue Exception => e
+      #   Rails.logger.error e.message
+      #   puts e.message
+      #   throw e
       end
     end
     return false
