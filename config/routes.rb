@@ -86,6 +86,8 @@ ShpostPackage::Application.routes.draw do
       get 'download'
       post 'download' => 'import_files#download'
       get 'insert_data'
+      get 'err_download'
+      post 'err_download' => 'import_files#err_download'
     end
   end
 

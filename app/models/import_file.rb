@@ -31,7 +31,7 @@ class ImportFile < ActiveRecord::Base
           f.write(file.read)
         end
 
-        ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, err_file_path: file_path, import_type: import_type, is_query: is_query, is_update: is_update
+        ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, import_type: import_type, is_query: is_query, is_update: is_update
 
         file_path
       end
