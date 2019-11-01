@@ -199,16 +199,16 @@ class QueryResultsController < ApplicationController
     @business_id=nil
     results = []
         
-    if !@order_date.blank? and !params[:business].blank? and !params[:business]["business_id"].blank? 
-      @business_id = params[:business]["business_id"]
-      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "own").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "other").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?","#{@order_date}%", @business_id, "unit").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "returns").order(:registration_no)
-      results << QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "waiting").order(:registration_no)
-      QueryResult.accessible_by(current_ability).where("order_date like ? and business_id = ?", "#{@order_date}%", @business_id).update_all query_date: Time.now
+    if !@order_date.blank? and !params[:business_id].blank?
+      @business_id = params[:business_id].to_i
+      results << QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?", @order_date.to_datetime, @business_id, "own").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?", @order_date.to_datetime, @business_id, "other").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?",@order_date.to_datetime, @business_id, "unit").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?", @order_date.to_datetime, @business_id, "returns").order(:registration_no)
+      results << QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?", @order_date.to_datetime, @business_id, "waiting").order(:registration_no)
+      QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ?", @order_date.to_datetime, @business_id).update_all query_date: Time.now
     end
- 
+
     send_data(results_xls_content_for(results), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")        
   end
 

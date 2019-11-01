@@ -94,22 +94,22 @@ class ReturnResultsController < ApplicationController
 	      is_abc = (params[:checkbox][:is_abc].eql?"1") ? true : false
 	    end
         
-	    if !@order_date.blank? and !params[:business].blank? and !params[:business]["business_id"].blank? 
-	      @business_id = params[:business]["business_id"]
+	    if !@order_date.blank? and !params[:business_id].blank?
+	      @business_id = params[:business_id].to_i
 
 	      if is_abc
 	      	if is_own
-	      		results = ReturnResult.accessible_by(current_ability).where(user_id: current_user.id).includes(:query_result).includes({query_result: :qr_attr}).where("return_results.order_date like ? and return_results.business_id = ?", "#{@order_date}%", @business_id).order("return_results.created_at")
+	      		results = ReturnResult.accessible_by(current_ability).where(user_id: current_user.id).includes(:query_result).includes({query_result: :qr_attr}).where("return_results.order_date = ? and return_results.business_id = ?", @order_date.to_datetime, @business_id).order("return_results.created_at")
 	      	else
-	      		results = ReturnResult.accessible_by(current_ability).includes(:query_result).includes({query_result: :qr_attr}).where("return_results.order_date like ? and return_results.business_id = ?", "#{@order_date}%", @business_id).order("return_results.created_at")
+	      		results = ReturnResult.accessible_by(current_ability).includes(:query_result).includes({query_result: :qr_attr}).where("return_results.order_date = ? and return_results.business_id = ?", @order_date.to_datetime, @business_id).order("return_results.created_at")
 	      	end
 	      else
-		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "normal").order(:registration_no)
-		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "signed").order(:registration_no)
-		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?","#{@order_date}%", @business_id, "others").order(:registration_no)
-		      results << ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ? and status = ?", "#{@order_date}%", @business_id, "waiting").order(:registration_no)
+		      results << ReturnResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?", @order_date.to_datetime, @business_id, "normal").order(:registration_no)
+		      results << ReturnResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?", @order_date.to_datetime, @business_id, "signed").order(:registration_no)
+		      results << ReturnResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?",@order_date.to_datetime, @business_id, "others").order(:registration_no)
+		      results << ReturnResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?", @order_date.to_datetime, @business_id, "waiting").order(:registration_no)
 		  end
-	      ReturnResult.accessible_by(current_ability).where("order_date like ? and business_id = ?", "#{@order_date}%", @business_id).update_all query_date: Time.now
+	      ReturnResult.accessible_by(current_ability).where("order_date = ? and business_id = ?", @order_date.to_datetime, @business_id).update_all query_date: Time.now
 	    end
  		
  		if is_abc
