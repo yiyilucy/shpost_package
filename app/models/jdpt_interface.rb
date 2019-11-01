@@ -8,6 +8,7 @@ class JdptInterface
 
       date = (Time.now - keep_days.day).to_date
       QueryResult.where("created_at < ?", date).where(business: business).delete_all
+      QrAttr.where("created_at < ?", date).where(business: business).delete_all
       ReturnResult.where("created_at < ?", date).where(business: business).delete_all
       InterfaceSender.where("created_at < ?", date).where(business: business).delete_all
     end
