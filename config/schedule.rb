@@ -27,7 +27,7 @@ every :day, :at => '11:35pm' do
   runner "JdptInterface.clean_date_by_days"
 end
 
-every '15 2 * * *' do  
-  runner "JdptInterface.batch_init_ywtb"
+every 1.hours do  
+  runner "YwtbInterface.batch_init_ywtb"
 end
 
