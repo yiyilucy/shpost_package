@@ -1,3 +1,5 @@
 $('#registration_no').val("");
+number = parseInt($('#return_num').text());
+$('#return_num').text(number + 1);
 $('#out_query_results').html(" <%= escape_javascript(render(:partial => "return_results/return_scan_form")) %> ");
 $('#registration_no').focus();
