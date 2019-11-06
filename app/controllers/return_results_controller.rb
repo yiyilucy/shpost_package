@@ -94,8 +94,8 @@ class ReturnResultsController < ApplicationController
 	      is_abc = (params[:checkbox][:is_abc].eql?"1") ? true : false
 	    end
         
-	    if !@order_date.blank? and !params[:business_id].blank?
-	      @business_id = params[:business_id].to_i
+	    if !@order_date.blank? and !params[:business].blank? and !params[:business][:business_id].blank?
+	      @business_id = params[:business][:business_id].to_i
 
 	      if is_abc
 	      	if is_own
@@ -205,7 +205,8 @@ class ReturnResultsController < ApplicationController
 	def do_return
 		registration_no = params[:registration_no]
 		return_reason = (params[:return_reason].blank?) ? "" : params[:return_reason].split(".").last
-
+		@return_num = params[:return_num].blank? ? 1 : (params[:return_num].to_i+1)
+		
 		if !registration_no.blank? && !return_reason.blank?
 			query_result = QueryResult.accessible_by(current_ability).find_by(unit_id: current_user.unit.try(:id), registration_no: registration_no)
 			if !query_result.blank?

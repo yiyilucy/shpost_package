@@ -10,6 +10,7 @@ class ReturnResult < ActiveRecord::Base
 
   STATUS_SHOW = { normal: '普通退件', signed: '签收后退件', others: '异常退件', waiting: '待查询'}
 
+  
   def status_name
     status.blank? ? "" : ReturnResult::STATUS["#{status}".to_sym]
   end

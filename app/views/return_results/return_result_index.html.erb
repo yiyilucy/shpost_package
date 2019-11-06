@@ -78,7 +78,7 @@
     <td><%= others.to_s + " /" + sprintf("%0.2f" ,others/sum*100) + "%" %></td>
     <td><%= waiting.to_s + " /" + sprintf("%0.2f" ,waiting/sum*100) + "%" %></td>
     <td><%= s[1] %></td>
-    <td><%= link_to "导出", "/return_results/export?order_date=#{s[0]}&&business_id=#{@business_id}", :class => 'btn btn-primary', :method => 'post' %></td>
+    <td><%= submit_tag "导出",:class => 'btn btn-primary', onclick: "form1.action='/return_results/export?order_date=#{s[0]}';form1.submit();" %></td>
   </tr>
   <% end %>
   <% @sum_all = ((@sum_all==0) ? 0 : @sum_all.to_f) %>
