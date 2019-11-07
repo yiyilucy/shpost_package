@@ -341,7 +341,11 @@ class ImportFile < ActiveRecord::Base
       file_path = DOWNLOAD_DIRECT + filename
             
       exporterrorinfos_xls_content_for(sheet_error, title_row, file_path)
-      f.update status: "success", desc: "部分导入成功,共#{sheet_error.size}行失败,可能原因是#{txt}", err_file_path: file_path
+      if sheet_error.size == (row_count - 1)
+        f.update status: "fail", desc: "失败", err_file_path: file_path
+      else
+        f.update status: "success", desc: "部分导入成功,共#{sheet_error.size}行失败,可能原因是#{txt}", err_file_path: file_path
+      end
     else
       f.update status: "success", desc: "成功"
     end
