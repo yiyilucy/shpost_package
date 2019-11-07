@@ -40,7 +40,7 @@
       ActiveSupport::SafeBuffer.new << 
       (link_to t('.download', :default => t("helpers.links.download")), download_import_file_path(import_file),:method => 'post', :class => 'btn btn-xs btn-primary' if (can? :download, import_file))<< ' ' <<
 
-      (link_to "错误文件下载", err_download_import_file_path(import_file),:method => 'post', :class => 'btn btn-xs btn-primary' if (can? :err_download, import_file) && (!import_file.desc.eql?"成功"))
+      (link_to "错误文件下载", err_download_import_file_path(import_file),:method => 'post', :class => 'btn btn-xs btn-primary' if (can? :err_download, import_file) && (!import_file.desc.eql?"成功") && !(["waiting", "doing"].include?import_file.status))
     end
 
   end 
