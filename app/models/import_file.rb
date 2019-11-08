@@ -164,15 +164,7 @@ class ImportFile < ActiveRecord::Base
         if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
           import_object.update order_date: f.import_date, status: status
 
-          if !import_object.qr_attr.blank?
-          	qr_attr = import_object.qr_attr
-          	infos_hash.keys.each do |x|
-          		qr_attr.send("#{x}=", infos_hash[x]) if (qr_attr.respond_to? "#{x}=") && !infos_hash[x].blank?
-          	end
-          	qr_attr.save!
-					else
-            QrAttr.create! data_date: infos_hash["data_date"], batch_date: infos_hash["batch_date"], lmk: infos_hash["lmk"], id_code: infos_hash["id_code"], sn: infos_hash["sn"],  issue_bank: infos_hash["issue_bank"], name: infos_hash["name"], bank_no: infos_hash["bank_no"], phone: infos_hash["phone"], address: infos_hash["address"], query_result_id: import_object.id, id_num: infos_hash["id_num"], province: infos_hash["province"], city: infos_hash["city"], district: infos_hash["district"], weight: infos_hash["weight"], price: infos_hash["price"]
-          end
+          complete_qr_attr(import_object, infos_hash)
         else
           if f.is_query
             import_object.update order_date: f.import_date, status: status
@@ -180,7 +172,23 @@ class ImportFile < ActiveRecord::Base
             import_object.update order_date: f.import_date
           end
         end
+      else
+        if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
+          complete_qr_attr(import_object, infos_hash)
+        end
       end
+    end
+  end
+
+  def self.complete_qr_attr(import_object, infos_hash)
+    if !import_object.qr_attr.blank?
+      qr_attr = import_object.qr_attr
+      infos_hash.keys.each do |x|
+        qr_attr.send("#{x}=", infos_hash[x]) if (qr_attr.respond_to? "#{x}=") && !infos_hash[x].blank?
+      end
+      qr_attr.save!
+    else
+      QrAttr.create! data_date: infos_hash["data_date"], batch_date: infos_hash["batch_date"], lmk: infos_hash["lmk"], id_code: infos_hash["id_code"], sn: infos_hash["sn"],  issue_bank: infos_hash["issue_bank"], name: infos_hash["name"], bank_no: infos_hash["bank_no"], phone: infos_hash["phone"], address: infos_hash["address"], query_result_id: import_object.id, id_num: infos_hash["id_num"], province: infos_hash["province"], city: infos_hash["city"], district: infos_hash["district"], weight: infos_hash["weight"], price: infos_hash["price"]
     end
   end
 
