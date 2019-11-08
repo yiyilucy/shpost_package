@@ -81,7 +81,8 @@ class YwtbInterface
             "expressCompany"=> "EMS",
             "createTime"=> result.qr_attr.try(:batch_date).try(:strftime,'%Y-%m-%d %H:%M:%S'),
             "createMethod"=> "线下下单",
-            "isSend"=> result.status.in?(QueryResult::STATUS_DELIVERED) ? "是" : "否",
+            "isSend" => result.status.in?(QueryResult::STATUS_DELIVERED) ? "是" : "否",
+            "sendTime" => result.status.in?(QueryResult::STATUS_DELIVERED) ? result.operated_at.try(:strftime,'%Y-%m-%d %H:%M:%S'): '' ,
             "isTips"=> "是"
             }.to_json
 
