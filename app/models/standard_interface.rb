@@ -58,6 +58,8 @@ class StandardInterface
       interface_sender.interface_send
     end
 
+    query_result.reload
+
     status = query_result.status.eql?(QueryResult::STATUS[:waiting]) && query_result.is_posting? ? "posting" : query_result.status
 
     mail_json = {"MAIL_NO" => query_result.registration_no, "STATUS" => status, "RESULT_MSG" => query_result.result, "OPERATED_AT" => query_result.operated_at.try(:strftime, '%Y%m%d%H%M'), "QUERIED_AT" => query_result.query_date.try(:strftime, '%Y%m%d%H%M'), "QUERY_MSG" => interface_sender.last_response}
