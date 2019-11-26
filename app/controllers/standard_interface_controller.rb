@@ -13,7 +13,7 @@ class StandardInterfaceController < ApplicationController
     @business_code = @context_hash['BUSINESS_CODE']
     begin
       mail = StandardInterface.mail_push(@context_hash, @business, @unit)
-    rescue => e
+    rescue Exception => e
       if ! e.is_a? RuntimeError
         out_error e
       end
@@ -32,7 +32,7 @@ class StandardInterfaceController < ApplicationController
     return error_builder('0005', '查询列表为空') if @context_hash['MAIL_NO'].blank?
     begin
       success_builder(StandardInterface.mail_query(@context_hash, @business, @unit))
-    rescue => e
+    rescue Exception => e
       if ! e.is_a? RuntimeError
         out_error e
       end
@@ -45,7 +45,8 @@ class StandardInterfaceController < ApplicationController
     return error_builder('0005', '查询列表为空') if @context_hash['MAIL_NO'].blank?
     begin
       success_builder(StandardInterface.mail_query_in_time(@context_hash, @business, @unit))
-    rescue => e
+    rescue Exception => e
+      binding.pry
       if ! e.is_a? RuntimeError
         out_error e
       end
@@ -75,13 +76,13 @@ class StandardInterfaceController < ApplicationController
     @context = params[:context]
     begin
       @context_hash = ActiveSupport::JSON.decode(@context)
-    rescue => e
+    rescue Exception => e
       return error_builder('0002')
     end
 
     @mark = params[:mark]
     
-    # return verify_sign
+    return verify_sign
 
   end
 
