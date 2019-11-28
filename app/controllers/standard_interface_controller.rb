@@ -46,7 +46,6 @@ class StandardInterfaceController < ApplicationController
     begin
       success_builder(StandardInterface.mail_query_in_time(@context_hash, @business, @unit))
     rescue Exception => e
-      binding.pry
       if ! e.is_a? RuntimeError
         out_error e
       end
