@@ -24,7 +24,7 @@ every 2.minutes do
 end
 
 every :day, :at => '11:35pm' do
-  runner "JdptInterface.clean_date_by_days"
+  runner "JdptInterface.clean_data_by_days"
 end
 
 every 1.hours do  

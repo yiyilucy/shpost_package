@@ -8,7 +8,7 @@ class JdptInterface
 
       date = (Time.now - keep_days.day).to_date
       QueryResult.where("created_at < ?", date).where(business: business).delete_all
-      QrAttr.where("created_at < ?", date).where(business: business).delete_all
+      QrAttr.joins(:query_result).where("query_results.created_at < ?", '2019-01-01').where(query_results: {business_id: business.id}).delete_all
       ReturnResult.where("created_at < ?", date).where(business: business).delete_all
       InterfaceSender.where("created_at < ?", date).where(business: business).delete_all
     end
@@ -145,10 +145,10 @@ class JdptInterface
         else
           return false
         end
-      # rescue Exception => e
-      #   Rails.logger.error e.message
-      #   puts e.message
-      #   throw e
+      rescue Exception => e
+        Rails.logger.error e.message
+        puts e.message
+        throw e
       end
     end
     return false
