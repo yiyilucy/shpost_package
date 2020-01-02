@@ -102,6 +102,9 @@ class ImportFile < ActiveRecord::Base
     if !title_row.index("总邮资").blank?
       indexs_hash["price_index"] = title_row.index("总邮资")
     end
+    if !title_row.index("订单号").blank?
+      indexs_hash["business_code_index"] = title_row.index("订单号")
+    end
 
     return indexs_hash
   end
@@ -127,6 +130,7 @@ class ImportFile < ActiveRecord::Base
     district_index = indexs_hash["district_index"]
     weight_index = indexs_hash["weight_index"]
     price_index = indexs_hash["price_index"]
+    business_code_index = indexs_hash["business_code_index"]
 
     infos_hash["registration_no"] = registration_no_index.blank? ? "" : (rowarr[registration_no_index].blank? ? "" : rowarr[registration_no_index].to_s.gsub(' ','').split('.0')[0])
     infos_hash["postcode"] = postcode_index.blank? ? "" : (rowarr[postcode_index].blank? ? "" : rowarr[postcode_index].to_s.split('.0')[0])
@@ -146,6 +150,7 @@ class ImportFile < ActiveRecord::Base
     infos_hash["district"] = district_index.blank? ? "" : (rowarr[district_index].blank? ? "" : rowarr[district_index].to_s.split('.0')[0])
     infos_hash["weight"] = weight_index.blank? ? 0.00 : (rowarr[weight_index].blank? ? 0.00 : rowarr[weight_index].to_f.round(2))
     infos_hash["price"] = price_index.blank? ? 0.00 : (rowarr[price_index].blank? ? 0.00 : rowarr[price_index].to_f.round(2))
+    infos_hash["business_code"] = business_code_index.blank? ? "" : (rowarr[business_code_index].blank? ? "" : rowarr[business_code_index].to_s.split('.0')[0])
 
     return infos_hash
   end
@@ -155,21 +160,21 @@ class ImportFile < ActiveRecord::Base
     status = f.is_query ? "waiting" : "own"
 
     if import_object.blank?
-      import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status
+      import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status, business_code: infos_hash["business_code"]
       if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
         QrAttr.create! data_date: infos_hash["data_date"], batch_date: infos_hash["batch_date"], lmk: infos_hash["lmk"], id_code: infos_hash["id_code"], sn: infos_hash["sn"],  issue_bank: infos_hash["issue_bank"], name: infos_hash["name"], bank_no: infos_hash["bank_no"], phone: infos_hash["phone"], address: infos_hash["address"], query_result_id: import_object.id, id_num: infos_hash["id_num"], province: infos_hash["province"], city: infos_hash["city"], district: infos_hash["district"], weight: infos_hash["weight"], price: infos_hash["price"]
       end
     else
       if f.is_update
         if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
-          import_object.update order_date: f.import_date, status: status
+          import_object.update order_date: f.import_date, status: status, business_code: business_code
 
           complete_qr_attr(import_object, infos_hash)
         else
           if f.is_query
-            import_object.update order_date: f.import_date, status: status
+            import_object.update order_date: f.import_date, status: status, business_code: business_code
           else
-            import_object.update order_date: f.import_date
+            import_object.update order_date: f.import_date, business_code: business_code
           end
         end
       else

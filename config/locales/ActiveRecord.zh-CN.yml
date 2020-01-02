@@ -343,6 +343,7 @@ zh-CN:
         status: "状态"
         unit_id: "单位"
         business_id: "商户"
+        business_code: "订单号"
       import_file:
         file_name: "文件名"
         file_path: "原文件存放路径"
