@@ -1,7 +1,22 @@
 zh-CN:
   YwtbInterface:
-    business:
-      business_no: '010101'
+    businesses:
+      -
+        :business_no: '010101'
+        # sender_no: 
+        #             - '90000010296749'
+        #             - '90000011041715'
+        #             - '90000011041692'
+        :ywtb_type: 'rkb'
+        :need_data_from_pkp: false
+      -
+        :business_no: '010102'
+        :ywtb_type: 'crj'
+        :need_data_from_pkp: true
+        :sender_no: 
+                    - '90000010296749'
+                    - '90000011041715'
+                    - '90000011041692'
     oauth2_get_token:
       client_id: EMS
       client_secret: 1111111b

@@ -23,3 +23,15 @@ production:
   database: db/production.sqlite3
   pool: 5
   timeout: 5000
+
+pkp_data_source_development:
+  adapter: sqlite3
+  database: ../shpost_mail_message/db/development.sqlite3
+  pool: 5
+  timeout: 5000
+
+pkp_data_source_production:
+  adapter: sqlite3
+  database: ../shpost_mail_message/db/production.sqlite3
+  pool: 5
+  timeout: 5000

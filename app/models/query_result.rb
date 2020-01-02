@@ -24,7 +24,8 @@ class QueryResult < ActiveRecord::Base
   end
 
   def to_send?
-    if !I18n.t(:YwtbInterface).is_a?(String) && business.eql?(Business.find_by(no: I18n.t(:YwtbInterface)[:business][:business_no]))
+    businesses = I18n.t(:YwtbInterface)[:businesses].map{|x| x[:business_no]}
+    if business.no.in?(Business.find_by(no: I18n.t(:YwtbInterface)[:businesses][:business_no]))
       if !status.eql?(STATUS[:waiting]) || ! is_sent || order_date <= (Date.today - business.end_date)
         return true
       end 
