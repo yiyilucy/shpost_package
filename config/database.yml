@@ -23,6 +23,13 @@ production:
   database: db/production.sqlite3
   pool: 5
   timeout: 5000
+  # adapter: oracle_enhanced
+  # database: package
+  # host: 10.126.25.113
+  # port: 1521
+  # username: package
+  # password: package
+  # pool: 200
 
 pkp_data_source_development:
   adapter: sqlite3
@@ -35,3 +42,10 @@ pkp_data_source_production:
   database: ../shpost_mail_message/db/production.sqlite3
   pool: 5
   timeout: 5000
+  # adapter: oracle_enhanced
+  # database: ywdata
+  # host: 10.126.6.148
+  # port: 1521
+  # username: mailmessage
+  # password: Mmsg_2019
+  # pool: 200
