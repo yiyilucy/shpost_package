@@ -31,6 +31,7 @@ class YwtbInterface
                 next
               end
               YwtbInterface.ywtb_token result, ywtb_type
+              result.update! to_send: false
             end
           rescue Exception => e
             Rails.logger.error e.message
@@ -85,6 +86,28 @@ class YwtbInterface
 
     #   InterfaceSender.interface_sender_initialize("jdpt_trace", body, {business_id: result.business_id, unit_id: result.unit_id,  object_id: result.id, object_class: result.class.to_s, callback_params: {id: result.id, class: result.class.to_s}.to_json})
     # end
+  end
+
+  
+
+  def self.do_response(res, *args)
+    ActiveRecord::Base.transaction do
+      begin
+        result = QueryResult.find args.first['id']
+        res_hash = ActiveSupport::JSON.decode(res)
+        if res_hash['isSuccess']
+          result.update! is_sent: true
+          return true
+        else
+          return false
+        end
+      rescue => e
+        Rails.logger.error e.message
+        puts e.message
+        throw e
+      end
+    end
+    return false
   end
 
   #人口办body
@@ -162,25 +185,4 @@ class YwtbInterface
               "isTips"=> "否"
               }.to_json
   end
-
-  def self.do_response(res, *args)
-    ActiveRecord::Base.transaction do
-      begin
-        result = QueryResult.find args.first['id']
-        res_hash = ActiveSupport::JSON.decode(res)
-        if res_hash['isSuccess']
-          result.update! is_sent: true
-          return true
-        else
-          return false
-        end
-      rescue => e
-        Rails.logger.error e.message
-        puts e.message
-        throw e
-      end
-    end
-    return false
-  end
-
 end
