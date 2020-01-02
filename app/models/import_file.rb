@@ -157,7 +157,16 @@ class ImportFile < ActiveRecord::Base
 
   def self.process_datas(result_object, f, title_row, infos_hash)
     import_object = result_object.find_by_registration_no infos_hash["registration_no"]
-    status = f.is_query ? "waiting" : "own"
+    status = nil
+    if f.is_query
+      if import_object.blank? 
+        status = "waiting"
+      else
+        status = import_object.status.blank? ? "waiting" : import_object.status
+      end
+    else
+      status = "own"
+    end
 
     if import_object.blank?
       import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status, business_code: infos_hash["business_code"]
