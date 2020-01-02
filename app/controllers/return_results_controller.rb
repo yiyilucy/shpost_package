@@ -133,9 +133,9 @@ class ReturnResultsController < ApplicationController
 	      sheet.row(0).default_format = blue  
 	  
 	  	  if sheet_name[i].eql?"签收后退件"
-	      	sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件所属日期 查询日期 签收描述 签收时间} 
+	      	sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件所属日期 查询日期 订单号 签收描述 签收时间} 
 	      else
-	      	sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件所属日期 查询日期}
+	      	sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件所属日期 查询日期 订单号}
 	      end
 	      count_row = 1
 	      obj.each do |o|  
@@ -143,9 +143,10 @@ class ReturnResultsController < ApplicationController
 	        sheet[count_row,1]=o.registration_no
 	        sheet[count_row,2]=o.order_date.strftime('%Y-%m-%d').to_s
 	        sheet[count_row,3]=o.query_date.strftime('%Y-%m-%d').to_s
+	        sheet[count_row,4]=o.business_code.blank? ? "" : o.business_code
 	        if sheet_name[i].eql?"签收后退件"
-		        sheet[count_row,4]=o.result.blank? ? "" : o.result
-		        sheet[count_row,5]=o.operated_at.blank? ? "" : o.operated_at.strftime('%Y-%m-%d').to_s
+		        sheet[count_row,5]=o.result.blank? ? "" : o.result
+		        sheet[count_row,6]=o.operated_at.blank? ? "" : o.operated_at.strftime('%Y-%m-%d').to_s
 		    end
 	        
 	        count_row += 1
@@ -164,7 +165,7 @@ class ReturnResultsController < ApplicationController
 
 	    blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
 	    sheet1.row(0).default_format = blue 
-	    sheet1.row(0).concat %w{邮编 姓名 电话 地址 批次日期 约投号码 退回原因}  
+	    sheet1.row(0).concat %w{邮编 姓名 电话 地址 批次日期 约投号码 退回原因 订单号}  
 	    count_row = 1
 	    obj.each do |obj|
 	      sheet1[count_row,0]=obj.postcode
@@ -174,6 +175,7 @@ class ReturnResultsController < ApplicationController
 	      sheet1[count_row,4]=obj.query_result.qr_attr.batch_date.strftime("%Y-%m-%d").to_s
 	      sheet1[count_row,5]=obj.registration_no
 	      sheet1[count_row,6]=obj.reason
+	      sheet[count_row,7]=obj.business_code.blank? ? "" : obj.business_code
 	      
 	      count_row += 1
 	    end 
