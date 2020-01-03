@@ -133,7 +133,6 @@ class JdptInterface
             return true
           end
           last_result = result_class.get_result_with_status(res_hash["responseItems"])
-          
           if result.is_a? QueryResult
             result.update!(status: last_result["status"], result: last_result["opt_desc"], query_date: Date.today.to_time, operated_at: last_result["opt_at"], is_posting: last_result["is_posting"])
 
@@ -146,6 +145,7 @@ class JdptInterface
           return false
         end
       rescue Exception => e
+        binding.pry
         Rails.logger.error e.message
         puts e.message
         throw e

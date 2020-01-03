@@ -4,6 +4,7 @@ class PkpWaybillBase < PkpDataRecord
     end_date = Date.today - 1.day
     get_query_records(start_date, end_date)
   end
+  
   def self.get_query_records(start_date, end_date)
     businesses = I18n.t(:YwtbInterface)[:businesses]
     businesses.each do |x|
