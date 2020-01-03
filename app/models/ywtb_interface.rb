@@ -6,7 +6,11 @@ class YwtbInterface
 
     businesses.each do |x|
       business = Business.find_by no: x[:business_no]
-      results = QueryResult.where(business: business, to_send: true).order(order_date: :desc)
+      if need_data_from_pkp
+        results = QueryResult.where(business: business, to_send: true).where.not(business_code: nil).order(order_date: :desc)
+      else
+        results = QueryResult.where(business: business, to_send: true).order(order_date: :desc)
+      end
       if ! results.blank?
         batch_init_ywtb_interface_by_thread results, x[:ywtb_type]
         #results.update_all(to_send: false)

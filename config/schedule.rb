@@ -5,31 +5,31 @@
 
 # Example:
 #
-set :environment , :development
+# set :environment , :development
 env :PATH, ENV['PATH']
 env :GEM_PATH, ENV['GEM_PATH']
 
-# set :output, "log/cron_log.log"
+set :output, "log/cron_log.log"
 
-# every 2.minutes do
-#   runner "InterfaceSender.schedule_send"
-# end
+every 2.minutes do
+  runner "InterfaceSender.schedule_send"
+end
 
-# every :day, :at => '0:15am' do
-#   runner "JdptInterface.batch_init_jdpt_trace"
-# end
+every :day, :at => '0:15am' do
+  runner "JdptInterface.batch_init_jdpt_trace"
+end
 
-# every 2.minutes do
-#   runner "ImportFile.import_data"
-# end
+every 2.minutes do
+  runner "ImportFile.import_data"
+end
 
-# every :day, :at => '11:35pm' do
-#   runner "JdptInterface.clean_data_by_days"
-# end
+every :day, :at => '11:35pm' do
+  runner "JdptInterface.clean_data_by_days"
+end
 
-# every 1.hours do  
-#   runner "YwtbInterface.batch_init_ywtb"
-# end
+every 1.hours do  
+  runner "YwtbInterface.batch_init_ywtb"
+end
 
 every :day, :at => '0:02am' do
   

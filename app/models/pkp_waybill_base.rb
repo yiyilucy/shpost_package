@@ -1,7 +1,7 @@
 class PkpWaybillBase < PkpDataRecord
   def self.get_query_records_schedule
     start_date = Date.today - 2.day
-    end_date = Date.today + 1.day
+    end_date = Date.today - 1.day
     get_query_records(start_date, end_date)
   end
   def self.get_query_records(start_date, end_date)
