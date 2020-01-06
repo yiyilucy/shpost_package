@@ -61,11 +61,11 @@ class QueryResult < ActiveRecord::Base
     end
     result = {"opt_at" => opt_time, "opt_desc" => opt_desc, "status" => status}
 
-    if status.eql? QueryResult::STATUS[:waiting]
+    # if status.eql? QueryResult::STATUS[:waiting]
       result["is_posting"] = response.find{|x| x['opCode'].eql? '203' }.blank? ? false : true
-    else
-      result["is_posting"] = false
-    end
+    # else
+      # result["is_posting"] = false
+    # end
 
     result
   end
