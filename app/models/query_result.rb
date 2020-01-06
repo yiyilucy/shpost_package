@@ -14,7 +14,7 @@ class QueryResult < ActiveRecord::Base
   STATUS_DELIVERED = [STATUS[:own], STATUS[:other], STATUS[:unit]]
 
   def status_name
-  	status.blank? ? "" : QueryResult::STATUS["#{status}".to_sym]
+  	status.blank? ? "" : QueryResult::STATUS_SHOW["#{status}".to_sym]
 	end
 
   def update_to_send

@@ -1,0 +1,37 @@
+<%- model_class = QueryResult -%>
+<div class="page-header">
+  <h1>一网通办收寄信息查询</h1>
+</div>
+
+<%= grid(@ywtb_query_results_grid) do |g|
+    g.column name: model_class.human_attribute_name(:registration_no), attribute: 'registration_no'
+
+    g.column name: model_class.human_attribute_name(:postcode), attribute: 'postcode'
+
+    g.column name: model_class.human_attribute_name(:order_date), attribute: 'order_date' do |query_result|
+      query_result.order_date.blank? ? "" : query_result.order_date.strftime('%Y-%m-%d').to_s
+    end
+    
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status', custom_filter: QueryResult::STATUS_SHOW.invert do |query_result|
+      query_result.status_name
+    end
+
+    g.column name: model_class.human_attribute_name(:source), attribute: 'source'
+
+    g.column name: model_class.human_attribute_name(:business_code), attribute: 'business_code'
+
+    g.column name: model_class.human_attribute_name(:query_date), attribute: 'query_date' do |query_result|
+      query_result.query_date.blank? ? "" : query_result.query_date.strftime('%Y-%m-%d').to_s
+    end
+
+    g.column name: model_class.human_attribute_name(:is_sent), attribute: 'is_sent' do |query_result|
+      query_result.is_sent ? '是' : "否"
+    end
+
+    g.column name: model_class.human_attribute_name(:to_send), attribute: 'to_send' do |query_result|
+      query_result.to_send ? '是' : "否"
+    end
+    
+
+  end 
+%>

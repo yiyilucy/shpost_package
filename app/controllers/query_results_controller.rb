@@ -287,6 +287,26 @@ class QueryResultsController < ApplicationController
     end
   end
 
+  def ywtb_query_result_index
+    businesses = I18n.t(:YwtbInterface)[:businesses]
+    business_id = nil
+    
+    businesses.each do |x|
+      if x[:ywtb_type].eql?"crj"
+        business_no = x[:business_no]
+        business_id = Business.find_by(no: business_no).try :id
+        break
+      end
+    end
+
+    @ywtb_query_results = QueryResult.where(business_id: business_id)
+   
+    @ywtb_query_results_grid = initialize_grid(@ywtb_query_results,
+         :order => 'registration_no',
+         :order_direction => 'asc')
+
+  end
+
 
 
   private
