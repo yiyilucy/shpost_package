@@ -6,8 +6,8 @@ class YwtbInterface
 
     businesses.each do |x|
       business = Business.find_by no: x[:business_no]
-      if need_data_from_pkp
-        results = QueryResult.where(business: business, to_send: true).where.not(business_code: nil).order(order_date: :desc)
+      if x[:need_data_from_pkp]
+        results = QueryResult.where(business: business, to_send: true, source: 'ESB').where.not(business_code: nil).order(order_date: :desc)
       else
         results = QueryResult.where(business: business, to_send: true).order(order_date: :desc)
       end
@@ -20,7 +20,7 @@ class YwtbInterface
 
   def self.batch_init_ywtb_interface_by_thread(results, ywtb_type)
     results_count = results.size
-    i = results_count > 50 ? 50 : results_count
+    i = 5#results_count > 50 ? 50 : results_count
     ts = []
     i.times.each do |x|
       t = Thread.new do
