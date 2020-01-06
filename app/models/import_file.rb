@@ -176,14 +176,14 @@ class ImportFile < ActiveRecord::Base
     else
       if f.is_update
         if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
-          import_object.update order_date: f.import_date, status: status, business_code: business_code
+          import_object.update order_date: f.import_date, status: status, business_code: infos_hash["business_code"]
 
           complete_qr_attr(import_object, infos_hash)
         else
           if f.is_query
-            import_object.update order_date: f.import_date, status: status, business_code: business_code
+            import_object.update order_date: f.import_date, status: status, business_code: infos_hash["business_code"]
           else
-            import_object.update order_date: f.import_date, business_code: business_code
+            import_object.update order_date: f.import_date, business_code: infos_hash["business_code"]
           end
         end
       else
