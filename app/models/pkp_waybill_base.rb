@@ -27,7 +27,7 @@ class PkpWaybillBase < PkpDataRecord
               query_result.status = QueryResult::STATUS[:waiting]
               query_result.source = 'ESB'
               query_result.postcode = x.sender_postcode
-              query_result.order_date = x.biz_occur_date
+              query_result.order_date = x.biz_occur_date.to_date
 
               query_result.is_posting = false
               query_result.is_sent = false
