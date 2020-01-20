@@ -26,6 +26,8 @@ class PkpWaybillBase < PkpDataRecord
               query_result.registration_no = x.waybill_no
               query_result.status = QueryResult::STATUS[:waiting]
               query_result.source = 'ESB'
+              query_result.business_code = x.logistics_order_no if query_result.business_code.blank?
+              
               query_result.postcode = x.sender_postcode
               query_result.order_date = x.biz_occur_date.to_date
 

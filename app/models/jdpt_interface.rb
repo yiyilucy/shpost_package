@@ -7,10 +7,10 @@ class JdptInterface
       keep_days = 90 if keep_days.blank? || (keep_days <= 0)
 
       date = (Time.now - keep_days.day).to_date
-      QueryResult.where("created_at < ?", date).where(business: business).delete_all
-      QrAttr.joins(:query_result).where("query_results.created_at < ?", '2019-01-01').where(query_results: {business_id: business.id}).delete_all
-      ReturnResult.where("created_at < ?", date).where(business: business).delete_all
-      InterfaceSender.where("created_at < ?", date).where(business: business).delete_all
+      puts "delete #{business.name}'s query_results early than #{date} counts #{QueryResult.where("created_at < ?", date).where(business: business).delete_all}"
+      puts "delete #{business.name}'s qr_attrs early than #{date} counts #{QrAttr.joins(:query_result).where("query_results.created_at < ?", date).where(query_results: {business_id: business.id}).delete_all}"
+      puts "delete #{business.name}'s return_results early than #{date} counts #{ReturnResult.where("created_at < ?", date).where(business: business).delete_all}"
+      puts "delete #{business.name}'s interface_senders early than #{date} counts #{InterfaceSender.where("created_at < ?", date).where(business: business).delete_all}"
     end
   end
 
