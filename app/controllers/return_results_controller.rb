@@ -171,10 +171,17 @@ class ReturnResultsController < ApplicationController
 	    count_row = 1
 	    obj.each do |o|
 	      sheet1[count_row,0]=o.postcode
-	      sheet1[count_row,1]=o.query_result.qr_attr.name
-	      sheet1[count_row,2]=o.query_result.qr_attr.phone
-	      sheet1[count_row,3]=o.query_result.qr_attr.address
-	      sheet1[count_row,4]=o.query_result.qr_attr.batch_date.strftime("%Y-%m-%d").to_s
+	      if !o.query_result.blank? && !o.query_result.qr_attr.blank?
+	      	sheet1[count_row,1]=o.query_result.qr_attr.name
+	      	sheet1[count_row,2]=o.query_result.qr_attr.phone
+	      	sheet1[count_row,3]=o.query_result.qr_attr.address
+	      	sheet1[count_row,4]=o.query_result.qr_attr.batch_date.strftime("%Y-%m-%d").to_s
+		  else
+		  	sheet1[count_row,1]=""
+	      	sheet1[count_row,2]=""
+	      	sheet1[count_row,3]=""
+	      	sheet1[count_row,4]=""
+		  end
 	      sheet1[count_row,5]=o.registration_no
 	      sheet1[count_row,6]=o.reason
 	      sheet[count_row,7]=o.query_result.try(:business_code).blank? ? "" : o.query_result.try(:business_code)
