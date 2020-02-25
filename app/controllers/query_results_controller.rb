@@ -225,7 +225,7 @@ class QueryResultsController < ApplicationController
       blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
       sheet.row(0).default_format = blue  
   
-      sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件所属日期 查询日期 查询结果 操作时间 订单号}  
+      sheet.row(0).concat %w{邮政数据查询 挂号编号 邮件所属日期 查询日期 查询结果 操作时间 订单号 地址}  
       count_row = 1
       obj.each do |o|  
         sheet[count_row,0]="邮政数据查询"
@@ -235,6 +235,7 @@ class QueryResultsController < ApplicationController
         sheet[count_row,4]=o.result.blank? ? "" : o.result
         sheet[count_row,5]=o.operated_at.blank? ? "" : o.operated_at.strftime('%Y-%m-%d').to_s
         sheet[count_row,6]=o.business_code.blank? ? "" : o.business_code
+        sheet[count_row,7]=o.qr_attr.blank? ? "" : o.qr_attr.try(:address)
         
         count_row += 1
       end
