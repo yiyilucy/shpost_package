@@ -11,7 +11,7 @@ class JdptInterface
       puts "delete #{business.name}'s qr_attrs early than #{date} counts #{QrAttr.joins(:query_result).where("query_results.created_at < ?", date).where(query_results: {business_id: business.id}).delete_all}"
       puts "delete #{business.name}'s return_results early than #{date} counts #{ReturnResult.where("created_at < ?", date).where(business: business).delete_all}"
       puts "delete #{business.name}'s interface_senders early than #{date} counts #{InterfaceSender.where("created_at < ?", date).where(business: business).delete_all}"
-      puts "delete #{business.name}'s interface_senders early than #{date} counts #{InterfaceSender.where("created_at < ?", date).where(business: business).delete_all}"
+      puts "delete #{business.name}'s interface_infos early than #{date} counts #{InterfaceInfo.where("created_at < ?", date).where(business: business).delete_all}"
     end
   end
 
