@@ -169,7 +169,11 @@ class ImportFile < ActiveRecord::Base
     end
 
     if import_object.blank?
-      import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status, business_code: infos_hash["business_code"]
+      if result_object.is_a? QueryResult
+        import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status, business_code: infos_hash["business_code"]
+      else
+        import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status
+      end
       if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
         QrAttr.create! data_date: infos_hash["data_date"], batch_date: infos_hash["batch_date"], lmk: infos_hash["lmk"], id_code: infos_hash["id_code"], sn: infos_hash["sn"],  issue_bank: infos_hash["issue_bank"], name: infos_hash["name"], bank_no: infos_hash["bank_no"], phone: infos_hash["phone"], address: infos_hash["address"], query_result_id: import_object.id, id_num: infos_hash["id_num"], province: infos_hash["province"], city: infos_hash["city"], district: infos_hash["district"], weight: infos_hash["weight"], price: infos_hash["price"]
       end
