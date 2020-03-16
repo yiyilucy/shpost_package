@@ -206,7 +206,7 @@ class QueryResultsController < ApplicationController
       results << QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?",@order_date.to_datetime, @business_id, "unit").order(:registration_no)
       results << QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?", @order_date.to_datetime, @business_id, "returns").order(:registration_no)
       results << QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ? and status = ?", @order_date.to_datetime, @business_id, "waiting").order(:registration_no)
-      QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ?", @order_date.to_datetime, @business_id).update_all query_date: Time.now
+      # QueryResult.accessible_by(current_ability).where("order_date = ? and business_id = ?", @order_date.to_datetime, @business_id).update_all query_date: Time.now
     end
 
     send_data(results_xls_content_for(results), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")        
@@ -231,7 +231,7 @@ class QueryResultsController < ApplicationController
         sheet[count_row,0]="邮政数据查询"
         sheet[count_row,1]=o.registration_no
         sheet[count_row,2]=o.order_date.strftime('%Y-%m-%d').to_s
-        sheet[count_row,3]=o.query_date.strftime('%Y-%m-%d').to_s
+        sheet[count_row,3]=o.query_date.blank? ? "" : o.query_date.strftime('%Y-%m-%d').to_s
         sheet[count_row,4]=o.result.blank? ? "" : o.result
         sheet[count_row,5]=o.operated_at.blank? ? "" : o.operated_at.strftime('%Y-%m-%d').to_s
         sheet[count_row,6]=o.business_code.blank? ? "" : o.business_code
