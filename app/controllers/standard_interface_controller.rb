@@ -54,6 +54,19 @@ class StandardInterfaceController < ApplicationController
     end
   end
 
+   def mail_query_in_local
+    return error_builder('0005', '查询列表为空') if @context_hash['MAIL_NO'].blank?
+    begin
+      success_builder(StandardInterface.mail_query_in_local(@context_hash, @business, @unit))
+    rescue Exception => e
+      if ! e.is_a? RuntimeError
+        out_error e
+      end
+      error_builder('0005', e.message)
+      return
+    end
+  end
+
   private
   def out_error e
     puts e.message

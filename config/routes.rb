@@ -130,5 +130,7 @@ ShpostPackage::Application.routes.draw do
   match "/shpost_package/standard_interface/mail_query" => "standard_interface#mail_query", via: [:get, :post]
 
   match "/shpost_package/standard_interface/mail_query_in_time" => "standard_interface#mail_query_in_time", via: [:get, :post]
+
+  match "/shpost_package/standard_interface/mail_query_in_local" => "standard_interface#mail_query_in_local", via: [:get, :post]
   
 end

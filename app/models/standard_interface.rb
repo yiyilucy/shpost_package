@@ -65,4 +65,18 @@ class StandardInterface
     mail_json = {"MAIL_NO" => query_result.registration_no, "STATUS" => status, "RESULT_MSG" => query_result.result, "OPERATED_AT" => query_result.operated_at.try(:strftime, '%Y%m%d%H%M'), "QUERIED_AT" => query_result.query_date.try(:strftime, '%Y%m%d%H%M'), "QUERY_MSG" => interface_sender.last_response}
   end
 
+
+  def self.mail_query_in_local(context, business, unit)
+    mail_no = context["MAIL_NO"]
+
+    mail_trace = MailTrace.find_by mail_no: mail_no
+
+    raise "无该邮件信息" if mail_trace.blank?
+
+    if ! mail_trace.blank?
+      status = mail_trace.status.eql?(QueryResult::STATUS[:waiting]) && mail_trace.is_posting? ? "posting" : mail_trace.status
+
+      mail_json = {"MAIL_NO" => mail_trace.mail_no, "STATUS" => mail_trace.status, "RESULT_MSG" => mail_trace.result, "OPERATED_AT" => mail_trace.operated_at.try(:strftime, '%Y%m%d%H%M'), "QUERIED_AT" => mail_trace.last_received_at.try(:strftime, '%Y%m%d%H%M'), "QUERY_MSG" => mail_trace.jdpt_traces}
+    end
+  end
 end
