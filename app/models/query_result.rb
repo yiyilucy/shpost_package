@@ -70,6 +70,7 @@ class QueryResult < ActiveRecord::Base
 
     result
   end
+
   
 end
 

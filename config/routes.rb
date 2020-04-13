@@ -79,6 +79,9 @@ ShpostPackage::Application.routes.draw do
       post 'query_result_index'
       post 'export'
       get 'ywtb_query_result_index'
+      get 'pkp_result_index'
+      post 'pkp_result_index'
+      post 'pkp_export'
     end
   end
 

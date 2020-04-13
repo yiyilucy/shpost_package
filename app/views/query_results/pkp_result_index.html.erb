@@ -1,0 +1,102 @@
+<%- model_class = QueryResult -%>
+<div class="page-header">
+  <h1>新一代数据查询</h1>
+
+<%= form_tag('', name: 'form1')%>
+<table>
+  <tr>
+    <td>
+<div text-align:center>
+  <div style="float:left">
+  <table>
+  <tr>
+    <td valign="middle">
+    <%= label_tag(:start_date, "开始日期:", :style => "padding:0px") %>
+    </td>
+    <td valign="middle">
+    <%= text_field("start_date","start_date", value: @start_date.to_s,:style => "width:90px") %>
+    </td>
+    <td valign="middle">
+    <%= label_tag(:end_date, "结束日期:", :style => "padding:0px") %>
+    </td>
+    <td valign="middle">
+    <%= text_field("end_date","end_date", value: @end_date.to_s,:style => "width:90px") %>
+    </td>
+    <td valign="middle">
+    <%= label_tag(:business, "商户:",class: 'control-label') %>
+    </td>
+    <td valign="middle">
+    <%= select_tag "business_id", options_for_select(current_user.unit.pkp_businesses, :selected=>@business_id) %>
+    </td>
+    <td valign="middle">
+    <%= submit_tag "查询", :name => 'submit',:class => 'btn btn-primary', onclick: "form1.action='pkp_result_index';form1.submit();" %>
+    </td>
+  </tr>
+  </table>
+  </div>
+</div>
+</td>
+</tr>
+<% if !@results.blank? %>
+<tr>
+  <td>
+<div text-align:center>  
+<table class="table table-striped">
+<thead>
+  <tr>
+    <th>邮件所属日期</th>
+    <th>本人收(件)/占比</th>
+    <th>他人收(件)/占比</th>
+    <th>单位收(件)/占比</th>
+    <th>退件(件)/占比</th>
+    <th>未妥投(件)/占比</th>
+    <th>总件数</th>
+  </tr>
+</thead>
+<tbody>
+  <% success_all = 0
+     waiting_all = 0
+     returns_all = 0
+     sum_all = 0.00
+  %>
+  <% @sum.each do |s| %>
+  <% own = @results[[s[0], "own"]].blank? ? 0 : @results[[s[0], "own"]] 
+  other = @results[[s[0], "other"]].blank? ? 0 : @results[[s[0], "other"]]
+  unit = @results[[s[0], "unit"]].blank? ? 0 : @results[[s[0], "unit"]]
+  returns = @results[[s[0], "returns"]].blank? ? 0 : @results[[s[0], "returns"]] 
+  waiting = @results[[s[0], "waiting"]].blank? ? 0 : @results[[s[0], "waiting"]] 
+  sum = s[1].to_f
+  success_all = success_all + own + other + unit
+  waiting_all = waiting_all + waiting
+  returns_all = returns_all + returns
+  sum_all = sum_all + sum
+  %>
+
+  <tr>
+    <% if RailsEnv.is_oracle? %>
+    <td><%= s[0].strftime('%Y-%m-%d').to_s %></td>
+    <% else %>
+    <td><%= s[0] %></td>
+    <% end %>
+    <td><%= own.to_s + " /" + sprintf("%0.2f" ,own/sum*100) + "%" %></td>
+    <td><%= other.to_s + " /" + sprintf("%0.2f" ,other/sum*100) + "%" %></td>
+    <td><%= unit.to_s + " /" + sprintf("%0.2f" ,unit/sum*100) + "%" %></td>
+    <td><%= returns.to_s + " /" + sprintf("%0.2f" ,returns/sum*100) + "%" %></td>
+    <td><%= waiting.to_s + " /" + sprintf("%0.2f" ,waiting/sum*100) + "%" %></td>
+    <td><%= s[1] %></td>
+    <td><%= link_to "导出", "/query_results/pkp_export?order_date=#{s[0]}&&business_id=#{@business_id}", :class => 'btn btn-primary', :method => 'post' %></td>
+  </tr>
+  <% end %>
+  <tr>
+    <td colspan="7"><b><%= "妥投率: " + sprintf("%0.2f" ,success_all/sum_all*100) + "%, 未妥投率: " + (sprintf("%0.2f" ,waiting_all/sum_all*100)) + "%, 退件率: " + (sprintf("%0.2f" ,returns_all/sum_all*100)) + "%" %></b>
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
+</td>
+</tr>
+<% end %>
+</table>
+</form>
+</div> 
