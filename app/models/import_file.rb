@@ -218,6 +218,9 @@ class ImportFile < ActiveRecord::Base
     current_line = nil
     message = ""
     txt = ""
+    title_row = nil
+    indexs_hash = nil
+
        
     if !File.exist?(DOWNLOAD_DIRECT)
       Dir.mkdir(DOWNLOAD_DIRECT)          
@@ -252,18 +255,20 @@ class ImportFile < ActiveRecord::Base
     end
 
     instance.default_sheet = instance.sheets.first
-    title_row = instance.row(1)
-    indexs_hash = get_indexs(title_row)
-
     result_object = eval(f.import_type)
-
-    Rails.logger.info "*********** begin #{instance.count}***********"
+          
     line = 2
-    row_count = instance.count
     start_time  = Time.now
+
     if ! with_thread
       ActiveRecord::Base.transaction do
         begin
+          title_row = instance.row(1)
+          indexs_hash = get_indexs(title_row)
+          row_count = instance.count
+    
+          Rails.logger.info "*********** begin #{instance.count}***********"
+    
           while (line <= row_count)
             
             current_line = line
@@ -303,6 +308,10 @@ class ImportFile < ActiveRecord::Base
         end
       end
     else
+      title_row = instance.row(1)
+      indexs_hash = get_indexs(title_row)
+      row_count = instance.count
+    
       i = (row_count-1) > 5 ? 5 : (row_count-1)
 
       ts = []
