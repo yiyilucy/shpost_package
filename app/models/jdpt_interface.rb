@@ -146,7 +146,6 @@ class JdptInterface
           return false
         end
       rescue Exception => e
-        binding.pry
         Rails.logger.error e.message
         puts e.message
         throw e

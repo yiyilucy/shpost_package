@@ -54,7 +54,7 @@ class StandardInterface
 
     interface_sender ||= JdptInterface.jdpt_trace query_result
 
-    if ! interface_sender.status.eql? InterfaceSender::STATUS[:success]
+    if ! interface_sender.try(:status).eql? InterfaceSender::STATUS[:success]
       interface_sender.interface_send
     end
 
