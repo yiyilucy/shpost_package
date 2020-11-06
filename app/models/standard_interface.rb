@@ -39,30 +39,21 @@ class StandardInterface
   def self.mail_query_in_time(context, business, unit)
     mail_no = context["MAIL_NO"]
 
-    query_result = QueryResult.find_by(registration_no: mail_no, business_id: business.id)
+    interface_sender = JdptInterface.jdpt_trace_in_time mail_no, business
 
-    interface_sender = nil
-    if query_result.blank?
-      query_result = StandardInterface.mail_push(context, business, unit)
+    # if ! interface_sender.try(:status).eql? InterfaceSender::STATUS[:success]
+    interface_sender.interface_send
+    # end
+    if interface_sender.reload.status.eql? InterfaceSender::STATUS[:success]
+      last_result = JdptInterface.parse_last_result(interface_sender.reload.last_response)
+    
+
+    status = last_result["status"].eql?(QueryResult::STATUS[:waiting]) && last_result["is_posting"] ? "posting" : last_result["status"]
+
+    mail_json = {"MAIL_NO" => mail_no, "STATUS" => status, "RESULT_MSG" =>  last_result["opt_desc"], "OPERATED_AT" => last_result["opt_at"].try(:to_time).try(:strftime, '%Y%m%d%H%M'), "QUERIED_AT" => Time.now.strftime('%Y%m%d%H%M'), "QUERY_MSG" => interface_sender.last_response}
     else
-      if query_result.status.eql? QueryResult::STATUS[:waiting]
-        interface_sender = InterfaceSender.where(business: business, object_class: 'QueryResult', object_id: query_result.id, status: InterfaceSender::STATUS[:waiting], interface_code: 'jdpt_trace').last
-      else
-        interface_sender = InterfaceSender.where(business: business, object_class: 'QueryResult', object_id: query_result.id, status: InterfaceSender::STATUS[:success], interface_code: 'jdpt_trace').last
-      end
+      raise '新一代跟踪查询接口调用失败'
     end
-
-    interface_sender ||= JdptInterface.jdpt_trace query_result
-
-    if ! interface_sender.try(:status).eql? InterfaceSender::STATUS[:success]
-      interface_sender.interface_send
-    end
-
-    query_result.reload
-
-    status = query_result.status.eql?(QueryResult::STATUS[:waiting]) && query_result.is_posting? ? "posting" : query_result.status
-
-    mail_json = {"MAIL_NO" => query_result.registration_no, "STATUS" => status, "RESULT_MSG" => query_result.result, "OPERATED_AT" => query_result.operated_at.try(:strftime, '%Y%m%d%H%M'), "QUERIED_AT" => query_result.query_date.try(:strftime, '%Y%m%d%H%M'), "QUERY_MSG" => interface_sender.last_response}
   end
 
 

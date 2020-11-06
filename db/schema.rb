@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200407075351) do
+ActiveRecord::Schema.define(version: 20200513030631) do
 
   create_table "Users", force: true do |t|
     t.string   "email",                  default: "", null: false
@@ -52,14 +52,14 @@ ActiveRecord::Schema.define(version: 20200407075351) do
   end
 
   create_table "import_files", force: true do |t|
-    t.string   "file_name",                         null: false
-    t.string   "file_path",     default: "",        null: false
+    t.string   "file_name",                                      null: false
+    t.string   "file_path",                  default: "",        null: false
     t.datetime "import_date"
     t.integer  "user_id"
     t.integer  "unit_id"
     t.integer  "business_id"
-    t.string   "status",        default: "waiting"
-    t.string   "desc"
+    t.string   "status",                     default: "waiting"
+    t.string   "desc",          limit: 4000
     t.string   "err_file_path"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -561,6 +561,7 @@ ActiveRecord::Schema.define(version: 20200407075351) do
     t.integer  "level"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "pkp"
   end
 
   add_index "units", ["name"], name: "index_units_on_name", unique: true

@@ -45,3 +45,13 @@ zh-CN:
       # object_class: 'Keyclientorder'
       max_times: 2 #default_times: 10
       interval: 3600 #default_interval: 600
+    jdpt_trace_in_time:
+      # for test
+      url: 'http://10.4.44.237/querypush-twsln/mailTrack/queryMailTrackLn'
+      # for production
+      # url: 'http://10.4.189.174/querypush-twsln/mailTrack/queryMailTrackLn'
+      interface_type: 'http'
+      http_type: 'post'
+      # object_class: 'Keyclientorder'
+      max_times: 1 #default_times: 10
+      interval: 3600 #default_interval: 600

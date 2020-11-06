@@ -43,6 +43,9 @@ class StandardInterfaceController < ApplicationController
 
   def mail_query_in_time
     return error_builder('0005', '查询列表为空') if @context_hash['MAIL_NO'].blank?
+    
+    @business_code = @context_hash['MAIL_NO']
+
     begin
       success_builder(StandardInterface.mail_query_in_time(@context_hash, @business, @unit))
     rescue Exception => e
@@ -56,6 +59,9 @@ class StandardInterfaceController < ApplicationController
 
    def mail_query_in_local
     return error_builder('0005', '查询列表为空') if @context_hash['MAIL_NO'].blank?
+    
+    @business_code = @context_hash['MAIL_NO']
+
     begin
       success_builder(StandardInterface.mail_query_in_local(@context_hash, @business, @unit))
     rescue Exception => e

@@ -88,25 +88,45 @@ class JdptInterface
     end
   end
 
-  def self.init_jdpt_trace_body(result)
-    business = result.business
+  def self.jdpt_trace_in_time(registration_no, business)
+    body = JdptInterface.init_jdpt_trace_body_by_mail(registration_no, registration_no, business)
+
+    InterfaceSender.interface_sender_initialize("jdpt_trace_in_time", body, {business_id: business.id, unit_id: business.unit_id, business_code: registration_no})
+  end
+
+  def self.init_jdpt_trace_body_by_mail(registration_no, serial_no, business)
+    # business = business
     body = {}
     body['sendID'] = send_id = business.send_id
     body['sendID'] = send_id ||= 'SHPOST_PACKAGE'
     body['proviceNo'] = '99'
     body['msgKind'] = 'SHPOST_PACKAGE_JDPT_TRACE'
-    body['serialNo'] = "#{result.id}_#{Time.now.to_f}"
+    body['serialNo'] = "#{serial_no}_#{Time.now.to_f}"
     body['sendDate'] = Time.now.strftime('%Y%m%d%H%M%S')
     body['receiveID'] = 'JDPT'
     # body['batchNo'] = 
     body['dataType'] = 1
 
-    msg_body = {'traceNo' => result.registration_no}.to_json
+    msg_body = {'traceNo' => registration_no}.to_json
     # body['msgBody'] = "URLENCODE(#{msg_body})"
     body['msgBody'] = URI.encode(msg_body)
     body['dataDigest'] = self.data_digest(msg_body, business.secret_key)
 
     return body.to_json
+  end
+
+  def self.init_jdpt_trace_body(result)
+    init_jdpt_trace_body_by_mail(result.registration_no, result.id, result.business)
+  end
+
+  def self.parse_last_result(response)
+    res_hash = ActiveSupport::JSON.decode(response)
+
+    if res_hash["responseState"] && !res_hash["responseItems"].blank? 
+      last_result = QueryResult.get_result_with_status(res_hash["responseItems"])
+    else
+      last_result = {"opt_at" => nil, "opt_desc" => res_hash["errorDesc"], "status" => QueryResult::STATUS[:waiting]}
+    end
   end
 
   def self.do_response(res, *args)
