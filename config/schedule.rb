@@ -31,7 +31,10 @@ every 1.hours do
   runner "YwtbInterface.batch_init_ywtb"
 end
 
+evere 15.minutes do
+	runner "PkpWaybillBase.get_pkp_waybill_bases_by_query_results_today('GT')"
+end
+
 every :day, :at => '0:02am' do
-  
   runner "PkpWaybillBase.get_query_records_schedule"
 end
