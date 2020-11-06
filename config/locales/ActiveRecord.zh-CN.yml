@@ -353,7 +353,7 @@ zh-CN:
         user_id: "用户"
         unit_id: "单位"
         business_id: "商户"
-        status: "状态"
+        status: "处理状态"
         desc: "出错信息描述"
         err_file_path: "出错文件存放路径"
         created_at: "导入时间"
@@ -444,6 +444,10 @@ zh-CN:
           name: "退件导入"
           link: "/return_results/import"
           need_count: false
+        # abnormal_result:
+        #   name: "异常件导入"
+        #   link: "/query_results/abnormal_import"
+        #   need_count: false
         import_file:
           name: "信息导入结果"
           link: "/import_files"
@@ -470,6 +474,17 @@ zh-CN:
           needrole:
             can: :pkp_result_index
             role: :QueryResult
+    railway_match:
+      name: "高铁快包内件匹配"
+      submenu:
+        railway_import:
+          name: "信息导入"
+          link: "/query_results/railway_import"
+          need_count: false
+        railway_export:
+          name: "信息导出"
+          link: "/query_results/railway_index"
+          need_count: false
     logs:
       name: "日志查询"
       submenu:

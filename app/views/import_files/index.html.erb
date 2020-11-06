@@ -34,7 +34,9 @@
       import_file.import_type_name
     end
 
-    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc'
+    g.column name: model_class.human_attribute_name(:desc), attribute: 'desc' do |import_file|
+      [import_file.desc.try(:truncate, 35), {title: import_file.desc}]
+    end
     
     g.column do |import_file|
       ActiveSupport::SafeBuffer.new << 
