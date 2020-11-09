@@ -1,6 +1,6 @@
 <%- model_class = ImportFile -%>
 <div class="page-header">
-  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+  <h1>信息导出</h1>
 </div>
 
 <%= grid(@railway_import_files_grid) do |g|
@@ -28,7 +28,7 @@
 
     g.column do |import_file|
       ActiveSupport::SafeBuffer.new << 
-      (link_to '导出', railway_export_query_results_path(import_file),:method => 'post', :class => 'btn btn-xs btn-primary')
+      (link_to '导出', "/query_results/railway_export?import_file=#{import_file.id}", :method => 'post', :class => 'btn btn-xs btn-primary')
     end
 
   end 

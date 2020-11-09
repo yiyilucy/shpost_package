@@ -381,8 +381,7 @@ class QueryResultsController < ApplicationController
     pkp_columns = []
     qr_columns = []
     i = 0
-    j = 0
-
+    
     I18n.t("PkpWaybillBase.#{current_user.unit.pkp}.businesses").each do |x|
       if x[:business_no].eql?business_no
         x[:need_date].each do |y|
@@ -406,6 +405,8 @@ class QueryResultsController < ApplicationController
 
     count_row = 1
     obj.each do |o| 
+      j = 0
+
       pkp_columns.each do |p|
         col = o.pkp_waybill_base_local.try(p)
         if !col.blank?
@@ -467,7 +468,7 @@ class QueryResultsController < ApplicationController
       end
       flash[:notice] = flash_message
 
-      redirect_to "/query_results/import"            
+      redirect_to "/query_results/railway_import"            
     end
   end
 
@@ -504,8 +505,7 @@ class QueryResultsController < ApplicationController
     pkp_columns = []
     qr_columns = []
     i = 0
-    j = 0
-
+    
     I18n.t("PkpWaybillBase.#{current_user.unit.pkp}.businesses").each do |x|
       if x[:business_no].eql?business_no
         x[:need_date].each do |y|
@@ -529,6 +529,8 @@ class QueryResultsController < ApplicationController
 
     count_row = 1
     obj.each do |o| 
+      j = 0
+
       pkp_columns.each do |p|
         col = o.pkp_waybill_base_local.try(p)
         if !col.blank?

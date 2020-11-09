@@ -27,13 +27,13 @@ zh-CN:
           :need_date:
             - 
               :pkp_waybill_base_local:
-                - :waybill_no
-                - :sender_no
-                - :biz_occur_date
+                - waybill_no: "运单号"
+                - sender_no: "寄件客户代码"
+                - biz_occur_date: "收寄日期"
             - 
-              :operated_at
+              operated_at: "操作时间"
             -
-              :status_name
+              status_name: "状态"
     GT:
       businesses:
         -
@@ -42,8 +42,8 @@ zh-CN:
           :need_date:
             - 
               :pkp_waybill_base_local:
-                - :biz_occur_date
-                - :waybill_no
-                - :post_org_name
-                - :receiver_city_name
-                - :contents_type_name
+                - biz_occur_date: "收寄日期"
+                - waybill_no: "运单号"
+                - post_org_name: "收寄单位名称"
+                - receiver_city_name: "寄达市"
+                - contents_type_name: "内件类型名称"
