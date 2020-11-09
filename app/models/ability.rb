@@ -47,6 +47,9 @@ class Ability
         if !user.unit.can_pkp?
             cannot :pkp_result_index, QueryResult
         end
+        if !user.unit.can_railway?
+            cannot :railway_index, QueryResult
+        end
         can :manage, ReturnResult, unit_id: user.unit_id
         can :manage, Business, unit_id: user.unit_id
         cannot [:destroy, :new], Business
@@ -59,6 +62,9 @@ class Ability
         can :read, UserLog, user: {id: user.id}
 
         can :manage, QueryResult, unit_id: user.unit_id
+        if !user.unit.can_railway?
+            cannot :railway_index, QueryResult
+        end
         can :manage, ReturnResult, unit_id: user.unit_id
         can :manage, Business, unit_id: user.unit_id
         cannot :destroy, Business

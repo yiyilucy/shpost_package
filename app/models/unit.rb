@@ -24,4 +24,12 @@ class Unit < ActiveRecord::Base
     end
     return businesses
   end
+
+  def can_railway?
+    if self.pkp.eql?"GT"
+      return true
+    else
+      return false
+    end
+  end
 end

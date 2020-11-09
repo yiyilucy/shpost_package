@@ -476,6 +476,9 @@ zh-CN:
             role: :QueryResult
     railway_match:
       name: "高铁快包内件匹配"
+      needrole:
+        can: :railway_index
+        role: :QueryResult
       submenu:
         railway_import:
           name: "信息导入"
