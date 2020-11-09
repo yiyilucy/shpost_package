@@ -431,6 +431,130 @@ class QueryResultsController < ApplicationController
     xls_report.string  
   end
 
+  # def abnormal_import
+  #   unless request.get?
+  #     business_id = params[:business_select]
+  #     if business_id.blank?
+  #       flash_message = "请选择商户！"
+  #     else
+  #       if file = ImportFile.upload_info(params[:file]['file'], business_id, nil, "AbnormalResult", current_user, true, false)    
+  #         flash_message = "导入成功！"
+  #       else
+  #         flash_message = "导入失败!"
+  #       end
+  #     end
+  #     flash[:notice] = flash_message
+
+  #     redirect_to "/query_results/abnormal_import"            
+  #   end
+  # end
+
+  def railway_import
+    @order_date = Time.now.strftime('%Y-%m-%d')
+    is_query = false
+    is_update = false
+    
+    unless request.get?
+      business_id = params[:business_select]
+      if business_id.blank?
+        flash_message = "请选择商户！"
+      else
+        if file = ImportFile.upload_info(params[:file]['file'], business_id, @order_date, "QueryResult", current_user, is_query, is_update)    
+          flash_message = "导入成功！"
+        else
+          flash_message = "导入失败!"
+        end
+      end
+      flash[:notice] = flash_message
+
+      redirect_to "/query_results/import"            
+    end
+  end
+
+  def railway_index
+    businesses = []
+    I18n.t("PkpWaybillBase.#{current_user.unit.pkp}.businesses").each do |x|
+      businesses << Business.find_by(no: x[:business_no]).id if !Business.find_by(no: x[:business_no]).blank?
+    end
+    @railway_import_files = ImportFile.where("business_id in (?)", businesses)
+
+    @railway_import_files_grid = initialize_grid(@railway_import_files,
+         :order => 'import_files.created_at',
+         :order_direction => 'desc')
+  end
+
+  def railway_export
+    import_file = ImportFile.find(params[:import_file].to_i)
+    results = import_file.query_results
+
+    send_data(railway_results_xls_content_for(results, import_file.business_id), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")  
+  end
+
+  def railway_results_xls_content_for(obj, business_id)  
+    xls_report = StringIO.new  
+    book = Spreadsheet::Workbook.new  
+    
+    sheet = book.create_worksheet :name => "sheet1"  
+   
+    blue = Spreadsheet::Format.new :color => :blue, :weight => :bold, :size => 10  
+    sheet.row(0).default_format = blue  
+
+    business_no = Business.find(business_id).no
+    title = []
+    pkp_columns = []
+    qr_columns = []
+    i = 0
+    j = 0
+
+    I18n.t("PkpWaybillBase.#{current_user.unit.pkp}.businesses").each do |x|
+      if x[:business_no].eql?business_no
+        x[:need_date].each do |y|
+          if y.has_key?(:pkp_waybill_base_local)
+            y[:pkp_waybill_base_local].each do |z|
+              title << z.values[0]
+              pkp_columns << z.keys[0]
+            end
+          else
+            title << y.values[0]
+            qr_columns << y.keys[0]
+          end
+        end
+      end
+    end
+
+    while i < title.size
+      sheet[0, i] = title[i]
+      i += 1
+    end
+
+    count_row = 1
+    obj.each do |o| 
+      pkp_columns.each do |p|
+        col = o.pkp_waybill_base_local.try(p)
+        if !col.blank?
+          col = (col.is_a?Time) ? col.to_date : col
+        end
+        sheet[count_row,j]=col
+        j += 1
+      end
+
+      qr_columns.each do |q|
+        col = o.try(q)
+        if !col.blank?
+          col = (col.is_a?Time) ? col.to_date : col
+        end
+        sheet[count_row,j]=col
+        j += 1
+      end
+        
+      count_row += 1
+    end
+  
+    book.write xls_report  
+    xls_report.string  
+  end
+
+
 
   private
     def set_query_result

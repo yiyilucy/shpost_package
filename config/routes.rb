@@ -82,6 +82,13 @@ ShpostPackage::Application.routes.draw do
       get 'pkp_result_index'
       post 'pkp_result_index'
       post 'pkp_export'
+      get 'railway_import'
+      post 'railway_import' => 'query_results#railway_import'
+      get 'railway_index'
+      post 'railway_index'
+      post 'railway_export'
+      # get 'abnormal_import'
+      # post 'abnormal_import' => 'query_results#abnormal_import'
     end
   end
 

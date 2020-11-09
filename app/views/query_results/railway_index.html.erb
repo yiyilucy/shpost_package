@@ -1,0 +1,35 @@
+<%- model_class = ImportFile -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human%></h1>
+</div>
+
+<%= grid(@railway_import_files_grid) do |g|
+    g.column name: model_class.human_attribute_name(:file_name), attribute: 'file_name'
+
+    g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', assoc: :business do |import_file|
+      import_file.business.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:user_id), attribute: 'name', assoc: :user do |import_file|
+      import_file.user.try :name
+    end
+
+    g.column name: model_class.human_attribute_name(:created_at), attribute: 'created_at'do |import_file|
+       import_file.created_at.localtime.to_s(:db)
+    end
+
+    g.column name: model_class.human_attribute_name(:status), attribute: 'status',custom_filter: ImportFile::STATUS.invert do |import_file| 
+      import_file.status_name
+    end
+
+    g.column name: '匹配收寄信息数', attribute: 'total_rows' do |import_file|
+      (import_file.finish_rows.blank? ? "" : import_file.finish_rows)+"/"+(import_file.total_rows.blank? ? "" : import_file.total_rows)
+    end
+
+    g.column do |import_file|
+      ActiveSupport::SafeBuffer.new << 
+      (link_to '导出', railway_export_query_results_path(import_file),:method => 'post', :class => 'btn btn-xs btn-primary')
+    end
+
+  end 
+%>
