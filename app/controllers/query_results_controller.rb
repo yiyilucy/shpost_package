@@ -475,7 +475,7 @@ class QueryResultsController < ApplicationController
   def railway_index
     businesses = []
     I18n.t("PkpWaybillBase.#{current_user.unit.pkp}.businesses").each do |x|
-      businesses << Business.find_by(no: x[:business_no]).id if !Business.find_by(no: x[:business_no]).blank?
+      businesses << Business.find_by(no: x[:business_no], unit_id: current_user.unit_id).id if !Business.find_by(no: x[:business_no]).blank?
     end
     @railway_import_files = ImportFile.accessible_by(current_ability).where("business_id in (?)", businesses)
 
