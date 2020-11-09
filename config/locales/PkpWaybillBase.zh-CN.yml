@@ -34,3 +34,16 @@ zh-CN:
               :operated_at
             -
               :status_name
+    GT:
+      businesses:
+        -
+          :business_no: '010103' #Tax
+          # :need_data_from_pkp: true
+          :need_date:
+            - 
+              :pkp_waybill_base_local:
+                - :biz_occur_date
+                - :waybill_no
+                - :post_org_name
+                - :receiver_city_name
+                - :contents_type_name
