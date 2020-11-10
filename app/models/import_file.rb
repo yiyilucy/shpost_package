@@ -255,7 +255,7 @@ class ImportFile < ActiveRecord::Base
       return false
     end
 
-    f.update total_rows: instance.count
+    f.update total_rows: instance.count>0 ? (instance.count-1) : 0
 
     instance.default_sheet = instance.sheets.first
     result_object = eval(f.import_type)
