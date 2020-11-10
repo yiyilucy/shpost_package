@@ -110,4 +110,4 @@ gem 'rqrcode'
 
 gem 'rqrcode_png'
 
-gem 'bulk_insert'
+gem 'bcrypt', '~> 3.1', '>= 3.1.16'

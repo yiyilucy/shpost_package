@@ -42,8 +42,8 @@ ActiveRecord::Schema.define(version: 20201106082050) do
     t.string   "import_type"
     t.boolean  "is_query"
     t.boolean  "is_update"
-    t.string   "total_rows"
-    t.string   "finish_rows"
+    t.integer  "total_rows",                 default: 0
+    t.integer  "finish_rows",                default: 0
   end
 
   create_table "interface_infos", force: true do |t|
@@ -318,6 +318,7 @@ ActiveRecord::Schema.define(version: 20201106082050) do
     t.boolean  "is_posting"
     t.boolean  "is_sent"
     t.boolean  "to_send"
+    t.integer  "import_file_id"
   end
 
   add_index "query_results", ["business_id"], name: "index_query_results_on_business_id"

@@ -5,10 +5,6 @@ class PkpWaybillBase < PkpDataRecord
     get_query_records(start_date, end_date)
   end
 
-  def self.get_query_records_4_ywtb(start_date, end_date)
-    self.get_query_records(start_date, end_date)
-  end
-  
   def self.get_query_records(start_date, end_date)
     businesses = I18n.t(:YwtbInterface)[:businesses]
     businesses.each do |x|
@@ -60,7 +56,7 @@ class PkpWaybillBase < PkpDataRecord
   end
 
   def self.get_pkp_waybill_bases_by_query_results_today(name)
-    self.get_pkp_waybill_bases(Date.today, Date.today)
+    self.get_pkp_waybill_bases_by_query_results(name, Date.today, Date.today)
   end
 
   def self.get_pkp_waybill_bases_by_query_results(name, start_date, end_date)
@@ -70,7 +66,7 @@ class PkpWaybillBase < PkpDataRecord
       business = Business.find_by no: business_no
 
       if !business.blank?
-        query_results = QueryResult.where(business: business).where("created_at >= ? and created_at< ? ",start_date, (end_date + 1.days).where(is_sent: false)
+        query_results = QueryResult.where(business: business).where("created_at >= ? and created_at< ? ",start_date, (end_date + 1.days)).where(is_sent: [nil, false])
 
         
         import_files = {}
@@ -80,7 +76,7 @@ class PkpWaybillBase < PkpDataRecord
 
         ActiveRecord::Base.transaction do
           query_results.each do |query_result|
-            pkp_waybill_base = Pkpwaybill_base.where(waybill_no: query_result.registration_no).last
+            pkp_waybill_base = PkpWaybillBase.where(waybill_no: query_result.registration_no).last
 
             if ! pkp_waybill_base.blank?
               pkp_waybill_base_local = pkp_waybill_base.to_local
