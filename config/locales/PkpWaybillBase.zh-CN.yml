@@ -43,7 +43,6 @@ zh-CN:
             - 
               :pkp_waybill_base_local:
                 - biz_occur_date: "收寄日期"
-                - waybill_no: "运单号"
                 - post_org_name: "收寄单位名称"
                 - receiver_city_name: "寄达市"
                 - contents_type_name: "内件类型名称"

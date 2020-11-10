@@ -386,6 +386,9 @@ class QueryResultsController < ApplicationController
       if x[:business_no].eql?business_no
         x[:need_date].each do |y|
           if y.has_key?(:pkp_waybill_base_local)
+            if current_user.unit.pkp.eql?"GT"
+              title << "运单号"
+            end
             y[:pkp_waybill_base_local].each do |z|
               title << z.values[0]
               pkp_columns << z.keys[0]
@@ -407,6 +410,12 @@ class QueryResultsController < ApplicationController
     obj.each do |o| 
       j = 0
 
+      if current_user.unit.pkp.eql?"GT"
+        col = o.registration_no
+        sheet[count_row,j]=col
+        j += 1
+      end
+
       pkp_columns.each do |p|
         col = o.pkp_waybill_base_local.try(p)
         if !col.blank?
@@ -427,7 +436,7 @@ class QueryResultsController < ApplicationController
         
       count_row += 1
     end
-  
+
     book.write xls_report  
     xls_report.string  
   end

@@ -23,7 +23,7 @@
     end
 
     g.column name: '匹配收寄信息数', attribute: 'total_rows' do |import_file|
-      (import_file.finish_rows.blank? ? "" : import_file.finish_rows)+"/"+(import_file.total_rows.blank? ? "" : import_file.total_rows)
+      (import_file.finish_rows.blank? ? "0" : import_file.finish_rows)+"/"+(import_file.total_rows.blank? ? "0" : import_file.total_rows)
     end
 
     g.column do |import_file|

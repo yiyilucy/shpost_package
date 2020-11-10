@@ -67,7 +67,6 @@ class PkpWaybillBase < PkpDataRecord
 
       if !business.blank?
         query_results = QueryResult.where(business: business).where("created_at >= ? and created_at< ? ",start_date, (end_date + 1.days)).where(is_sent: [nil, false])
-
         
         import_files = {}
 
