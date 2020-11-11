@@ -378,24 +378,20 @@ class QueryResultsController < ApplicationController
 
     business_no = Business.find(business_id).no
     title = []
-    pkp_columns = []
-    qr_columns = []
+    content_columns = []
     i = 0
     
     I18n.t("PkpWaybillBase.#{current_user.unit.pkp}.businesses").each do |x|
       if x[:business_no].eql?business_no
         x[:need_date].each do |y|
           if y.has_key?(:pkp_waybill_base_local)
-            if current_user.unit.pkp.eql?"GT"
-              title << "运单号"
-            end
             y[:pkp_waybill_base_local].each do |z|
               title << z.values[0]
-              pkp_columns << z.keys[0]
+              content_columns << "pkp_waybill_base_local.#{z.keys[0]}"
             end
           else
             title << y.values[0]
-            qr_columns << y.keys[0]
+            content_columns << y.keys[0]
           end
         end
       end
@@ -410,30 +406,21 @@ class QueryResultsController < ApplicationController
     obj.each do |o| 
       j = 0
 
-      if current_user.unit.pkp.eql?"GT"
-        col = o.registration_no
-        sheet[count_row,j]=col
-        j += 1
-      end
-
-      pkp_columns.each do |p|
-        col = o.pkp_waybill_base_local.try(p)
-        if !col.blank?
-          col = (col.is_a?Time) ? col.to_date : col
+      content_columns.each do |c|
+        if c.start_with? "pkp_waybill_base_local"
+          to_send = c.split(".")
+          col = o.send(to_send[0]).blank? ? "" : o.send(to_send[0]).send(to_send[1])
+        else
+          col = o.send(c)
         end
-        sheet[count_row,j]=col
-        j += 1
-      end
-
-      qr_columns.each do |q|
-        col = o.try(q)
-        if !col.blank?
-          col = (col.is_a?Time) ? col.to_date : col
-        end
-        sheet[count_row,j]=col
-        j += 1
-      end
         
+        if !col.blank?
+          col = (col.is_a?Time) ? col.to_date : col
+        end
+        sheet[count_row,j]=col
+        j += 1
+      end
+
       count_row += 1
     end
 

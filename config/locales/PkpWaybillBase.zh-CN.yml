@@ -40,6 +40,8 @@ zh-CN:
           :business_no: '010103' #Tax
           # :need_data_from_pkp: true
           :need_date:
+            -
+              registration_no: "运单号"
             - 
               :pkp_waybill_base_local:
                 - biz_occur_date: "收寄日期"
