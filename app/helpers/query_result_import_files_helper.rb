@@ -1,0 +1,2 @@
+module QueryResultImportFilesHelper
+end

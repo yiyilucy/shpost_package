@@ -385,6 +385,10 @@ zh-CN:
         district: "寄达区名称"
         weight: "重量(克)"
         price: "总邮资"
+        branch_no: "妥投局代码"
+        branch_name: "妥投投递局"
+        match_branch: "信息匹配投递局"
+        mistake_num: "错分次数"
   menu:
     permission:
       name: "权限管理"
@@ -487,6 +491,20 @@ zh-CN:
         railway_export:
           name: "信息导出"
           link: "/query_results/railway_index"
+          need_count: false
+    import_allocation:
+      name: "进口分拣多次转局"
+      needrole:
+        can: :allocation_index
+        role: :QueryResult
+      submenu:
+        allocation_import:
+          name: "信息导入"
+          link: "/query_results/allocation_import"
+          need_count: false
+        allocation_export:
+          name: "信息导出"
+          link: "/query_results/allocation_index"
           need_count: false
     logs:
       name: "日志查询"

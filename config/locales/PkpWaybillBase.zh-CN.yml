@@ -48,3 +48,17 @@ zh-CN:
                 - post_org_name: "收寄单位名称"
                 - receiver_city_name: "寄达市"
                 - contents_type_name: "内件类型名称"
+    YGB:
+      businesses:
+        -
+          :business_no: '010104' 
+          # :need_data_from_pkp: true
+          :need_date:
+            -
+              registration_no: "运单号"
+            - 
+              :pkp_waybill_base_local:
+                - biz_occur_date: "收寄日期"
+                - post_org_name: "收寄单位名称"
+                - receiver_city_name: "寄达市"
+                - contents_type_name: "内件类型名称"

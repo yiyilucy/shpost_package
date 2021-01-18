@@ -1,5 +1,7 @@
 ShpostPackage::Application.routes.draw do
   
+  resources :query_result_import_files
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
@@ -87,6 +89,11 @@ ShpostPackage::Application.routes.draw do
       get 'railway_index'
       post 'railway_index'
       post 'railway_export'
+      get 'allocation_import'
+      post 'allocation_import' => 'query_results#allocation_import'
+      get 'allocation_index'
+      post 'allocation_index'
+      post 'allocation_export'
       # get 'abnormal_import'
       # post 'abnormal_import' => 'query_results#abnormal_import'
     end

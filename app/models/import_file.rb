@@ -3,6 +3,7 @@ class ImportFile < ActiveRecord::Base
   belongs_to :unit
   belongs_to :user
   has_many :query_results
+  has_many :query_result_import_files
 
   STATUS = { success: '成功', fail: '失败', waiting: '待处理', doing: '处理中'}
   IMPORT_TYPE = { QueryResult: '信息导入', ReturnResult: '退件导入'}
@@ -90,12 +91,18 @@ class ImportFile < ActiveRecord::Base
     end
     if !title_row.index("寄达省名称").blank?
       indexs_hash["province_index"] = title_row.index("寄达省名称")
+    elsif !title_row.index("妥投省份").blank?
+      indexs_hash["province_index"] = title_row.index("妥投省份")       
     end
     if !title_row.index("寄达市名称").blank?
       indexs_hash["city_index"] = title_row.index("寄达市名称")
+    elsif !title_row.index("妥投地市").blank?
+      indexs_hash["city_index"] = title_row.index("妥投地市")  
     end
     if !title_row.index("寄达区名称").blank?
       indexs_hash["district_index"] = title_row.index("寄达区名称")
+    elsif !title_row.index("妥投县市").blank?
+      indexs_hash["district_index"] = title_row.index("妥投县市") 
     end
     if !title_row.index("重量(克)").blank?
       indexs_hash["weight_index"] = title_row.index("重量(克)")
@@ -105,6 +112,18 @@ class ImportFile < ActiveRecord::Base
     end
     if !title_row.index("订单号").blank?
       indexs_hash["business_code_index"] = title_row.index("订单号")
+    end
+    if !title_row.index("妥投局代码").blank?
+      indexs_hash["branch_no_index"] = title_row.index("妥投局代码")
+    end
+    if !title_row.index("妥投投递局").blank?
+      indexs_hash["branch_name_index"] = title_row.index("妥投投递局")
+    end
+    if !title_row.index("信息匹配投递局").blank?
+      indexs_hash["match_branch_index"] = title_row.index("信息匹配投递局")
+    end
+    if !title_row.index("错分次数").blank?
+      indexs_hash["mistake_num_index"] = title_row.index("错分次数")
     end
 
     return indexs_hash
@@ -132,6 +151,10 @@ class ImportFile < ActiveRecord::Base
     weight_index = indexs_hash["weight_index"]
     price_index = indexs_hash["price_index"]
     business_code_index = indexs_hash["business_code_index"]
+    branch_no_index = indexs_hash["branch_no_index"]
+    branch_name_index = indexs_hash["branch_name_index"]
+    match_branch_index = indexs_hash["match_branch_index"]
+    mistake_num_index = indexs_hash["mistake_num_index"]
 
     infos_hash["registration_no"] = registration_no_index.blank? ? "" : (rowarr[registration_no_index].blank? ? "" : rowarr[registration_no_index].to_s.gsub(' ','').split('.0')[0])
     infos_hash["postcode"] = postcode_index.blank? ? "" : (rowarr[postcode_index].blank? ? "" : rowarr[postcode_index].to_s.split('.0')[0])
@@ -152,6 +175,10 @@ class ImportFile < ActiveRecord::Base
     infos_hash["weight"] = weight_index.blank? ? 0.00 : (rowarr[weight_index].blank? ? 0.00 : rowarr[weight_index].to_f.round(2))
     infos_hash["price"] = price_index.blank? ? 0.00 : (rowarr[price_index].blank? ? 0.00 : rowarr[price_index].to_f.round(2))
     infos_hash["business_code"] = business_code_index.blank? ? "" : (rowarr[business_code_index].blank? ? "" : rowarr[business_code_index].to_s.split('.0')[0])
+    infos_hash["branch_no"] = branch_no_index.blank? ? "" : (rowarr[branch_no_index].blank? ? "" : rowarr[branch_no_index].to_s.split('.0')[0])
+    infos_hash["branch_name"] = branch_name_index.blank? ? "" : (rowarr[branch_name_index].blank? ? "" : rowarr[branch_name_index].to_s.split('.0')[0])
+    infos_hash["match_branch"] = match_branch_index.blank? ? "" : (rowarr[match_branch_index].blank? ? "" : rowarr[match_branch_index].to_s.split('.0')[0])
+    infos_hash["mistake_num"] = mistake_num_index.blank? ? "" : (rowarr[mistake_num_index].blank? ? "" : rowarr[mistake_num_index].to_s.split('.0')[0])
 
     return infos_hash
   end
@@ -170,30 +197,38 @@ class ImportFile < ActiveRecord::Base
     end
 
     if import_object.blank?
-      if result_object.is_a? QueryResult
-        import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status, business_code: infos_hash["business_code"], import_file_id: f.id
+      if result_object.eql? QueryResult
+        import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status, business_code: infos_hash["business_code"]
+
+        QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
       else
         import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status
       end
-      if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
-        QrAttr.create! data_date: infos_hash["data_date"], batch_date: infos_hash["batch_date"], lmk: infos_hash["lmk"], id_code: infos_hash["id_code"], sn: infos_hash["sn"],  issue_bank: infos_hash["issue_bank"], name: infos_hash["name"], bank_no: infos_hash["bank_no"], phone: infos_hash["phone"], address: infos_hash["address"], query_result_id: import_object.id, id_num: infos_hash["id_num"], province: infos_hash["province"], city: infos_hash["city"], district: infos_hash["district"], weight: infos_hash["weight"], price: infos_hash["price"]
+      if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?) || (!title_row.index("收寄时间").blank?) || (!title_row.index("错分次数").blank?)
+        QrAttr.create! data_date: infos_hash["data_date"], batch_date: infos_hash["batch_date"], lmk: infos_hash["lmk"], id_code: infos_hash["id_code"], sn: infos_hash["sn"],  issue_bank: infos_hash["issue_bank"], name: infos_hash["name"], bank_no: infos_hash["bank_no"], phone: infos_hash["phone"], address: infos_hash["address"], query_result_id: import_object.id, id_num: infos_hash["id_num"], province: infos_hash["province"], city: infos_hash["city"], district: infos_hash["district"], weight: infos_hash["weight"], price: infos_hash["price"], branch_no: infos_hash["branch_no"], branch_name: infos_hash["branch_name"], match_branch: infos_hash["match_branch"], mistake_num: infos_hash["mistake_num"]
       end
     else
       if f.is_update
         if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
-          import_object.update order_date: f.import_date, status: status, business_code: infos_hash["business_code"], import_file_id: f.id
+          import_object.update order_date: f.import_date, status: status, business_code: infos_hash["business_code"]
 
           complete_qr_attr(import_object, infos_hash)
+
+          QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
         else
           if f.is_query
-            import_object.update order_date: f.import_date, status: status, business_code: infos_hash["business_code"], import_file_id: f.id
+            import_object.update order_date: f.import_date, status: status, business_code: infos_hash["business_code"]
+
+            QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
           else
             import_object.update order_date: f.import_date, business_code: infos_hash["business_code"]
           end
         end
       else
-        if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?)
+        if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?) || (!title_row.index("错分次数").blank?)
           complete_qr_attr(import_object, infos_hash)
+
+          QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
         end
       end
     end
@@ -207,7 +242,7 @@ class ImportFile < ActiveRecord::Base
       end
       qr_attr.save!
     else
-      QrAttr.create! data_date: infos_hash["data_date"], batch_date: infos_hash["batch_date"], lmk: infos_hash["lmk"], id_code: infos_hash["id_code"], sn: infos_hash["sn"],  issue_bank: infos_hash["issue_bank"], name: infos_hash["name"], bank_no: infos_hash["bank_no"], phone: infos_hash["phone"], address: infos_hash["address"], query_result_id: import_object.id, id_num: infos_hash["id_num"], province: infos_hash["province"], city: infos_hash["city"], district: infos_hash["district"], weight: infos_hash["weight"], price: infos_hash["price"]
+      QrAttr.create! data_date: infos_hash["data_date"], batch_date: infos_hash["batch_date"], lmk: infos_hash["lmk"], id_code: infos_hash["id_code"], sn: infos_hash["sn"],  issue_bank: infos_hash["issue_bank"], name: infos_hash["name"], bank_no: infos_hash["bank_no"], phone: infos_hash["phone"], address: infos_hash["address"], query_result_id: import_object.id, id_num: infos_hash["id_num"], province: infos_hash["province"], city: infos_hash["city"], district: infos_hash["district"], weight: infos_hash["weight"], price: infos_hash["price"], branch_no: infos_hash["branch_no"], branch_name: infos_hash["branch_name"], match_branch: infos_hash["match_branch"], mistake_num: infos_hash["mistake_num"]
     end
   end
 
@@ -221,7 +256,9 @@ class ImportFile < ActiveRecord::Base
     txt = ""
     title_row = nil
     indexs_hash = nil
-
+    line = nil
+    no_data_row = nil
+    row_count = nil
        
     if !File.exist?(DOWNLOAD_DIRECT)
       Dir.mkdir(DOWNLOAD_DIRECT)          
@@ -255,18 +292,27 @@ class ImportFile < ActiveRecord::Base
       return false
     end
 
-    f.update total_rows: instance.count>0 ? (instance.count-1) : 0
+    if !f.unit.pkp.blank? && (f.unit.pkp.eql?"YGB")
+      # 上面非数据行数
+      no_data_row = 2
+      line = 3
+    else     
+      no_data_row = 1 
+      line = 2
+    end
+
+    f.update total_rows: instance.count>0 ? (instance.count-no_data_row) : 0
 
     instance.default_sheet = instance.sheets.first
     result_object = eval(f.import_type)
-          
-    line = 2
+
     start_time  = Time.now
 
     if ! with_thread
       ActiveRecord::Base.transaction do
         begin
-          title_row = instance.row(1)
+          title_row = instance.row(no_data_row)
+          
           indexs_hash = get_indexs(title_row)
           row_count = instance.count
     
@@ -279,7 +325,7 @@ class ImportFile < ActiveRecord::Base
             rowarr = instance.row(current_line)
             line += 1
             infos_hash = get_infos(rowarr, indexs_hash)
-            # Rails.logger.info "*********** time1 #{Time.now - start_time}***********"
+            # Rails.logger.info "*********** infos_hash #{infos_hash}***********"
 
             if infos_hash["registration_no"].blank?
               txt = "缺少挂号编号或约投号码或邮件号" + "(第" + current_line.to_s + "行)"
@@ -311,14 +357,15 @@ class ImportFile < ActiveRecord::Base
         end
       end
     else
-      title_row = instance.row(1)
+      title_row = instance.row(no_data_row)
+      
       indexs_hash = get_indexs(title_row)
       row_count = instance.count
     
-      i = (row_count-1) > 5 ? 5 : (row_count-1)
+      i = (row_count-no_data_row) > 5 ? 5 : (row_count-no_data_row)
 
       ts = []
-      line = 2
+      
       i.times.each do |x|
         t = Thread.new do
           begin
@@ -377,9 +424,9 @@ class ImportFile < ActiveRecord::Base
     elsif !sheet_error.blank?
       filename = "Error_Infos_#{Time.now.strftime('%Y%m%d %H:%M:%S')}.xls"
       file_path = DOWNLOAD_DIRECT + filename
-            
+         
       exporterrorinfos_xls_content_for(sheet_error, title_row, file_path)
-      if sheet_error.size == (row_count - 1)
+      if sheet_error.size == (row_count - no_data_row)
         f.update status: "fail", desc: "失败", err_file_path: file_path
       else
         f.update status: "success", desc: "部分导入成功,共#{sheet_error.size}行失败,可能原因是#{txt}", err_file_path: file_path

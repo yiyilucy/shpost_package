@@ -32,4 +32,12 @@ class Unit < ActiveRecord::Base
       return false
     end
   end
+
+  def can_allocation?
+    if self.pkp.eql?"YGB"
+      return true
+    else
+      return false
+    end
+  end
 end

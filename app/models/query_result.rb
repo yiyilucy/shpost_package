@@ -4,6 +4,7 @@ class QueryResult < ActiveRecord::Base
   has_one :qr_attr, dependent: :destroy
   has_one :return_result
   has_one :pkp_waybill_base_local, dependent: :destroy
+  has_many :query_result_import_files
 
 	validates_presence_of :registration_no, :message => '不能为空'
   validates_uniqueness_of :registration_no, :message => '该挂号编号已存在'
