@@ -32,7 +32,7 @@ every 1.hours do
 end
 
 every 5.minutes do
-	runner "PkpWaybillBase.get_pkp_waybill_bases_by_query_results_today('GT')"
+	runner "PkpWaybillBase.get_pkp_waybill_bases_by_query_results_today"
 end
 
 every :day, :at => '0:02am' do

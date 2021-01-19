@@ -8,6 +8,7 @@ class ImportFile < ActiveRecord::Base
   STATUS = { success: '成功', fail: '失败', waiting: '待处理', doing: '处理中'}
   IMPORT_TYPE = { QueryResult: '信息导入', ReturnResult: '退件导入'}
   IS_QUERY = { true: '是', false: '否'}
+  FETCH_STATUS = { success: '成功', fail: '失败', waiting: '待处理'}
 
   DOWNLOAD_DIRECT = "#{Rails.root}/public/download/"
   
@@ -21,6 +22,10 @@ class ImportFile < ActiveRecord::Base
 
   def is_query_name
     is_query.blank? ? "" : ImportFile::IS_QUERY["#{is_query}".to_sym]
+  end
+
+  def fetch_status_name
+    fetch_status.blank? ? "" : ImportFile::FETCH_STATUS["#{fetch_status}".to_sym]
   end
 
   def self.upload_info(file, business_id, order_date, import_type, current_user, is_query, is_update)

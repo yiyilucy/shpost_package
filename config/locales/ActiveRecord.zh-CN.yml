@@ -353,11 +353,12 @@ zh-CN:
         user_id: "用户"
         unit_id: "单位"
         business_id: "商户"
-        status: "处理状态"
+        status: "文件处理状态"
         desc: "出错信息描述"
         err_file_path: "出错文件存放路径"
         created_at: "导入时间"
         import_type: "导入类型"
+        fetch_status: "数据抓取状态"
       up_download:
         name: "名字"
         use: "用途"
@@ -419,6 +420,9 @@ zh-CN:
     
     business:
       name: "商户管理"
+      needrole:
+        can: :read
+        role: :Business
       submenu:
         business:
           name: "商户管理"
@@ -426,6 +430,9 @@ zh-CN:
           need_count: false
     return_reason:
       name: "退件理由管理"
+      needrole:
+        can: :read
+        role: :ReturnReason
       submenu:
         return_reason:
           name: "退件理由管理"
@@ -433,12 +440,18 @@ zh-CN:
           need_count: false
     return_scan:
       name: "退件扫描录入"
+      needrole:
+        can: :return_scan
+        role: :ReturnResult
       submenu:
         return_scan:
           name: "退件扫描录入"
           link: "/return_results/return_scan"
     import:
       name: "信息导入"
+      needrole:
+        can: :import
+        role: :QueryResult
       submenu:
         query_result:
           name: "信息导入"
@@ -458,6 +471,9 @@ zh-CN:
           need_count: false
     query_result:
       name: "数据查询"
+      needrole:
+        can: :query_result_index
+        role: :QueryResult
       submenu:
         query_result:
           name: "数据查询"
@@ -479,32 +495,18 @@ zh-CN:
             can: :pkp_result_index
             role: :QueryResult
     railway_match:
-      name: "高铁快包内件匹配"
+      name: "新一代收寄信息匹配"
       needrole:
-        can: :railway_index
+        can: :railway_allocation_index
         role: :QueryResult
       submenu:
         railway_import:
           name: "信息导入"
-          link: "/query_results/railway_import"
+          link: "/query_results/railway_allocation_import"
           need_count: false
         railway_export:
           name: "信息导出"
-          link: "/query_results/railway_index"
-          need_count: false
-    import_allocation:
-      name: "进口分拣多次转局"
-      needrole:
-        can: :allocation_index
-        role: :QueryResult
-      submenu:
-        allocation_import:
-          name: "信息导入"
-          link: "/query_results/allocation_import"
-          need_count: false
-        allocation_export:
-          name: "信息导出"
-          link: "/query_results/allocation_index"
+          link: "/query_results/railway_allocation_index"
           need_count: false
     logs:
       name: "日志查询"

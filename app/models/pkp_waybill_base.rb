@@ -55,47 +55,90 @@ class PkpWaybillBase < PkpDataRecord
     end
   end
 
-  def self.get_pkp_waybill_bases_by_query_results_today(name)
-    self.get_pkp_waybill_bases_by_query_results(name, Date.today, Date.today)
+  def self.get_pkp_waybill_bases_by_query_results_today
+    self.get_pkp_waybill_bases_by_query_results(Date.today, Date.today)
   end
 
-  def self.get_pkp_waybill_bases_by_query_results(name, start_date, end_date)
-    businesses = I18n.t(:PkpWaybillBase)[name.to_sym][:businesses]
-    businesses.each do |x|
-      business_no = x[:business_no]
-      business = Business.find_by no: business_no
+  def self.get_pkp_waybill_bases_by_query_results(start_date, end_date) 
+    import_files = {}
+    trans_error = false
+    
+    query_result_import_files = QueryResultImportFile.where("created_at >= ? and created_at< ? ",start_date, (end_date + 1.days)).where(is_sent: [nil, false])
 
-      if !business.blank?
-        query_results = QueryResult.where(business: business).where("created_at >= ? and created_at< ? ",start_date, (end_date + 1.days)).where(is_sent: [nil, false])
-        
-        import_files = {}
-
-        query_results.select(:import_file_id).distinct.map{|x| ImportFile.find(x.import_file_id) if ! x.import_file_id.blank?}.compact.each{|y| import_files[y.id] = y}
-
-
-        ActiveRecord::Base.transaction do
-          query_results.each do |query_result|
+    query_result_import_files.map{|x| x.import_file}.compact.each{|y| import_files[y.id] = y}
+    
+    ActiveRecord::Base.transaction do
+      begin
+        query_result_import_files.each do |query_result_import_file|
+          query_result = query_result_import_file.query_result
+          pkp_waybill_base_local = query_result.pkp_waybill_base_local
+          
+          if pkp_waybill_base_local.blank?
             pkp_waybill_base = PkpWaybillBase.where(waybill_no: query_result.registration_no).last
-
+            
             if ! pkp_waybill_base.blank?
               pkp_waybill_base_local = pkp_waybill_base.to_local
 
               pkp_waybill_base_local.query_result = query_result
 
               pkp_waybill_base_local.save!
-
-              query_result.update!(is_sent: true)
-
-              import_files[query_result.import_file_id].finish_rows += 1
             end
           end
-
-          import_files.values.each{|x| x.save! }
-
+          query_result_import_file.update!(is_sent: true)
+          import_files[query_result_import_file.import_file_id].finish_rows += 1         
         end
+
+        import_files.values.each{|x| x.save! }
+      rescue Exception => e
+        trans_error = true
+        Rails.logger.error e.backtrace
       end
     end
+    
+    if trans_error
+      import_files.values.each{|x| x.update fetch_status: "fail" }    
+    else
+      import_files.values.each{|x| x.update fetch_status: "success" }  
+    end
   end
+
+  # def self.get_pkp_waybill_bases_by_query_results(start_date, end_date)
+  #   businesses = I18n.t(:PkpWaybillBase)[name.to_sym][:businesses]
+  #   businesses.each do |x|
+  #     business_no = x[:business_no]
+  #     business = Business.find_by no: business_no
+
+  #     if !business.blank?
+  #       query_results = QueryResult.where(business: business).where("created_at >= ? and created_at< ? ",start_date, (end_date + 1.days)).where(is_sent: [nil, false])
+        
+  #       import_files = {}
+
+  #       query_results.select(:import_file_id).distinct.map{|x| ImportFile.find(x.import_file_id) if ! x.import_file_id.blank?}.compact.each{|y| import_files[y.id] = y}
+
+
+  #       ActiveRecord::Base.transaction do
+  #         query_results.each do |query_result|
+  #           pkp_waybill_base = PkpWaybillBase.where(waybill_no: query_result.registration_no).last
+
+  #           if ! pkp_waybill_base.blank?
+  #             pkp_waybill_base_local = pkp_waybill_base.to_local
+
+  #             pkp_waybill_base_local.query_result = query_result
+
+  #             pkp_waybill_base_local.save!
+
+  #             query_result.update!(is_sent: true)
+
+  #             import_files[query_result.import_file_id].finish_rows += 1
+  #           end
+  #         end
+
+  #         import_files.values.each{|x| x.save! }
+
+  #       end
+  #     end
+  #   end
+  # end
 
   #4 common
   # def self.get_pkp_waybill_bases_yesterday(name)

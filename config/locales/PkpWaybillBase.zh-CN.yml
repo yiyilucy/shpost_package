@@ -56,9 +56,20 @@ zh-CN:
           :need_date:
             -
               registration_no: "运单号"
+            -
+              :qr_attr:
+                - branch_no: "妥投局代码"
+                - province: "妥投省份"
+                - city: "妥投地市"
+                - district: "妥投县市"
+                - branch_name: "妥投投递局"
+                - match_branch: "信息匹配投递局"
+                - mistake_num: "错分次数"
             - 
               :pkp_waybill_base_local:
                 - biz_occur_date: "收寄日期"
+                - post_org_no: "收寄机构代码"
                 - post_org_name: "收寄单位名称"
-                - receiver_city_name: "寄达市"
-                - contents_type_name: "内件类型名称"
+                - receiver_addr: "收件客户地址"
+                
+

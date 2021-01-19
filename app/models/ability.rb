@@ -47,36 +47,58 @@ class Ability
         if !user.unit.can_pkp?
             cannot :pkp_result_index, QueryResult
         end
-        if !user.unit.can_railway?
-            cannot :railway_index, QueryResult
+        if !(user.unit.can_railway? || user.unit.can_allocation?)
+            cannot [:railway_allocation_index], QueryResult
+        else
+            cannot [:import, :query_result_index], QueryResult
         end
-        if !user.unit.can_allocation?
-            cannot :allocation_index, QueryResult
-        end
+        # if !user.unit.can_allocation?
+        #     cannot [:allocation_index], QueryResult
+        # end
+        # if user.unit.can_railway? || user.unit.can_allocation?
+        #     cannot [:import, :query_result_index], QueryResult
+        # end
         can :manage, ReturnResult, unit_id: user.unit_id
+        if user.unit.can_railway? || user.unit.can_allocation?
+            cannot :return_scan, ReturnResult
+        end
         can :manage, Business, unit_id: user.unit_id
         cannot [:destroy, :new], Business
+        if user.unit.can_railway? || user.unit.can_allocation?
+            cannot :read, Business
+        end
         can :manage, ImportFile, unit_id: user.unit_id
         can :manage, UpDownload
         can :manage, ReturnReason, unit_id: user.unit_id
+        if user.unit.can_railway? || user.unit.can_allocation?
+            cannot :read, ReturnReason
+        end
     elsif user.user?
         # can :read, Unit, id: user.unit_id
         # can [:read, :update], User, id: user.id
         can :read, UserLog, user: {id: user.id}
 
         can :manage, QueryResult, unit_id: user.unit_id
-        if !user.unit.can_railway?
-            cannot :railway_index, QueryResult
-        end
-        if !user.unit.can_allocation?
-            cannot :allocation_index, QueryResult
+        if !user.unit.can_railway? || !user.unit.can_allocation?
+            cannot [:railway_allocation_index], QueryResult
+        else
+            cannot [:import, :query_result_index], QueryResult
         end
         can :manage, ReturnResult, unit_id: user.unit_id
+        if user.unit.can_railway? || user.unit.can_allocation?
+            cannot :return_scan, ReturnResult
+        end
         can :manage, Business, unit_id: user.unit_id
         cannot :destroy, Business
+        if user.unit.can_railway? || user.unit.can_allocation?
+            cannot :read, Business
+        end
         can :manage, ImportFile, unit_id: user.unit_id
         can [:read, :up_download_export], UpDownload
         can :manage, ReturnReason, unit_id: user.unit_id
+        if user.unit.can_railway? || user.unit.can_allocation?
+            cannot :read, ReturnReason
+        end
     else
         cannot :manage, :all
         #can :update, User, id: user.id

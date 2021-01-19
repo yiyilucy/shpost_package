@@ -385,7 +385,12 @@ class QueryResultsController < ApplicationController
       I18n.t("PkpWaybillBase.#{current_user.unit.pkp}.businesses").each do |x|
         if x[:business_no].eql?business_no
           x[:need_date].each do |y|
-            if y.has_key?(:pkp_waybill_base_local)
+            if y.has_key?(:qr_attr)
+              y[:qr_attr].each do |q|
+                title << q.values[0]
+                content_columns << "qr_attr.#{q.keys[0]}"
+              end
+            elsif y.has_key?(:pkp_waybill_base_local)
               y[:pkp_waybill_base_local].each do |z|
                 title << z.values[0]
                 content_columns << "pkp_waybill_base_local.#{z.keys[0]}"
@@ -408,7 +413,7 @@ class QueryResultsController < ApplicationController
         j = 0
 
         content_columns.each do |c|
-          if c.start_with? "pkp_waybill_base_local"
+          if (c.start_with? "qr_attr") || (c.start_with? "pkp_waybill_base_local")
             to_send = c.split(".")
             col = o.send(to_send[0]).blank? ? "" : o.send(to_send[0]).send(to_send[1])
           else
@@ -448,7 +453,7 @@ class QueryResultsController < ApplicationController
   #   end
   # end
 
-  def railway_import
+  def railway_allocation_import
     @order_date = Time.now.strftime('%Y-%m-%d')
     is_query = false
     is_update = false
@@ -466,11 +471,11 @@ class QueryResultsController < ApplicationController
       end
       flash[:notice] = flash_message
 
-      redirect_to "/query_results/railway_import"            
+      redirect_to "/query_results/railway_allocation_import"            
     end
   end
 
-  def railway_index
+  def railway_allocation_index
     businesses = []
 
     if !current_user.unit.blank? && !current_user.unit.pkp.blank?
@@ -486,57 +491,49 @@ class QueryResultsController < ApplicationController
          :order_direction => 'desc')
   end
 
-  def railway_export
+  def railway_allocation_export
     import_file = ImportFile.find(params[:import_file].to_i)
-    results = QueryResult.joins(:query_result_import_files).where("query_result_import_files.import_file_id=?",import_file.id)
 
-    send_data(pkp_results_xls_content_for(results, import_file.business_id), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")  
-  end
+    if (import_file.status.eql?"success") && (import_file.fetch_status.eql?"success")
+      results = QueryResult.joins(:query_result_import_files).where("query_result_import_files.import_file_id=?", import_file.id)
 
-  def allocation_import
-    @order_date = Time.now.strftime('%Y-%m-%d')
-    is_query = false
-    is_update = false
-    
-    unless request.get?
-      business_id = params[:business_select]
-      if business_id.blank?
-        flash_message = "请选择商户！"
+      send_data(pkp_results_xls_content_for(results, import_file.business_id), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls") 
+    else
+      file_path = import_file.file_path
+      if !file_path.blank? and File.exist?(file_path)
+        io = File.open(file_path)
+        filename = File.basename(file_path)
+        send_data(io.read, :type => "text/excel;charset=utf-8; header=present",              :filename => filename)
+        io.close
       else
-        if file = ImportFile.upload_info(params[:file]['file'], business_id, @order_date, "QueryResult", current_user, is_query, is_update)    
-          flash_message = "导入成功！"
-        else
-          flash_message = "导入失败!"
-        end
+        redirect_to railway_allocation_index, :notice => '数据抓取不成功，且原文件不存在，下载失败！'
       end
-      flash[:notice] = flash_message
-
-      redirect_to "/query_results/allocation_import"            
-    end
+    end 
   end
 
-  def allocation_index
-    businesses = []
 
-    if !current_user.unit.blank? && !current_user.unit.pkp.blank?
-      I18n.t("PkpWaybillBase.#{current_user.unit.pkp}.businesses").each do |x|
-        businesses << Business.find_by(no: x[:business_no], unit_id: current_user.unit_id).id if !Business.find_by(no: x[:business_no]).blank?
-      end
-    end
-    
-    @allocation_import_files = ImportFile.accessible_by(current_ability).where("business_id in (?)", businesses)
+  # def allocation_index
+  #   businesses = []
 
-    @allocation_import_files_grid = initialize_grid(@allocation_import_files,
-         :order => 'import_files.created_at',
-         :order_direction => 'desc')
-  end
+  #   if !current_user.unit.blank? && !current_user.unit.pkp.blank?
+  #     I18n.t("PkpWaybillBase.#{current_user.unit.pkp}.businesses").each do |x|
+  #       businesses << Business.find_by(no: x[:business_no], unit_id: current_user.unit_id).id if !Business.find_by(no: x[:business_no]).blank?
+  #     end
+  #   end
 
-  def allocation_export
-    import_file = ImportFile.find(params[:import_file].to_i)
-    results = QueryResult.joins(:query_result_import_files).where("query_result_import_files.import_file_id=?",import_file.id)
+  #   @allocation_import_files = ImportFile.accessible_by(current_ability).where("business_id in (?)", businesses)
 
-    send_data(pkp_results_xls_content_for(results, import_file.business_id), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")  
-  end
+  #   @allocation_import_files_grid = initialize_grid(@allocation_import_files,
+  #        :order => 'import_files.created_at',
+  #        :order_direction => 'desc')
+  # end
+
+  # def allocation_export
+  #   import_file = ImportFile.find(params[:import_file].to_i)
+  #   results = QueryResult.joins(:query_result_import_files).where("query_result_import_files.import_file_id=?",import_file.id)
+
+  #   send_data(pkp_results_xls_content_for(results, import_file.business_id), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")  
+  # end
 
   
   private

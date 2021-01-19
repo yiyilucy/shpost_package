@@ -3,7 +3,7 @@
   <h1>信息导出</h1>
 </div>
 
-<%= grid(@allocation_import_files_grid) do |g|
+<%= grid(@railway_import_files_grid) do |g|
     g.column name: model_class.human_attribute_name(:file_name), attribute: 'file_name'
 
     g.column name: model_class.human_attribute_name(:business_id), attribute: 'name', assoc: :business do |import_file|
@@ -22,9 +22,13 @@
       import_file.status_name
     end
 
+    g.column name: model_class.human_attribute_name(:fetch_status), attribute: 'fetch_status',custom_filter: ImportFile::FETCH_STATUS.invert do |import_file| 
+      import_file.fetch_status_name
+    end
+
     g.column do |import_file|
       ActiveSupport::SafeBuffer.new << 
-      (link_to '导出', "/query_results/allocation_export?import_file=#{import_file.id}", :method => 'post', :class => 'btn btn-xs btn-primary')
+      (link_to '导出', "/query_results/railway_allocation_export?import_file=#{import_file.id}", :method => 'post', :class => 'btn btn-xs btn-primary')
     end
 
   end 
