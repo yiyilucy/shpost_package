@@ -79,7 +79,7 @@ class Ability
         can :read, UserLog, user: {id: user.id}
 
         can :manage, QueryResult, unit_id: user.unit_id
-        if !user.unit.can_railway? || !user.unit.can_allocation?
+        if !(user.unit.can_railway? || user.unit.can_allocation?)
             cannot [:railway_allocation_index], QueryResult
         else
             cannot [:import, :query_result_index], QueryResult
