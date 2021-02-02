@@ -38,7 +38,16 @@ class ImportFile < ActiveRecord::Base
           f.write(file.read)
         end
 
-        ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, import_type: import_type, is_query: is_query, is_update: is_update
+        b = Business.find business_id
+       
+        a = []
+        I18n.t(:PkpWaybillBase).values.map{|x| x[:businesses]}.map{|x|  a= a + x.map{|y| y[:business_no]}}
+        
+        if b.business_no in? a          
+          ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, import_type: import_type, is_query: is_query, is_update: is_update, fetch_status: 'waiting'
+        else
+          ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, import_type: import_type, is_query: is_query, is_update: is_update, fetch_status: 'false'
+        end
 
         file_path
       end
@@ -53,6 +62,8 @@ class ImportFile < ActiveRecord::Base
       indexs_hash["registration_no_index"] = title_row.index("约投号码")
     elsif !title_row.index("邮件号").blank?
       indexs_hash["registration_no_index"] = title_row.index("邮件号")
+    else 
+      indexs_hash["registration_no_index"] = 0
     end
     if !title_row.index("邮编").blank?
       indexs_hash["postcode_index"] = title_row.index("邮编")
@@ -205,7 +216,9 @@ class ImportFile < ActiveRecord::Base
       if result_object.eql? QueryResult
         import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status, business_code: infos_hash["business_code"]
 
-        QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
+        if f.fetch_status.eql?"waiting"
+          QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
+        end
       else
         import_object = result_object.create! registration_no: infos_hash["registration_no"], postcode: infos_hash["postcode"], order_date: f.import_date, unit_id: f.unit_id, business_id: f.business_id, source: "邮政数据查询", status: status
       end
@@ -219,12 +232,16 @@ class ImportFile < ActiveRecord::Base
 
           complete_qr_attr(import_object, infos_hash)
 
-          QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
+          if f.fetch_status.eql?"waiting"
+            QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
+          end
         else
           if f.is_query
             import_object.update order_date: f.import_date, status: status, business_code: infos_hash["business_code"]
 
-            QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
+            if f.fetch_status.eql?"waiting"
+              QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
+            end
           else
             import_object.update order_date: f.import_date, business_code: infos_hash["business_code"]
           end
@@ -233,7 +250,9 @@ class ImportFile < ActiveRecord::Base
         if (!title_row.index("联名卡标识").blank?) || (!title_row.index("身份证号码").blank?) || (!title_row.index("收寄时间").blank?) || (!title_row.index("错分次数").blank?)
           complete_qr_attr(import_object, infos_hash)
 
-          QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
+          if f.fetch_status.eql?"waiting"
+            QueryResultImportFile.create! query_result_id: import_object.id, import_file_id: f.id
+          end
         end
       end
     end

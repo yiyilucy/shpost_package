@@ -63,7 +63,7 @@ class PkpWaybillBase < PkpDataRecord
     import_files = {}
     trans_error = false
     
-    query_result_import_files = QueryResultImportFile.where("created_at >= ? and created_at< ? ",start_date, (end_date + 1.days)).where(is_sent: [nil, false])
+    query_result_import_files = QueryResultImportFile.where("created_at >= ? and created_at< ? ",start_date, (end_date + 1.days)).where(is_sent: [nil, false]).limit(5000)
 
     query_result_import_files.map{|x| x.import_file}.compact.each{|y| import_files[y.id] = y}
     
