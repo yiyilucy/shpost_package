@@ -43,7 +43,7 @@ class ImportFile < ActiveRecord::Base
         a = []
         I18n.t(:PkpWaybillBase).values.map{|x| x[:businesses]}.map{|x|  a= a + x.map{|y| y[:business_no]}}
         
-        if b.business_no in? a          
+        if b.no.in? a  
           ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, import_type: import_type, is_query: is_query, is_update: is_update, fetch_status: 'waiting'
         else
           ImportFile.create! file_name: filename, file_path: file_path, import_date: order_date, user_id: current_user.id, unit_id: current_user.unit.id, business_id: business_id, import_type: import_type, is_query: is_query, is_update: is_update, fetch_status: 'false'
@@ -325,7 +325,7 @@ class ImportFile < ActiveRecord::Base
       line = 2
     end
 
-    f.update total_rows: instance.count>0 ? (instance.count-no_data_row) : 0
+    f.update total_rows: instance.last_row>0 ? (instance.last_row-no_data_row) : 0
 
     instance.default_sheet = instance.sheets.first
     result_object = eval(f.import_type)
