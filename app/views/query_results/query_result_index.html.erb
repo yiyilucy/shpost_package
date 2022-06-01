@@ -31,6 +31,9 @@
     <td valign="middle">
     <%= submit_tag "查询", :name => 'submit',:class => 'btn btn-primary', onclick: "form1.action='query_result_index';form1.submit();" %>
     </td>
+    <td valign="middle">
+    <%= link_to "导出", "/query_results/export_results", :class => 'btn btn-primary', :method => 'post' %>
+    </td>
   </tr>
   </table>
   </div>

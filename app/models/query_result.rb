@@ -15,6 +15,8 @@ class QueryResult < ActiveRecord::Base
 
   STATUS_DELIVERED = [STATUS[:own], STATUS[:other], STATUS[:unit]]
 
+  DOWNLOAD_DIRECT = "#{Rails.root}/public/download/"
+
   def status_name
   	status.blank? ? "" : QueryResult::STATUS_SHOW["#{status}".to_sym]
 	end
@@ -70,6 +72,44 @@ class QueryResult < ActiveRecord::Base
     # end
 
     result
+  end
+
+  def self.export_results
+    filename = "Export_#{Time.now.strftime('%Y%m%d %H:%M:%S')}.xls"
+    file_path = QueryResult::DOWNLOAD_DIRECT + filename  
+    results = QueryResult.includes(:qr_attr).where("operated_at >= ? and operated_at < ? and status in (?) ", Date.today-1.days, Date.today, QueryResult::STATUS_DELIVERED)
+    # exportresults_xls_content_for(results, file_path)
+  end
+  
+  def self.exportresults_xls_content_for(results,file_path)
+    xls_report = StringIO.new   #temp
+    book = Spreadsheet::Workbook.new   
+    sheet = book.create_worksheet :name => "Results"  
+
+    title = Spreadsheet::Format.new :color => :black, :weight => :bold, :size => 10  
+    sheet.row(0).default_format = title 
+    sheet.row(0).concat %w{serial registNbr name mobile state date receiver bankNo bankName company context1 context2}  
+    count_row = 1
+
+    results.each do |o|  
+      sheet[count_row,0]=count_row 
+      sheet[count_row,1]=o.registration_no
+      sheet[count_row,2]=o.qr_attr.blank? ? "" : o.qr_attr.try(:name)
+      sheet[count_row,3]=o.qr_attr.blank? ? "" : o.qr_attr.try(:phone)
+      sheet[count_row,4]="1"
+      sheet[count_row,5]=o.operated_at.blank? ? "" : o.operated_at.strftime('%Y-%m-%d').to_s
+      sheet[count_row,6]=o.result.blank? ? "" : o.result
+      sheet[count_row,7]=""
+      sheet[count_row,8]=""
+      sheet[count_row,9]="EMS"
+      sheet[count_row,10]=""
+      sheet[count_row,11]=""
+
+      count_row += 1
+    end
+    # book.write file_path
+    book.write xls_report  #temp
+    xls_report.string      #temp
   end
 
   
