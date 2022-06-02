@@ -38,3 +38,7 @@ end
 every :day, :at => '0:02am' do
   runner "PkpWaybillBase.get_query_records_schedule"
 end
+
+every :day, :at => '6:00am' do
+  runner "QueryResult.export_results"
+end

@@ -15,7 +15,7 @@ class QueryResult < ActiveRecord::Base
 
   STATUS_DELIVERED = [STATUS[:own], STATUS[:other], STATUS[:unit]]
 
-  DOWNLOAD_DIRECT = "#{Rails.root}/public/download/"
+  # DOWNLOAD_DIRECT = "#{Rails.root}/public/download/"
 
   def status_name
   	status.blank? ? "" : QueryResult::STATUS_SHOW["#{status}".to_sym]
@@ -75,14 +75,22 @@ class QueryResult < ActiveRecord::Base
   end
 
   def self.export_results
+    start_date = Date.today-1.days
+    end_date = Date.today
+    export_results_by_date(start_date, end_date)
+  end
+
+  def self.export_results_by_date(start_date, end_date)
     filename = "Export_#{Time.now.strftime('%Y%m%d %H:%M:%S')}.xls"
-    file_path = QueryResult::DOWNLOAD_DIRECT + filename  
-    results = QueryResult.includes(:qr_attr).where("operated_at >= ? and operated_at < ? and status in (?) ", Date.today-1.days, Date.today, QueryResult::STATUS_DELIVERED)
-    # exportresults_xls_content_for(results, file_path)
+    # file_path = QueryResult::DOWNLOAD_DIRECT + filename  
+    file_path = I18n.t("schedule_export_file_path") + filename 
+
+    results = QueryResult.includes(:qr_attr).where("operated_at >= ? and operated_at < ? and status in (?) ", start_date, end_date, QueryResult::STATUS_DELIVERED)
+    exportresults_xls_content_for(results, file_path)
   end
   
-  def self.exportresults_xls_content_for(results,file_path)
-    xls_report = StringIO.new   #temp
+  def self.exportresults_xls_content_for(results, file_path)
+    # xls_report = StringIO.new   #temp
     book = Spreadsheet::Workbook.new   
     sheet = book.create_worksheet :name => "Results"  
 
@@ -107,9 +115,9 @@ class QueryResult < ActiveRecord::Base
 
       count_row += 1
     end
-    # book.write file_path
-    book.write xls_report  #temp
-    xls_report.string      #temp
+    book.write file_path
+    # book.write xls_report  #temp
+    # xls_report.string      #temp
   end
 
   

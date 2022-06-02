@@ -535,10 +535,10 @@ class QueryResultsController < ApplicationController
   #   send_data(pkp_results_xls_content_for(results, import_file.business_id), :type => "text/excel;charset=utf-8; header=present", :filename => "Results_#{Time.now.strftime("%Y%m%d")}.xls")  
   # end
 
-  def export_results
-    results = QueryResult.export_results
-    send_data(QueryResult.exportresults_xls_content_for(results,""), :type => "text/excel;charset=utf-8; header=present", :filename => "Export_#{Time.now.strftime("%Y%m%d")}.xls")
-  end
+  # def export_results
+  #   results = QueryResult.export_results
+  #   send_data(QueryResult.exportresults_xls_content_for(results,""), :type => "text/excel;charset=utf-8; header=present", :filename => "Export_#{Time.now.strftime("%Y%m%d")}.xls")
+  # end
 
   
   private
