@@ -1,0 +1,9 @@
+zh-CN:
+  YL:
+    businesses:
+      -
+        :business_no: '010105'
+        # :ywtb_type: 'yl'
+        :need_data_from_pkp: true
+        :sender_no: 
+                    - '90000010296749'

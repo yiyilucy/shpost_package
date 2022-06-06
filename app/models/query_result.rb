@@ -81,11 +81,11 @@ class QueryResult < ActiveRecord::Base
   end
 
   def self.export_results_by_date(start_date, end_date)
-    filename = "Export_#{Time.now.strftime('%Y%m%d %H:%M:%S')}.xls"
+    filename = "cupd-receive-#{Time.now.strftime('%Y%m%d')}-EMS.csv"
     # file_path = QueryResult::DOWNLOAD_DIRECT + filename  
     file_path = I18n.t("schedule_export_file_path") + filename 
 
-    results = QueryResult.includes(:qr_attr).where("operated_at >= ? and operated_at < ? and status in (?) ", start_date, end_date, QueryResult::STATUS_DELIVERED)
+    results = QueryResult.includes(:qr_attr).includes(:business).where("operated_at >= ? and operated_at < ? and status in (?) and businesses.no = ?", start_date, end_date, QueryResult::STATUS_DELIVERED, I18n.t(:YL)[:businesses][0][:business_no])
     exportresults_xls_content_for(results, file_path)
   end
   

@@ -1,12 +1,23 @@
 class PkpWaybillBase < PkpDataRecord
   def self.get_query_records_schedule
-    start_date = Date.today - 2.day
-    end_date = Date.today - 1.day
-    get_query_records(start_date, end_date)
+    get_query_records_schedule_ywtb
+    get_query_records_schedule_yl
   end
 
-  def self.get_query_records(start_date, end_date)
-    businesses = I18n.t(:YwtbInterface)[:businesses]
+  def self.get_query_records_schedule_ywtb
+    start_date = Date.today - 2.day
+    end_date = Date.today - 1.day
+    get_query_records(:YwtbInterface,start_date, end_date)
+  end
+
+  def self.get_query_records_schedule_yl
+    start_date = Date.today - 1.day
+    end_date = Date.today
+    get_query_records(:YL,start_date, end_date)
+  end
+
+  def self.get_query_records(code, start_date, end_date)
+    businesses = I18n.t(code)[:businesses]
     businesses.each do |x|
       if x[:need_data_from_pkp]
         business_no = x[:business_no]
