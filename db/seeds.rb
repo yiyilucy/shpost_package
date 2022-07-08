@@ -22,4 +22,4 @@ business = Business.create(name: '运管部', unit_id: unit.id, no: '010104')
 user = User.create(username: "ygbadmin", role: "unitadmin", name: "管理员", unit_id: unit.id, password: 'ygbadmin12345')
 
 unit_yl = Unit.create(name: '银联', desc: '银联', no: '10000', short_name: 'yl', pkp: 'YL')
-business_yl = Business.create(name: '银联', start_date: 1, end_date:8, unit_id: unit_yl.id, no: '010105')
+business_yl = Business.create(name: '银联', start_date: 1, end_date:15, unit_id: unit_yl.id, no: '010105')
