@@ -87,8 +87,16 @@ class QueryResult < ActiveRecord::Base
 
     results = QueryResult.includes(:qr_attr).includes(:business).where("operated_at >= ? and operated_at < ? and status in (?) and businesses.no = ?", start_date, end_date, QueryResult::STATUS_DELIVERED, I18n.t(:YL)[:businesses][0][:business_no])
     exportresults_xls_content_for(results, file_path)
+    
+    sftp_upload(file_path)
   end
  
+  def sftp_upload(file_path_l, file_path_r = './')
+    Net::SFTP.start('172.10.126.51', 'test0817', :password => 'test0817') do |sftp|
+      sftp.upload!(file_path_l, file_path_r)
+    end
+  end
+
   def self.exportresults_xls_content_for(results, file_path)
     # xls_report = StringIO.new   #temp
     book = Spreadsheet::Workbook.new   
