@@ -81,31 +81,31 @@ class QueryResult < ActiveRecord::Base
   end
 
   def self.export_results_by_date(start_date, end_date)
-    filename = "cupd-receive-#{Time.now.strftime('%Y%m%d')}-EMS.csv"
+    filename = "cupd-receive-#{Time.now.strftime('%Y%m%d')}-EMS.xls"
     # file_path = QueryResult::DOWNLOAD_DIRECT + filename  
     file_path = I18n.t("schedule_export_file_path") + filename 
 
     results = QueryResult.includes(:qr_attr).includes(:business).where("operated_at >= ? and operated_at < ? and status in (?) and businesses.no = ?", start_date, end_date, QueryResult::STATUS_DELIVERED, I18n.t(:YL)[:businesses][0][:business_no])
     exportresults_xls_content_for(results, file_path)
   end
-  
+ 
   def self.exportresults_xls_content_for(results, file_path)
     # xls_report = StringIO.new   #temp
     book = Spreadsheet::Workbook.new   
     sheet = book.create_worksheet :name => "Results"  
 
-    title = Spreadsheet::Format.new :color => :black, :weight => :bold, :size => 10  
-    sheet.row(0).default_format = title 
-    sheet.row(0).concat %w{serial registNbr name mobile state date receiver bankNo bankName company context1 context2}  
-    count_row = 1
+    # title = Spreadsheet::Format.new :color => :black, :weight => :bold, :size => 10  
+    # sheet.row(0).default_format = title 
+    # sheet.row(0).concat %w{serial registNbr name mobile state date receiver bankNo bankName company context1 context2}  
+    count_row = 0
 
     results.each do |o|  
-      sheet[count_row,0]=count_row 
+      sheet[count_row,0]=count_row + 1
       sheet[count_row,1]=o.registration_no
-      sheet[count_row,2]=o.qr_attr.blank? ? "" : o.qr_attr.try(:name)
-      sheet[count_row,3]=o.qr_attr.blank? ? "" : o.qr_attr.try(:phone)
+      sheet[count_row,2]=""
+      sheet[count_row,3]=""
       sheet[count_row,4]="1"
-      sheet[count_row,5]=o.operated_at.blank? ? "" : o.operated_at.strftime('%Y-%m-%d').to_s
+      sheet[count_row,5]=o.operated_at.blank? ? "" : o.operated_at.strftime('%Y%m%d').to_s
       sheet[count_row,6]=o.result.blank? ? "" : o.result
       sheet[count_row,7]=""
       sheet[count_row,8]=""
@@ -120,6 +120,19 @@ class QueryResult < ActiveRecord::Base
     # xls_report.string      #temp
   end
 
+  # def self.exportresults_xls_content_for(results, file_path)
+  #   i = 1
+  #   csv_string = CSV.generate do |csv|
+  #     results.each do |o|
+  #       csv << [i, o.registration_no, o.qr_attr.blank? ? "" : o.qr_attr.try(:name), o.qr_attr.blank? ? "" : o.qr_attr.try(:phone), "1", o.operated_at.blank? ? "" : o.operated_at.strftime('%Y%m%d').to_s, o.result.blank? ? "" : o.result, "", "", "EMS", "", ""]
+  #       i += 1
+  #     end
+  #   end
+
+  #   fh = File.new(file_path, "wb")
+  #   fh.puts NKF.nkf("-wL", csv_string)
+  #   fh.close
+  # end
   
 end
 
