@@ -110,6 +110,4 @@ gem 'rqrcode'
 
 gem 'rqrcode_png'
 
-gem 'bcrypt', '~> 3.1', '>= 3.1.16'
-
 gem 'net-sftp', '~> 2.1.3.rc3'
