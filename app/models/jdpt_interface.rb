@@ -23,13 +23,13 @@ class JdptInterface
 
       return_results = get_return_results business
 
-      batch_init_jdpt_trace_by_thread query_results
+      batch_init_jdpt_trace_by_thread query_results, business
 
-      batch_init_jdpt_trace_by_thread return_results
+      batch_init_jdpt_trace_by_thread return_results, business
     end
   end
 
-  def self.batch_init_jdpt_trace_by_thread(results)
+  def self.batch_init_jdpt_trace_by_thread(results, business = nil)
     i = results.size > 5 ? 5 : results.size
     ts = []
     i.times.each do |x|
@@ -44,7 +44,30 @@ class JdptInterface
               if result.blank?
                 next
               end
-              JdptInterface.jdpt_trace result
+
+              remote = true
+
+              if business.try(:local_first)
+
+                mail_trace = MailTrace.find_by mail_no: mail_no
+                
+                if ! mail_trace.blank? && mail_trace.last_received_at > result.query_date
+
+                  remote = false
+
+                  if result.is_a? QueryResult
+                    result.update!(status: mail_trace.status, result: mail_trace.result, query_date: mail_trace.last_received_at.try(:strftime, '%Y%m%d%H%M'), operated_at: mail_trace.operated_at.try(:strftime, '%Y%m%d%H%M'), is_posting: mail_trace.is_posting)
+
+                    result.update_to_send
+                  else
+                    result.update!(status: mail_trace.status, result: mail_trace.result, query_date: mail_trace.last_received_at.try(:strftime, '%Y%m%d%H%M'), operated_at: mail_trace.operated_at.try(:strftime, '%Y%m%d%H%M'))
+                  end
+                end
+              end
+               
+              if remote
+                JdptInterface.jdpt_trace result
+              end
             end
           rescue Exception => e
             Rails.logger.error e.message
