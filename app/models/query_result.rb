@@ -74,24 +74,24 @@ class QueryResult < ActiveRecord::Base
     result
   end
 
-  def self.export_results
+  def self.yl_export_results_yesterday
     start_date = Date.today-1.days
     end_date = Date.today
-    export_results_by_date(start_date, end_date)
+    file_path_name = yl_export_results_by_date(start_date, end_date)
+    sftp_upload(file_path_name[0], "/upload/#{file_path_name[1]}")
   end
 
-  def self.export_results_by_date(start_date, end_date)
+  def self.yl_export_results_by_date(start_date, end_date)
     filename = "cupd-receive-#{Time.now.strftime('%Y%m%d')}-EMS.xls"
     # file_path = QueryResult::DOWNLOAD_DIRECT + filename  
     file_path = I18n.t("schedule_export_file_path") + filename 
 
     results = QueryResult.includes(:qr_attr).includes(:business).where("operated_at >= ? and operated_at < ? and status in (?) and businesses.no = ?", start_date, end_date, QueryResult::STATUS_DELIVERED, I18n.t(:YL)[:businesses][0][:business_no])
     exportresults_xls_content_for(results, file_path)
-    
-    sftp_upload(file_path)
+    return [file_path, filename]    
   end
  
-  def sftp_upload(file_path_l, file_path_r = './')
+  def self.sftp_upload(file_path_l, file_path_r = './')
     Net::SFTP.start('172.10.126.51', 'test0817', :password => 'test0817') do |sftp|
       sftp.upload!(file_path_l, file_path_r)
     end

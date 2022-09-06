@@ -40,5 +40,5 @@ every :day, :at => '0:02am' do
 end
 
 every :day, :at => '6:00am' do
-  runner "QueryResult.export_results"
+  runner "QueryResult.yl_export_results_yesterday"
 end
