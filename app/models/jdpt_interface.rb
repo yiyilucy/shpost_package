@@ -49,9 +49,9 @@ class JdptInterface
 
               if business.try(:local_first)
 
-                mail_trace = MailTrace.find_by mail_no: mail_no
+                mail_trace = MailTrace.find_by mail_no: result.registration_no
                 
-                if ! mail_trace.blank? && mail_trace.last_received_at > result.query_date
+                if ! mail_trace.blank? && (result.query_date.blank? || mail_trace.last_received_at > result.query_date)
 
                   remote = false
 
