@@ -70,4 +70,16 @@ class StandardInterface
       mail_json = {"MAIL_NO" => mail_trace.mail_no, "STATUS" => mail_trace.status, "RESULT_MSG" => mail_trace.result, "OPERATED_AT" => mail_trace.operated_at.try(:strftime, '%Y%m%d%H%M'), "QUERIED_AT" => mail_trace.last_received_at.try(:strftime, '%Y%m%d%H%M'), "QUERY_MSG" => mail_trace.jdpt_traces}
     end
   end
+
+  def self.waybill_query_in_local(mail_no)
+    # mail_no = context["MAIL_NO"]
+
+    waybill = PkpWaybillBase.find_by waybill_no: mail_no
+
+    raise "无该邮件信息" if waybill.blank?
+
+    if ! waybill.blank?
+      mail_json = {"MAIL_NO" => mail_no, "WEIGHT" => waybill.order_weight, "PRICE" => waybill.postage_total }
+    end
+  end
 end

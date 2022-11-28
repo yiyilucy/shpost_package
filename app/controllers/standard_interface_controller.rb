@@ -57,13 +57,33 @@ class StandardInterfaceController < ApplicationController
     end
   end
 
-   def mail_query_in_local
+  def mail_query_in_local
     return error_builder('0005', '查询列表为空') if @context_hash['MAIL_NO'].blank?
     
     @business_code = @context_hash['MAIL_NO']
 
     begin
       success_builder(StandardInterface.mail_query_in_local(@context_hash, @business, @unit))
+    rescue Exception => e
+      if ! e.is_a? RuntimeError
+        out_error e
+      end
+      error_builder('0005', e.message)
+      return
+    end
+  end
+
+  def waybill_query_in_local
+    mail_no = params[:mail_no]
+    return error_builder('0005', '查询列表为空') if mail_no.blank?
+    
+    @business_code = mail_no
+
+    # @unit = Unit.first
+    # @business = Business.first
+
+    begin
+      success_builder(StandardInterface.waybill_query_in_local(mail_no))
     rescue Exception => e
       if ! e.is_a? RuntimeError
         out_error e
@@ -113,12 +133,12 @@ class StandardInterfaceController < ApplicationController
 
   def interface_return
     begin
-      verify_params
+      verify_params if ! params[:action].eql? "waybill_query_in_local"
       if !@status.eql? false
         yield
       end
     ensure
-      InterfaceInfo.log(params[:controller], params[:action], @unit, @business, @status, request.url, params.to_json, @return_json.to_json, request.ip, @business_code, @object) unless params[:action].eql?('mail_query')
+      # InterfaceInfo.log(params[:controller], params[:action], @unit, @business, @status, request.url, params.to_json, @return_json.to_json, request.ip, @business_code, @object) unless params[:action].eql?('mail_query')
     end
   end
 
