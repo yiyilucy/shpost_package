@@ -79,7 +79,7 @@ class StandardInterface
     raise "无该邮件信息" if waybill.blank?
 
     if ! waybill.blank?
-      mail_json = {"MAIL_NO" => mail_no, "WEIGHT" => waybill.order_weight, "PRICE" => waybill.postage_total }
+      mail_json = {"MAIL_NO" => mail_no, "WEIGHT" => waybill.real_weight, "PRICE" => waybill.postage_total }
     end
   end
 end
