@@ -82,7 +82,7 @@ class QueryResult < ActiveRecord::Base
   end
 
   def self.yl_export_results_by_date(start_date, end_date)
-    filename = "cupd-receive-#{Time.now.strftime('%Y%m%d')}-EMS.xls"
+    filename = "cupd-receive-#{end_date.strftime('%Y%m%d')}-EMS.xls"
     # file_path = QueryResult::DOWNLOAD_DIRECT + filename  
     file_path = I18n.t("schedule_export_file_path") + filename 
 
@@ -92,7 +92,7 @@ class QueryResult < ActiveRecord::Base
   end
  
   def self.sftp_upload(file_path_l, file_path_r = './')
-    Net::SFTP.start('172.10.126.51', 'test0817', :password => 'test0817') do |sftp|
+    Net::SFTP.start('172.10.126.51', 'test0817', :password => '@Yinlian20221125') do |sftp|
       sftp.upload!(file_path_l, file_path_r)
     end
   end
