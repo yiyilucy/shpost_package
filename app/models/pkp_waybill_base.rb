@@ -74,7 +74,7 @@ class PkpWaybillBase < PkpDataRecord
     import_files = {}
     trans_error = false
     
-    query_result_import_files = QueryResultImportFile.where("created_at >= ? and created_at< ? ",start_date, (end_date + 1.days)).where(is_sent: [nil, false]).limit(5000)
+    query_result_import_files = QueryResultImportFile.where("created_at >= ? and created_at< ? ",start_date, (end_date + 1.days)).where(is_sent: [nil, false]).limit(2000)
 
     query_result_import_files.map{|x| x.import_file}.compact.each{|y| import_files[y.id] = y}
     
@@ -95,10 +95,10 @@ class PkpWaybillBase < PkpDataRecord
               pkp_waybill_base_local.save!
             end
           end
-          query_result_import_file.update!(is_sent: true)
+          
           import_files[query_result_import_file.import_file_id].finish_rows += 1         
         end
-
+        query_result_import_files.update_all(is_sent: true)
         import_files.values.each{|x| x.save! }
       rescue Exception => e
         trans_error = true
