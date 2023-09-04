@@ -48,9 +48,9 @@ class QueryResult < ActiveRecord::Base
 
     if !opt_code.blank?
       if opt_code.eql? '704'
-        if opt_desc.include? '本人'
+        if opt_desc.include? '已签收'
           status = QueryResult::STATUS[:own]
-        elsif opt_desc.include? '他人'
+        elsif opt_desc.include?('已代签收') && (opt_desc.include?('家人') || opt_desc.include?('朋友') || opt_desc.include?('同事'))
           status = QueryResult::STATUS[:other]
         else
           status = QueryResult::STATUS[:unit]
