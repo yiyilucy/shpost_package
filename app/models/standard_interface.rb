@@ -42,10 +42,10 @@ class StandardInterface
     interface_sender = JdptInterface.jdpt_trace_in_time mail_no, business
 
     # if ! interface_sender.try(:status).eql? InterfaceSender::STATUS[:success]
-    interface_sender.interface_send
+    interface_sender.interface_send false
     # end
-    if interface_sender.reload.status.eql? InterfaceSender::STATUS[:success]
-      last_result = JdptInterface.parse_last_result(interface_sender.reload.last_response)
+    if interface_sender.status.eql? InterfaceSender::STATUS[:success]
+      last_result = JdptInterface.parse_last_result(interface_sender.last_response)
     
 
     status = last_result["status"].eql?(QueryResult::STATUS[:waiting]) && last_result["is_posting"] ? "posting" : last_result["status"]

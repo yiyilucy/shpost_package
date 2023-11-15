@@ -114,7 +114,7 @@ class JdptInterface
   def self.jdpt_trace_in_time(registration_no, business)
     body = JdptInterface.init_jdpt_trace_body_by_mail(registration_no, registration_no, business)
 
-    InterfaceSender.interface_sender_initialize("jdpt_trace_in_time", body, {business_id: business.id, unit_id: business.unit_id, business_code: registration_no})
+    InterfaceSender.interface_sender_initialize("jdpt_trace_in_time", body, {business_id: business.id, unit_id: business.unit_id, business_code: registration_no, next_time: nil})
   end
 
   def self.init_jdpt_trace_body_by_mail(registration_no, serial_no, business)

@@ -37,7 +37,9 @@ class InterfaceSender < ActiveRecord::Base
       end
       
       # interface_sender.set_next_time
-      interface_sender.save!
+      if interface_sender_hash[:no_persistence].blank?
+        interface_sender.save!
+      end
       return interface_sender
     end
   end
@@ -83,7 +85,8 @@ class InterfaceSender < ActiveRecord::Base
   #   # end
   # end
 
-  def interface_send
+
+  def interface_send(persisted = true)
     begin
       response = nil
       Timeout.timeout(60) do
@@ -102,12 +105,17 @@ class InterfaceSender < ActiveRecord::Base
       end
       throw TimeoutError if response.blank?
 
-      self.callback response
+      self.callback(response, persisted)
     rescue Exception => e
       self.error_msg = "#{e.class.name} #{e.message} \n#{e.backtrace.join("\n")}"
-      self.fail! response
+      if persisted
+        self.fail! response
+      else
+        self.fail response
+      end
     end
   end
+
 
   def interface_rebuild
     if !self.object_class.blank? && !self.object_id.blank?
@@ -137,24 +145,41 @@ class InterfaceSender < ActiveRecord::Base
     end
   end
 
-  def callback response
+  def callback(response, persisted = true)
     if self.callback_class.blank? || ! self.callback_class.constantize.respond_to?(self.callback_method.to_sym) || self.callback_class.constantize.send(self.callback_method.to_sym, response, (self.callback_params.blank? ? self.callback_params : JSON.parse(self.callback_params)))
 
-      self.succeed! response
+      if persisted
+        self.succeed! response
+      else
+        self.succeed response
+      end
     else
-      self.fail! response
+      if persisted
+        self.fail! response
+      else
+        self.fail response
+      end
     end
   end
 
   def succeed! response
+    self.succeed response
+    self.save!
+  end
+
+  def succeed response
     self.last_response = response
     self.last_time = Time.now
     self.send_times += 1
     self.success
-    self.save!
   end
 
   def fail! response
+    self.fail response
+    self.save!
+  end
+
+  def fail response
     self.last_response = response
     self.last_time = Time.now
     self.send_times += 1
@@ -166,7 +191,6 @@ class InterfaceSender < ActiveRecord::Base
       self.set_next_time
       self.waiting
     end
-    self.save!
   end
 
   def set_next_time

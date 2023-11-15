@@ -55,3 +55,4 @@ zh-CN:
       # object_class: 'Keyclientorder'
       max_times: 1 #default_times: 10
       interval: 3600 #default_interval: 600
+      no_persistence: true
