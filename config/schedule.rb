@@ -19,7 +19,7 @@ every :day, :at => '0:15am' do
   runner "JdptInterface.batch_init_jdpt_trace"
 end
 
-every 2.minutes do
+every 10.minutes do
   runner "ImportFile.import_data"
 end
 
@@ -31,7 +31,7 @@ every 1.hours do
   runner "YwtbInterface.batch_init_ywtb"
 end
 
-every 5.minutes do
+every 3.minutes do
 	runner "PkpWaybillBase.get_pkp_waybill_bases_by_query_results_today"
 end
 
