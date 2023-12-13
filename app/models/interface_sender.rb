@@ -45,7 +45,14 @@ class InterfaceSender < ActiveRecord::Base
   end
 
   def self.schedule_send(thread_count = nil)
-    interface_senders = self.where(status: InterfaceSender::STATUS[:waiting]).where('next_time < ?', Time.now).order(:created_at).limit(1000)
+    d1 = Time.now
+    # interface_senders = self.where(status: InterfaceSender::STATUS[:waiting]).where('next_time < ?', Time.now).order(:created_at).limit(1000)
+    interface_senders = self.where(status: InterfaceSender::STATUS[:waiting]).where('next_time < ?', Time.now).where('(last_time < next_time) or (last_time is null) or (last_time < ?)', (Time.now - 1.hour)).limit(1000)
+    interface_senders = InterfaceSender.where(ids: interface_senders.ids)
+    interface_senders.update_all(last_time: Time.now)
+
+    cout = interface_senders.size
+
     if ! thread_count.blank?
       i = thread_count
     else
@@ -63,15 +70,18 @@ class InterfaceSender < ActiveRecord::Base
             next
           end
           
-          puts is.id
           is.interface_send
         end
+        ActiveRecord::Base.connection_pool.release_connection
       end
       ts<<t
     end
     ts.each do |x|
       x.join
     end
+
+    d2 = Time.now
+    puts "schedule_send sent #{cout} between #{d2 - d1}"
   end
 
   # def self.schedule_send
