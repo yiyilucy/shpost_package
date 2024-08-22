@@ -324,8 +324,9 @@ class ImportFile < ActiveRecord::Base
       no_data_row = 1 
       line = 2
     end
+    total_rows = instance.last_row>0 ? (instance.last_row-no_data_row) : 0
 
-    f.update total_rows: instance.last_row>0 ? (instance.last_row-no_data_row) : 0
+    f.update total_rows: total_rows
 
     instance.default_sheet = instance.sheets.first
     result_object = eval(f.import_type)
@@ -333,7 +334,7 @@ class ImportFile < ActiveRecord::Base
     start_time  = Time.now
 
     if ! with_thread
-      ActiveRecord::Base.transaction do
+      
         begin
           title_row = instance.row(no_data_row)
           
@@ -341,37 +342,43 @@ class ImportFile < ActiveRecord::Base
           row_count = instance.count
     
           Rails.logger.info "*********** begin #{instance.count}***********"
-    
-          while (line <= row_count)
-            
-            current_line = line
-            
-            rowarr = instance.row(current_line)
-            line += 1
-            infos_hash = get_infos(rowarr, indexs_hash)
-            # Rails.logger.info "*********** infos_hash #{infos_hash}***********"
-
-            if infos_hash["registration_no"].blank?
-              txt = "缺少挂号编号或约投号码或邮件号" + "(第" + current_line.to_s + "行)"
-              # puts txt
-              sheet_error << (rowarr << txt)
-              next
+          if total_rows>0
+            total_times = (total_rows/10000)+1
+            total_times.times.each do |i| 
+              start_row = i*10000+line
+              end_row = get_end_row(i, row_count, line)
+              ActiveRecord::Base.transaction do
+                (start_row..end_row).each do |j|
+                  current_line = j
+                  
+                  rowarr = instance.row(current_line)
+                  infos_hash = get_infos(rowarr, indexs_hash)
+                  # Rails.logger.info "*********** infos_hash #{infos_hash}***********"
+                  if infos_hash["registration_no"].blank?
+                    txt = "缺少挂号编号或约投号码或邮件号" + "(第" + current_line.to_s + "行)"
+                    # puts txt
+                    sheet_error << (rowarr << txt)
+                    next
+                  end
+                  # Rails.logger.info "*********** time2 #{Time.now - start_time}***********"
+                  begin
+                    # Rails.logger.info "*********** begin process #{line}***********"
+                    process_datas(result_object, f, title_row, infos_hash)
+                  rescue ActiveRecord::RecordInvalid => e
+                    txt = e.message + "(第" + current_line.to_s + "行)"
+                    sheet_error << (rowarr << txt)
+                    next
+                  end
+                  # Rails.logger.info "*********** time2 #{Time.now - start_time}***********"
+                  if current_line%1000 == 0
+                    Rails.logger.info "*********** " + Time.now.strftime("%Y-%m-%d %H:%M:%S") + ", 文件<" + f.file_name + ">已处理到第" + current_line.to_s + "行 ***********"
+                  end
+                  # Rails.logger.info "*********** time4 #{Time.now - start_time}***********"
+                end
+              end
             end
-            # Rails.logger.info "*********** time2 #{Time.now - start_time}***********"
-            begin
-              # Rails.logger.info "*********** begin process #{line}***********"
-              process_datas(result_object, f, title_row, infos_hash)
-            rescue ActiveRecord::RecordInvalid => e
-              txt = e.message + "(第" + current_line.to_s + "行)"
-              sheet_error << (rowarr << txt)
-              next
-            end
-            # Rails.logger.info "*********** time2 #{Time.now - start_time}***********"
-            if current_line%1000 == 0
-              Rails.logger.info "*********** " + Time.now.strftime("%Y-%m-%d %H:%M:%S") + ", 文件<" + f.file_name + ">已处理到第" + current_line.to_s + "行 ***********"
-            end
-            # Rails.logger.info "*********** time4 #{Time.now - start_time}***********"
           end
+      
         rescue Exception => e
           trans_error = true
           message = e.message + "(第" + current_line.to_s + "行)"
@@ -379,7 +386,6 @@ class ImportFile < ActiveRecord::Base
           Rails.logger.error e.backtrace
           # raise ActiveRecord::Rollback
         end
-      end
     else
       title_row = instance.row(no_data_row)
       
@@ -460,7 +466,9 @@ class ImportFile < ActiveRecord::Base
     end
   end
 
-  
+  def self.get_end_row(times, row_count, line)
+    return (((times+1)*10000+line)>row_count)? row_count : ((times+1)*10000+line)
+  end
 
  #  def self.import_data_with_thread
  #    direct = "#{Rails.root}/public/download/"
