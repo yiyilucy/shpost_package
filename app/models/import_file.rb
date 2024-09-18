@@ -339,9 +339,9 @@ class ImportFile < ActiveRecord::Base
           title_row = instance.row(no_data_row)
           
           indexs_hash = get_indexs(title_row)
-          row_count = instance.count
+          row_count = instance.last_row
     
-          Rails.logger.info "*********** begin #{instance.count}***********"
+          Rails.logger.info "*********** begin #{instance.last_row}***********"
           if total_rows>0
             total_times = (total_rows/10000)+1
             total_times.times.each do |i| 
@@ -390,7 +390,7 @@ class ImportFile < ActiveRecord::Base
       title_row = instance.row(no_data_row)
       
       indexs_hash = get_indexs(title_row)
-      row_count = instance.count
+      row_count = instance.last_row
     
       i = (row_count-no_data_row) > 5 ? 5 : (row_count-no_data_row)
 
