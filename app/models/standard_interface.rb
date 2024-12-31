@@ -76,10 +76,19 @@ class StandardInterface
 
     waybill = PkpWaybillBase.find_by waybill_no: mail_no
 
-    raise "无该邮件信息" if waybill.blank?
+    raise "无该该邮件信息" if waybill.blank?
 
     if ! waybill.blank?
       mail_json = {"MAIL_NO" => mail_no, "WEIGHT" => waybill.real_weight, "PRICE" => waybill.postage_total }
     end
+  end
+
+  def self.phone_query(mail_no)
+    waybill = PkpWaybillBase.find_by waybill_no: mail_no
+
+    raise "无该该邮件信息" if waybill.blank?
+
+    raise "该邮件大客户不在白名单内" if ! waybill.sender_no.in? ['1030001624388', '1100207488562', '1030002147402']
+    mail_json = {"PHONE" => waybill.sender_mobile}
   end
 end
