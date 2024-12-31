@@ -67,7 +67,7 @@ class StandardInterface
     if ! mail_trace.blank?
       status = mail_trace.status.eql?(QueryResult::STATUS[:waiting]) && mail_trace.is_posting? ? "posting" : mail_trace.status
 
-      mail_json = {"MAIL_NO" => mail_trace.mail_no, "STATUS" => mail_trace.status, "RESULT_MSG" => mail_trace.result, "OPERATED_AT" => mail_trace.operated_at.try(:strftime, '%Y%m%d%H%M'), "QUERIED_AT" => mail_trace.last_received_at.try(:strftime, '%Y%m%d%H%M'), "QUERY_MSG" => mail_trace.jdpt_traces}
+      mail_json = {"MAIL_NO" => mail_trace.mail_no, "STATUS" => mail_trace.status, "RESULT_MSG" => mail_trace.result, "OPERATED_AT" => mail_trace.operated_at.try(:strftime, '%Y%m%d%H%M'), "QUERIED_AT" => mail_trace.last_received_at.try(:strftime, '%Y%m%d%H%M'), "QUERY_MSG" => mail_trace.jdpt_traces.to_json}
     end
   end
 

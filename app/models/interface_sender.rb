@@ -275,4 +275,46 @@ class InterfaceSender < ActiveRecord::Base
       return false
     end
   end
+
+
+  def self.mail_query_in_time(mail_no)
+    body = {}
+    body["context"]  = context = {MAIL_NO: mail_no}.to_json
+    body["business"] = 'xxj'
+    body["unit"] = 'xxj'
+    body["format"] ="JSON"
+    secrect_key = 'xxj34124888'
+    body["sign"] = Base64.strict_encode64(Digest::MD5.hexdigest("#{context}#{secrect_key}"))
+
+    i = InterfaceSender.interface_sender_initialize("mail_query_in_time", body.to_json)
+
+    i.interface_send
+
+    JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"].sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
+
+
+    return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"]
+  end
+
+  def self.mail_query_in_local(mail_no)
+    body = {}
+    body["context"]  = context = {MAIL_NO: mail_no}.to_json
+    body["business"] = 'xxj'
+    body["unit"] = 'xxj'
+    body["format"] ="JSON"
+    secrect_key = 'xxj34124888'
+    body["sign"] = Base64.strict_encode64(Digest::MD5.hexdigest("#{context}#{secrect_key}"))
+
+    i = InterfaceSender.interface_sender_initialize("mail_query_in_local", body.to_json)
+
+    i.interface_send
+
+    # JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"]["responseItems"]).sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
+
+    # return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"]["responseItems"])
+
+    JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"].sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
+
+    return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"]
+  end
 end

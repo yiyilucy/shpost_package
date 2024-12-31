@@ -56,3 +56,23 @@ zh-CN:
       max_times: 1 #default_times: 10
       interval: 3600 #default_interval: 600
       no_persistence: true
+    mail_query_in_time:
+      # for test
+      #url: 'http://10.4.44.237/querypush-twsln/mailTrack/queryMailTrackLn'
+      # for production
+      url: 'http://120.72.168.7:3001/shpost_package/standard_interface/mail_query_in_time'
+      interface_type: 'http'
+      http_type: 'post'
+      # object_class: 'Keyclientorder'
+      max_times: 5 #default_times: 10
+      interval: 3600 #default_interval: 600
+    mail_query_in_local:
+      # for test
+      #url: 'http://10.4.44.237/querypush-twsln/mailTrack/queryMailTrackLn'
+      # for production
+      url: 'http://120.72.168.7:3001/shpost_package/standard_interface/mail_query_in_local'
+      interface_type: 'http'
+      http_type: 'post'
+      # object_class: 'Keyclientorder'
+      max_times: 5 #default_times: 10
+      interval: 3600 #default_interval: 600

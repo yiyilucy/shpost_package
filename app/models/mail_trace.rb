@@ -3,12 +3,12 @@ class MailTrace < PkpDataRecord
 
   def jdpt_traces
     trace = [] 
-    self.mail_trace_details.each do |x|
+    self.mail_trace_details.order(:created_at).each do |x|
       if !x.blank?
         trace += JSON.parse(x.traces.gsub("=>", ":"))
       end
     end
 
-    msg = {"responseState" => true,"errorDesc" => "","receiveID" => "", "responseItems" => trace.to_json}
+    msg = {"responseState" => true,"errorDesc" => "","receiveID" => "", "responseItems" => trace}
   end
 end
