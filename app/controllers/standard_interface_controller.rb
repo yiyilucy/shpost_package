@@ -94,16 +94,12 @@ class StandardInterfaceController < ApplicationController
   end
 
   def phone_query
-    mail_no = params[:mail_no]
-    return error_builder('0005', '查询列表为空') if mail_no.blank?
+    return error_builder('0005', '查询列表为空') if @context_hash['MAIL_NO'].blank?
+
+    @business_code = @context_hash['MAIL_NO']
     
-    @business_code = mail_no
-
-    # @unit = Unit.first
-    # @business = Business.first
-
     begin
-      success_builder(StandardInterface.phone_query(mail_no))
+      success_builder(StandardInterface.phone_query(@business_code))
     rescue Exception => e
       if ! e.is_a? RuntimeError
         out_error e

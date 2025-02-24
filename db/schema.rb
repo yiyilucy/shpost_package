@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220905022341) do
+ActiveRecord::Schema.define(version: 20240914053339) do
 
   create_table "businesses", force: true do |t|
     t.string   "name",        default: "",    null: false
@@ -276,6 +276,7 @@ ActiveRecord::Schema.define(version: 20220905022341) do
   end
 
   add_index "pkp_waybill_base_locals", ["created_day"], name: "index_pkp_waybill_base_locals_on_created_day"
+  add_index "pkp_waybill_base_locals", ["query_result_id"], name: "index_pkp_waybill_base_locals_on_query_result_id"
   add_index "pkp_waybill_base_locals", ["sender_no"], name: "index_pkp_waybill_base_locals_on_sender_no"
   add_index "pkp_waybill_base_locals", ["waybill_no"], name: "index_pkp_waybill_base_locals_on_waybill_no"
 
@@ -315,6 +316,8 @@ ActiveRecord::Schema.define(version: 20220905022341) do
     t.datetime "updated_at"
   end
 
+  add_index "query_result_import_files", ["query_result_id"], name: "index_query_result_import_files_on_query_result_id"
+
   create_table "query_results", force: true do |t|
     t.string   "source"
     t.string   "registration_no",                     null: false
@@ -339,6 +342,7 @@ ActiveRecord::Schema.define(version: 20220905022341) do
   add_index "query_results", ["order_date"], name: "index_query_results_on_order_date"
   add_index "query_results", ["registration_no"], name: "index_query_results_on_registration_no", unique: true
   add_index "query_results", ["status"], name: "index_query_results_on_status"
+  add_index "query_results", ["unit_id"], name: "index_query_results_on_unit_id"
 
   create_table "return_reasons", force: true do |t|
     t.string   "reason"

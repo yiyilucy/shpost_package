@@ -309,12 +309,12 @@ class InterfaceSender < ActiveRecord::Base
 
     i.interface_send
 
-    # JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"]["responseItems"]).sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
+    JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"]["responseItems"]).sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
 
-    # return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"]["responseItems"])
+    return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"]["responseItems"])
 
-    JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"].sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
+    # JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"].sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
 
-    return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"]
+    # return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"]
   end
 end
