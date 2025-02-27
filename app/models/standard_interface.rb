@@ -48,9 +48,9 @@ class StandardInterface
       last_result = JdptInterface.parse_last_result(interface_sender.last_response)
     
 
-    status = last_result["status"].eql?(QueryResult::STATUS[:waiting]) && last_result["is_posting"] ? "posting" : last_result["status"]
+      status = last_result["status"].eql?(QueryResult::STATUS[:waiting]) && last_result["is_posting"] ? "posting" : last_result["status"]
 
-    mail_json = {"MAIL_NO" => mail_no, "STATUS" => status, "RESULT_MSG" =>  last_result["opt_desc"], "OPERATED_AT" => last_result["opt_at"].try(:to_time).try(:strftime, '%Y%m%d%H%M'), "QUERIED_AT" => Time.now.strftime('%Y%m%d%H%M'), "QUERY_MSG" => interface_sender.last_response}
+      mail_json = {"MAIL_NO" => mail_no, "STATUS" => status, "RESULT_MSG" =>  last_result["opt_desc"], "OPERATED_AT" => last_result["opt_at"].try(:to_time).try(:strftime, '%Y%m%d%H%M'), "QUERIED_AT" => Time.now.strftime('%Y%m%d%H%M'), "QUERY_MSG" => interface_sender.last_response}
     else
       raise '新一代跟踪查询接口调用失败'
     end
@@ -85,18 +85,6 @@ class StandardInterface
   end
 
   def self.phone_query(mail_no)
-    if mail_no.in? ['1266659168416', '1205900485506', '1336022500421']
-      if mail_no.eql? '1266659168416'
-        return {"PHONE" => '13812235281'}
-      elsif mail_no.eql?  '1205900485506'
-        return {"PHONE" => '13032889823'}
-      elsif mail_no.eql?  '1336022500421'
-        return {"PHONE" => '15809020415'}
-      end
-    else
-      raise "无该该邮件信息" if waybill.blank?
-    end
-    
     waybill = PkpWaybillBase.find_by waybill_no: mail_no
 
     raise "无该该邮件信息" if waybill.blank?
@@ -105,6 +93,6 @@ class StandardInterface
 
     
 
-    mail_json = {"PHONE" => waybill.sender_mobile}
+    mail_json = {"PHONE" => waybill.receiver_mobile}
   end
 end

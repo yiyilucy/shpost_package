@@ -309,12 +309,29 @@ class InterfaceSender < ActiveRecord::Base
 
     i.interface_send
 
-    JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"]["responseItems"]).sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
+    # JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"]["responseItems"]).sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
 
-    return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"]["responseItems"])
+    # return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"]["responseItems"])
 
-    # JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"].sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
+    JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"].sort{|a, b| a['opTime'].to_time <=>  b['opTime'].to_time}.each{|x| puts x}
 
-    # return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"]
+    return JSON.parse(JSON.parse(i.last_response)["QUERY_MSG"])["responseItems"]
+  end
+
+  def self.phone_query(mail_no)
+    body = {}
+    body["context"]  = context = {MAIL_NO: mail_no}.to_json
+    body["business"] = 'shpost_sq'
+    body["unit"] = 'shpost_sq'
+    body["format"] ="JSON"
+    secrect_key = 'xxj34124888'
+    body["sign"] = Base64.strict_encode64(Digest::MD5.hexdigest("#{context}#{secrect_key}"))
+
+    i = InterfaceSender.interface_sender_initialize("phone_query", body.to_json)
+
+    i.interface_send
+
+
+    return i.last_response
   end
 end

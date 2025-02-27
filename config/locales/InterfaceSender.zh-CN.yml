@@ -76,3 +76,13 @@ zh-CN:
       # object_class: 'Keyclientorder'
       max_times: 5 #default_times: 10
       interval: 3600 #default_interval: 600
+    phone_query:
+      # for test
+      # url: 'http://120.72.168.7:3001/shpost_package/standard_interface/phone_query'
+      # for production
+      url: 'http://120.72.168.7:3001/shpost_package/standard_interface/phone_query'
+      interface_type: 'http'
+      http_type: 'post'
+      # object_class: 'Keyclientorder'
+      max_times: 5 #default_times: 10
+      interval: 3600 #default_interval: 600
