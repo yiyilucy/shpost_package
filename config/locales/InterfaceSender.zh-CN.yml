@@ -49,7 +49,7 @@ zh-CN:
       # for test
       url: 'http://10.4.44.237/querypush-twsln/mailTrack/queryMailTrackLn'
       # for production
-      # url: 'http://10.4.189.174/querypush-twsln/mailTrack/queryMailTrackLn'
+      # url: 'http://10.4.204.175/mailTrackGjcx/mailTrackGjcxTwsln/plus'
       interface_type: 'http'
       http_type: 'post'
       # object_class: 'Keyclientorder'

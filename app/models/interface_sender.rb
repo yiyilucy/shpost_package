@@ -280,10 +280,15 @@ class InterfaceSender < ActiveRecord::Base
   def self.mail_query_in_time(mail_no)
     body = {}
     body["context"]  = context = {MAIL_NO: mail_no}.to_json
+    body["format"] ="JSON"
+
     body["business"] = 'xxj'
     body["unit"] = 'xxj'
-    body["format"] ="JSON"
     secrect_key = 'xxj34124888'
+
+    # body["business"] = 'shjyksy'
+    # body["unit"] = 'east_cj'
+    # secrect_key = '17042a22acbdb43e'
     body["sign"] = Base64.strict_encode64(Digest::MD5.hexdigest("#{context}#{secrect_key}"))
 
     i = InterfaceSender.interface_sender_initialize("mail_query_in_time", body.to_json)
