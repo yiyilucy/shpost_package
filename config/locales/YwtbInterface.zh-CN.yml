@@ -7,8 +7,12 @@ zh-CN:
         #             - '90000010296749'
         #             - '90000011041715'
         #             - '90000011041692'
+        :sender_no:
+                    -'1030001319862'
+                    -'1030001414543'
+                    -'1100183572525'
         :ywtb_type: 'rkb'
-        :need_data_from_pkp: false
+        :need_data_from_pkp: true
       -
         :business_no: '010102'
         :ywtb_type: 'crj'
