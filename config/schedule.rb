@@ -12,7 +12,7 @@ env :GEM_PATH, ENV['GEM_PATH']
 set :output, "log/cron_log.log"
 
 every 2.minutes do
-  runner "InterfaceSender.schedule_send"
+  runner "InterfaceSender.schedule_send(30)"
 end
 
 every :day, :at => '0:15am' do
@@ -27,10 +27,14 @@ every :day, :at => '11:35pm' do
   runner "JdptInterface.clean_data_by_days"
 end
 
-every 1.hours do  
-  runner "YwtbInterface.batch_init_ywtb"
+every 10.minutes do  
+  runner "YwtbInterface.batch_init_ywtb", output: 'log/cron_ywtb.log'
 end
 
+every 30.minutes do
+  runner "PkpWaybillBaseHis.get_query_records_schedule_ywtb_daily_with_file", output: 'log/ywtb_2025.log'
+  runner "Rails.logger.info 'Ywtb 2025 schedule run at #{Time.now}'", output: 'log/ywtb_2025.log'
+end
 every 3.minutes do
 	runner "PkpWaybillBase.get_pkp_waybill_bases_by_query_results_today"
 end
