@@ -1,5 +1,6 @@
 zh-CN:
   PkpWaybillBase:
+  #政务效率
     ZWXL:
       businesses:
         -
@@ -34,6 +35,7 @@ zh-CN:
               operated_at: "操作时间"
             -
               status_name: "状态"
+  #高铁
     GT:
       businesses:
         -
@@ -48,6 +50,7 @@ zh-CN:
                 - post_org_name: "收寄单位名称"
                 - receiver_city_name: "寄达市"
                 - contents_type_name: "内件类型名称"
+    #运管部
     YGB:
       businesses:
         -
