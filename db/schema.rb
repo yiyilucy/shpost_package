@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20240914053339) do
+ActiveRecord::Schema.define(version: 20260731014947) do
 
   create_table "businesses", force: true do |t|
     t.string   "name",        default: "",    null: false
@@ -375,6 +375,17 @@ ActiveRecord::Schema.define(version: 20240914053339) do
     t.integer  "user_id"
     t.integer  "unit_id"
     t.string   "role"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "tax_prices", force: true do |t|
+    t.string   "tax_code"
+    t.string   "tax_name"
+    t.integer  "piece_amount"
+    t.integer  "piece_weight"
+    t.integer  "box_amount"
+    t.integer  "box_weight"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
