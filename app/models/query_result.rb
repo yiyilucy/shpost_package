@@ -1,4 +1,5 @@
 class QueryResult < ActiveRecord::Base
+  require 'write_xlsx'
 	belongs_to :business
 	belongs_to :unit
   has_one :qr_attr, dependent: :destroy
@@ -82,12 +83,13 @@ class QueryResult < ActiveRecord::Base
   end
 
   def self.yl_export_results_by_date(start_date, end_date)
-    filename = "cupd-receive-#{end_date.strftime('%Y%m%d')}-EMS.xls"
+    filename = "cupd-receive-#{end_date.strftime('%Y%m%d')}-EMS.xlsx"
     # file_path = QueryResult::DOWNLOAD_DIRECT + filename  
     file_path = I18n.t("schedule_export_file_path") + filename 
 
     results = QueryResult.includes(:qr_attr).includes(:business).where("operated_at >= ? and operated_at < ? and status in (?) and businesses.no = ?", start_date, end_date, QueryResult::STATUS_DELIVERED, I18n.t(:YL)[:businesses][0][:business_no])
-    exportresults_xls_content_for(results, file_path)
+
+    exportresults_xlsx_content_for(results, file_path)
     return [file_path, filename]    
   end
  
@@ -97,36 +99,61 @@ class QueryResult < ActiveRecord::Base
     end
   end
 
-  def self.exportresults_xls_content_for(results, file_path)
-    # xls_report = StringIO.new   #temp
-    book = Spreadsheet::Workbook.new   
-    sheet = book.create_worksheet :name => "Results"  
+  def self.exportresults_xlsx_content_for(results, file_path)
+    book = WriteXLSX.new(file_path)   
+    sheet = book.add_worksheet('Results') 
 
-    # title = Spreadsheet::Format.new :color => :black, :weight => :bold, :size => 10  
-    # sheet.row(0).default_format = title 
-    # sheet.row(0).concat %w{serial registNbr name mobile state date receiver bankNo bankName company context1 context2}  
     count_row = 0
 
     results.each do |o|  
-      sheet[count_row,0]=count_row + 1
-      sheet[count_row,1]=o.registration_no
-      sheet[count_row,2]=""
-      sheet[count_row,3]=""
-      sheet[count_row,4]="1"
-      sheet[count_row,5]=o.operated_at.blank? ? "" : o.operated_at.strftime('%Y%m%d').to_s
-      sheet[count_row,6]=o.result.blank? ? "" : o.result
-      sheet[count_row,7]=""
-      sheet[count_row,8]=""
-      sheet[count_row,9]="EMS"
-      sheet[count_row,10]=""
-      sheet[count_row,11]=""
+      sheet.write(count_row, 0, count_row + 1)
+      sheet.write(count_row,1, o.registration_no)
+      sheet.write(count_row,2, "")
+      sheet.write(count_row,3, "")
+      sheet.write(count_row,4, "1")
+      sheet.write(count_row,5, o.operated_at.blank? ? "" : o.operated_at.strftime('%Y%m%d').to_s)
+      sheet.write(count_row,6, o.result.blank? ? "" : o.result)
+      sheet.write(count_row,7, "")
+      sheet.write(count_row,8, "")
+      sheet.write(count_row,9, "EMS")
+      sheet.write(count_row,10, "")
+      sheet.write(count_row,11, "")
 
       count_row += 1
     end
-    book.write file_path
-    # book.write xls_report  #temp
-    # xls_report.string      #temp
+    book.close
   end
+
+  # def self.exportresults_xls_content_for(results, file_path)
+  #   # xls_report = StringIO.new   #temp
+  #   book = Spreadsheet::Workbook.new   
+  #   sheet = book.create_worksheet :name => "Results"  
+
+  #   # title = Spreadsheet::Format.new :color => :black, :weight => :bold, :size => 10  
+  #   # sheet.row(0).default_format = title 
+  #   # sheet.row(0).concat %w{serial registNbr name mobile state date receiver bankNo bankName company context1 context2}  
+  #   count_row = 0
+
+  #   results.each do |o|  
+  #     sheet[count_row,0]=count_row + 1
+  #     sheet[count_row,1]=o.registration_no
+  #     sheet[count_row,2]=""
+  #     sheet[count_row,3]=""
+  #     sheet[count_row,4]="1"
+  #     sheet[count_row,5]=o.operated_at.blank? ? "" : o.operated_at.strftime('%Y%m%d').to_s
+  #     sheet[count_row,6]=o.result.blank? ? "" : o.result
+  #     sheet[count_row,7]=""
+  #     sheet[count_row,8]=""
+  #     sheet[count_row,9]="EMS"
+  #     sheet[count_row,10]=""
+  #     sheet[count_row,11]=""
+
+  #     count_row += 1
+  #   end
+  #   book.write file_path
+  #   # book.write xls_report  #temp
+  #   # xls_report.string      #temp
+  # end
 
   # def self.exportresults_xls_content_for(results, file_path)
   #   i = 1

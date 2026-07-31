@@ -111,3 +111,5 @@ gem 'rqrcode'
 gem 'rqrcode_png'
 
 gem 'net-sftp', '~> 2.1.3.rc3'
+
+gem 'write_xlsx', '~> 1.9', '>= 1.09.5'
