@@ -74,7 +74,7 @@ class InterfaceSender < ActiveRecord::Base
         end
         ActiveRecord::Base.connection_pool.release_connection
       end
-      ts<<t
+      ts << t
     end
     ts.each do |x|
       x.join
